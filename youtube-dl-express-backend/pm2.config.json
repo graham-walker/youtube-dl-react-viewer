@@ -1,0 +1,7 @@
+{
+    "apps": [{
+        "name": "youtube-dl-react-viewer",
+        "script": "index.js",
+        "node_args": "--require dotenv/config"
+    }]
+}

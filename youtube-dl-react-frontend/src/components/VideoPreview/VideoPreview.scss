@@ -1,0 +1,34 @@
+.video-duration-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    padding: 2px 4px;
+    margin: 4px;
+    border-radius: 2px;
+    letter-spacing: 0.5px;
+    background-color: rgba($color: #000, $alpha: 0.8);
+    color: #fff;
+}
+
+.video-title-link {
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 1.15em;
+    padding-bottom: 0.1em;
+}
+
+.video-uploader-link {
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    display: -webkit-box;
+    overflow: hidden;
+    color: $text-muted !important;
+}

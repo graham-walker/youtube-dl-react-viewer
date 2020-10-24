@@ -1,0 +1,38 @@
+{
+  "name": "youtube-dl-express-backend",
+  "version": "1.0.0",
+  "description": "Web app for downloading and hosting videos using youtube-dl made with the MERN stack",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start pm2.config.json",
+    "dev": "nodemon --require dotenv/config index.js",
+    "exec": "node --require dotenv/config exec.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Graham Walker",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "commander": "^6.1.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^9.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.0",
+    "node-ffprobe": "^3.0.0",
+    "pm2": "^4.5.0",
+    "sharp": "^0.26.0",
+    "slash": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.2.0",
+    "npm": ">=6.0.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}

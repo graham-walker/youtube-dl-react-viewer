@@ -1,0 +1,47 @@
+@import '../node_modules/bootstrap/scss/functions';
+@import '../node_modules/bootstrap/scss/variables';
+
+$grid-breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1440px,
+    xxxl: 1660px,
+);
+
+$container-max-widths: (
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1380px,
+    xxxl: 1560px,
+);
+
+@import '../node_modules/bootstrap/scss/bootstrap.scss';
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+        @each $prop, $abbrev in (width: w, height: h) {
+            @each $size, $length in $sizes {
+                .#{$abbrev}#{$infix}-#{$size} {
+                    #{$prop}: $length !important;
+                }
+            }
+        }
+    }
+}
+
+@import './components/Admin/Admin.scss';
+@import './components/Video/Video.scss';
+@import './components/Video/Description/Description.scss';
+@import './components/VideoPreview/VideoPreview.scss';
+
+html {
+    width: 100%;
+    width: 100vw;
+    overflow-x: hidden;
+}
