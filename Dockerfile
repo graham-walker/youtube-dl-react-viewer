@@ -2,7 +2,7 @@ FROM node:15-alpine3.12
 USER 0
 
 # Fetch packages required for building, as well as ffmpeg and python3 pip
-RUN apk add --no-cache git make build-base python2 ffmpeg py3-pip
+RUN apk add --no-cache make build-base python2 ffmpeg py3-pip
 
 # Copy source code into the docker daemon
 WORKDIR /opt/youtube-dl-react-viewer
@@ -26,7 +26,7 @@ RUN cd ../youtube-dl-react-frontend && \
     npm run build
 
 # Remove packages used for building
-RUN apk del git make build-base python2
+RUN apk del make build-base python2
 
 EXPOSE 5000/tcp
 HEALTHCHECK \
