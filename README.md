@@ -3,16 +3,21 @@
 <img src="https://gwalkerux.com./uploads/youtube-dl-react-viewer-icon-black-white.png" alt="icon" width="100px" height="100px">
 
 **youtube-dl-react-viewer** is a web app made using the MERN stack to facilitate both the viewing and downloading of videos by parsing the output of [ytdl-org/youtube-dl](https://youtube-dl.org/). The app is not platform specific and should work on any Unix, Windows, or macOS machine.
-#
+
+---
+
 **Support the project**
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22FCAJ)
-#
+
+---
+
 **I strongly reccomend reading the entire readme before attempting to install the web app and download videos.**
 
 - [SCREENSHOTS](#screenshots)
 - [FEATURES](#features)
 - [INSTALLATION](#installation)
+- [RUNNING IN DOCKER](#running-in-docker)
 - [CONFIGURING ENVIRONMENT VARIABLES](#configuring-environment-variables)
 - [DOWNLOADING](#downloading)
 - [ISSUES & LIMITATIONS](#issues-&-limitations)
@@ -72,8 +77,6 @@
 
 ## Running in Docker
 
-**Please note:** The container is not distributed with a copy of [ytdl-org/youtube-dl](https://youtube-dl.org/).
-
 1. Clone the youtube-dl-react-viewer repository (e.g. `git clone https://github.com/graham-walker/youtube-dl-react-viewer`)
     * To change to a specific version, the git checkout command can be used e.g. `git checkout tags/v1.0.0`
 
@@ -83,7 +86,12 @@
 
 4. Navigate to http://localhost:5000 to access the application.
 
-5. For further configuration, access the container's command line by running `docker exec -it youtube-dl-react-viewer_app_1 /bin/sh`. A complimentary `pip` installation has been provided.
+5. For further configuration, access the container's command line by running `docker exec -it youtube-dl-react-viewer_app_1 /bin/sh`. `pip` is pre-installed.
+
+**Please note:** youtube-dl-react-viewer is not distributed with a copy of [ytdl-org/youtube-dl](https://youtube-dl.org/). This may be added to the container using the command line.
+
+Environment variables for the backend can be specified inside the `docker-compose.yaml` file. A full list of supported variables is shown in the next section.
+
 
 ## Configuring Environment Variables
 
