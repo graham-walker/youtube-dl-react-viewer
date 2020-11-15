@@ -1,9 +1,12 @@
 import express from 'express';
+import path from 'path';
+import fs from 'fs-extra';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
 
 import Downloader from '../utilities/job.utility.js';
+import { spawnSync } from 'child_process';
 
 const router = express.Router();
 
@@ -79,21 +82,64 @@ router.post('/jobs/download/', async (req, res) => {
         case 'started':
             return res.json({ success: `Job started${jobsAdded > 1 ? `. Queued ${jobsAdded - 1} jobs` : ''}` });
         case 'failed':
-            return res.json({ error: 'Failed to start job' });
+            return res.status(500).json({ error: 'Failed to start job' });
         default:
             return res.sendStatus(500);
     }
 });
 
-router.post('/jobs/stop', (req, res) => {
-    switch (downloader.stop()) {
+router.post('/jobs/stop', async (req, res) => {
+    switch (await downloader.stop()) {
         case 'stopped':
             return res.json({ success: 'All jobs stopped' });
+        case 'failed':
+            return res.json({ error: 'Failed to stop jobs' });
         case 'none':
             return res.json({ error: 'No jobs are running to stop' });
         default:
             return res.sendStatus(500);
     }
+});
+
+router.post('/errors/repair/:errorId', async (req, res) => {
+    if (downloader.isDownloading()) return res.status(500).json(
+        { error: 'Cannot attempt to repair error while a job is downloading' }
+    );
+
+    let error;
+    try {
+        error = await DownloadError.findOne({ _id: req.params.errorId });
+    } catch (err) {
+        return res.status(500).json({ error: 'Could not find error document' });
+    }
+
+    const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, [
+        'run',
+        'exec',
+        '--',
+        '--job-id',
+        error.jobDocument,
+        '--is-repair',
+        '--error-id',
+        error._id,
+        '--video',
+        path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', error.videoPath),
+    ], { windowsHide: true });
+
+    if (execProcess.status !== 0) return res.status(500).json(
+        {
+            error: `Exec failed to repair the download with status code: ${execProcess.status}.`
+                + ` Refresh the page to see the updated error.`
+        }
+    );
+
+    try {
+        await DownloadError.findByIdAndDelete(error._id);
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+
+    res.json({ success: 'Video repaired' });
 });
 
 export default router;

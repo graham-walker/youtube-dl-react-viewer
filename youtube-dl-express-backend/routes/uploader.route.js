@@ -40,8 +40,8 @@ router.get('/:extractor/:name/:page', async (req, res) => {
         videos = await Video.find(pattern)
             .select('-_id extractor id title mediumResizedThumbnailFile directory uploader videoFile uploadDate duration width height viewCount')
             .sort(sortBy(req.query['sort']))
-            .skip(page * parseInt(process.env.PAGE_SIZE))
-            .limit(parseInt(process.env.PAGE_SIZE))
+            .skip(page * parsedEnv.PAGE_SIZE)
+            .limit(parsedEnv.PAGE_SIZE)
             .lean()
             .exec();
     } catch (err) {

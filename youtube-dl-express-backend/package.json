@@ -1,12 +1,13 @@
 {
   "name": "youtube-dl-express-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web app for downloading and hosting videos using youtube-dl made with the MERN stack",
   "main": "index.js",
   "scripts": {
     "start": "pm2 start pm2.config.json",
     "dev": "nodemon --require dotenv/config index.js",
     "exec": "node --require dotenv/config exec.js",
+    "import": "node --require dotenv/config import.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Graham Walker",

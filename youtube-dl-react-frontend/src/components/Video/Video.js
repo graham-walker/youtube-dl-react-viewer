@@ -422,7 +422,7 @@ export default class VideoPage extends Component {
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
                                     </Button>
-                            {this.context.user?.isSuperuser &&
+                            {window.location.hostname === 'localhost' &&
                                 <Button
                                     variant="primary"
                                     className="mb-2"

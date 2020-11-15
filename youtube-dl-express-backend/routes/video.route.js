@@ -28,8 +28,8 @@ router.get('/search/:page', async function (req, res) {
         videos = await Video.find(pattern, options)
             .select('-_id extractor id title mediumResizedThumbnailFile directory uploader videoFile uploadDate duration width height viewCount')
             .sort(sortBy(req.query['sort'], req.query.search))
-            .skip(page * parseInt(process.env.PAGE_SIZE))
-            .limit(parseInt(process.env.PAGE_SIZE))
+            .skip(page * parsedEnv.PAGE_SIZE)
+            .limit(parsedEnv.PAGE_SIZE)
             .lean()
             .exec();
     } catch (err) {
@@ -116,7 +116,7 @@ router.get('/:extractor/:id', async (req, res) => {
         playlistVideos,
         jobVideos,
         similarVideos,
-        localVideoPath: slash(path.join(process.env.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
+        localVideoPath: slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
     });
 });
 

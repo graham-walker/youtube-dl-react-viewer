@@ -7,7 +7,7 @@ export default async (req, res, next) => {
     
     let decoded;
     try {
-        decoded = await jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+        decoded = await jwt.verify(token, parsedEnv.JWT_TOKEN_SECRET);
     } catch (err) {
         return res.sendStatus(401);
     }
