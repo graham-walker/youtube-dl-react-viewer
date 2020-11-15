@@ -52,6 +52,19 @@ export default class AdminPage extends Component {
         this.setState({ jobs });
     }
 
+    repairError = (errorId) => {
+        axios
+            .post(`/api/admin/errors/repair/${errorId}`)
+            .then(res => {
+                if (res.status === 200) {
+                    if (res.data.success) alert(res.data.success)
+                    if (res.data.error) alert('Error: ' + res.data.error)
+                }
+            }).catch(err => {
+                alert('Error: ' + getErrorMessage(err));
+            });
+    }
+
     render() {
         return (
             <PageLoadWrapper
@@ -127,7 +140,7 @@ export default class AdminPage extends Component {
                             </Tab.Container>
                         </Card>
                         <h5 className="mb-4">Failed downloads</h5>
-
+                        <p>If you are expecting to see a specific error here but do not, check the errors.txt or unknown errors.txt file in the output directory.</p>
                         {this.state.errors.length > 0 ?
                             this.state.errors.map(error =>
                                 <Alert variant="danger" key={error._id}>
@@ -146,13 +159,23 @@ export default class AdminPage extends Component {
                                                 <pre className="pre-scrollable">
                                                     {JSON.stringify(JSON.parse(error.errorObject), null, 4).replace(/\\n/g, '\n')}
                                                 </pre>
+                                                {!!error.success && <Alert variant="success">{error.success}</Alert>}
+                                                {!!error.error && <Alert variant="danger">{error.error}</Alert>}
                                                 <Button
                                                     href={window.gitHubLink + '/issues'}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     variant="danger"
+                                                    className="mr-2"
                                                 >
                                                     Report Error
+                                                </Button>
+                                                <Button
+                                                    className="mr-2"
+                                                    variant="danger"
+                                                    onClick={(e) => { this.repairError(error._id) }}
+                                                >
+                                                    Attempt Repair
                                                 </Button>
                                             </>
                                         </Accordion.Collapse>
