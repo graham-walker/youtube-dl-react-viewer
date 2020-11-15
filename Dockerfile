@@ -2,7 +2,7 @@ FROM node:15-alpine3.12
 USER 0
 
 # Fetch packages required for building, as well as ffmpeg and python3 pip
-RUN apk add --no-cache make build-base python2 ffmpeg py3-pip
+RUN apk add --no-cache make build-base python2 ffmpeg py3-pip attr
 
 # Copy source code into the docker daemon
 WORKDIR /opt/youtube-dl-react-viewer
