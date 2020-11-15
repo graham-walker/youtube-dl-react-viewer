@@ -38,7 +38,7 @@ router.post('/login', async (req, res) => {
     }
     if (!same) return res.status(401).json({ noRedirect: true, error: 'Incorrect username or password' });
 
-    const token = jwt.sign({ userId: user._id, globalPassword: process.env.GLOBAL_PASSWORD }, process.env.JWT_TOKEN_SECRET, {
+    const token = jwt.sign({ userId: user._id, globalPassword: parsedEnv.GLOBAL_PASSWORD }, parsedEnv.JWT_TOKEN_SECRET, {
         expiresIn: '30d'
     });
 
@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
         .cookie('token', token, {
             httpOnly: true,
             sameSite: 'strict',
-            secure: process.env.SECURE_COOKIES.toLowerCase() === 'true',
+            secure: parsedEnv.SECURE_COOKIES,
         })
         .json({ user });
 });
@@ -58,9 +58,9 @@ router.post('/login', async (req, res) => {
 router.post('/global', async (req, res) => {
     const { password } = req.body;
 
-    if (password !== process.env.GLOBAL_PASSWORD) return res.status(401).json({ noRedirect: true, error: 'Incorrect password' });
+    if (password !== parsedEnv.GLOBAL_PASSWORD) return res.status(401).json({ noRedirect: true, error: 'Incorrect password' });
 
-    const token = jwt.sign({ globalPassword: password }, process.env.JWT_TOKEN_SECRET, {
+    const token = jwt.sign({ globalPassword: password }, parsedEnv.JWT_TOKEN_SECRET, {
         expiresIn: '30d'
     });
 
@@ -68,13 +68,13 @@ router.post('/global', async (req, res) => {
         .cookie('token', token, {
             httpOnly: true,
             sameSite: 'strict',
-            secure: process.env.SECURE_COOKIES.toLowerCase() === 'true',
+            secure: parsedEnv.SECURE_COOKIES,
         })
         .send();
 });
 
 router.post('/logout', async (req, res) => {
-    res.clearCookie('token').json({ hasGlobalPassword: !!process.env.GLOBAL_PASSWORD });
+    res.clearCookie('token').json({ hasGlobalPassword: !!parsedEnv.GLOBAL_PASSWORD });
 });
 
 export default router;

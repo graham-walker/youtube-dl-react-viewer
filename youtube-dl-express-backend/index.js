@@ -19,15 +19,14 @@ import superuserMiddleware from './middleware/superuser.middleware.js';
 
 import User from './models/user.model.js';
 
-// Validate enviornment variables
-if (process.env.OUTPUT_DIRECTORY.endsWith('/')
-    || process.env.OUTPUT_DIRECTORY.endsWith('\\')
-) {
-    process.env.OUTPUT_DIRECTORY = process.env.OUTPUT_DIRECTORY.slice(0, -1);
-}
+import parsed from './parse-env.js';
+
+// Parse environment variables
+if (parsed.err) throw parsed.err;
+global.parsedEnv = parsed.env;
 
 // Connect to the database
-mongoose.connect(process.env.MONGOOSE_URL, {
+mongoose.connect(parsedEnv.MONGOOSE_URL, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -49,7 +48,7 @@ app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
 app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
 
 const staticFolders = ['videos', 'thumbnails', 'avatars'];
-const outputDirectory = process.env.OUTPUT_DIRECTORY;
+const outputDirectory = parsedEnv.OUTPUT_DIRECTORY;
 
 // Create the static folders
 for (let folder of staticFolders) {
@@ -67,7 +66,7 @@ app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
 });
 
 // Serve the react app build in production
-if (process.env.NODE_ENV === 'production') {
+if (parsedEnv.NODE_ENV === 'production') {
     app.use(express.static('../youtube-dl-react-frontend/build'));
     app.get('*', (req, res) => {
         res.sendFile(path.join(
@@ -77,14 +76,14 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start the server
-const backendPort = process.env.BACKEND_PORT;
+const backendPort = parsedEnv.BACKEND_PORT;
 app.listen(backendPort, () => {
     console.log('Server started on port:', backendPort);
 });
 
 // Create the superuser
-const superuserUsername = process.env.SUPERUSER_USERNAME;
-const superuserPassword = process.env.SUPERUSER_PASSWORD;
+const superuserUsername = parsedEnv.SUPERUSER_USERNAME;
+const superuserPassword = parsedEnv.SUPERUSER_PASSWORD;
 const user = new User({
     username: superuserUsername,
     password: superuserPassword,
