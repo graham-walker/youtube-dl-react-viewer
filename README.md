@@ -86,7 +86,7 @@ As of release 1.1.0 youtube-dl-react-viewer supports Docker containers.
 2. Set the working directory to `./youtube-dl-react-viewer`
 
 3. Specify the container environment variables by editing the `environment:` option inside of `docker-compose.yaml`
-    - The web app's contaner will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the next section
+    - The web app's container will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the next section
 
 4. Run `sudo docker-compose up -d` to build the image and start the containers
 
