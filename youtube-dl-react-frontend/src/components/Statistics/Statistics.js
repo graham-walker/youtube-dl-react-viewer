@@ -93,8 +93,8 @@ export default class StatisticsPage extends Component {
                                     <StatisticColumn
                                         title="Total Dislikes"
                                         icon="thumbs-down"
-                                        statistic={abbreviateNumber(statistic.totalLikeCount)}
-                                        detailedStatistic={statistic.totalLikeCount.toLocaleString() + ' dislikes'}
+                                        statistic={abbreviateNumber(statistic.totalDislikeCount)}
+                                        detailedStatistic={statistic.totalDislikeCount.toLocaleString() + ' dislikes'}
                                     />
                                 </Row>
                                 <h5>
