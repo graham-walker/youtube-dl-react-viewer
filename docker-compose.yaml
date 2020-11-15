@@ -1,0 +1,35 @@
+version: "2.4"
+services:
+
+    db:
+        image: mongo:4-bionic
+        restart: unless-stopped
+        mem_limit: 512m
+        networks:
+            - ytrv_net
+        volumes:
+            - ytrv_db:/data/db
+
+    app:
+        build: .
+        image: graham-walker/youtube-dl-react-viewer:0.1.0
+        restart: unless-stopped
+        mem_limit: 512m
+        #user: "1000"
+        networks:
+            - ytrv_net
+        ports:
+            - "0.0.0.0:5000:5000/tcp"
+        volumes:
+            - ytrv_downloads:/youtube-dl
+        depends_on:
+            - db
+
+volumes:
+    ytrv_db:
+    ytrv_downloads:
+
+networks:
+    default:
+    ytrv_net:
+        driver: "bridge"

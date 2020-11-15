@@ -3,16 +3,21 @@
 <img src="https://gwalkerux.com./uploads/youtube-dl-react-viewer-icon-black-white.png" alt="icon" width="100px" height="100px">
 
 **youtube-dl-react-viewer** is a web app made using the MERN stack to facilitate both the viewing and downloading of videos by parsing the output of [ytdl-org/youtube-dl](https://youtube-dl.org/). The app is not platform specific and should work on any Unix, Windows, or macOS machine.
-#
+
+---
+
 **Support the project**
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22FCAJ)
-#
+
+---
+
 **I strongly recommend reading the entire readme before attempting to install the web app and download videos.**
 
 - [SCREENSHOTS](#screenshots)
 - [FEATURES](#features)
 - [INSTALLATION](#installation)
+- [RUNNING IN DOCKER](#running-in-docker)
 - [CONFIGURING ENVIRONMENT VARIABLES](#configuring-environment-variables)
 - [DOWNLOADING](#downloading)
 - [IMPORTING ALREADY DOWNLOADED VIDEOS](#importing-already-downloaded-videos)
@@ -71,6 +76,24 @@
 7. (Optional) In order to be able to open videos in VLC directly from the browser you must manually register the `vlc://` URL protocol. An installation/guide for how to do this can be found at [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
 
 8. (Optional) In order to run the web app automatically after startup or after a system reboot you must configure PM2. See these resources for help configuring PM2 on [Linux/MacOS](https://pm2.keymetrics.io/docs/usage/startup/#saving-current-processes) and [Windows](https://stackoverflow.com/questions/42758985/windows-auto-start-pm2-and-node-apps).
+
+## Running in Docker
+
+1. Clone the youtube-dl-react-viewer repository (e.g. `git clone https://github.com/graham-walker/youtube-dl-react-viewer`)
+    * To change to a specific version, the git checkout command can be used e.g. `git checkout tags/v1.0.0`
+
+2. Change directory to the cloned project `cd youtube-dl-react-viewer`
+
+3. Run `docker-compose up -d` to build the image and start the containers.
+
+4. Navigate to http://localhost:5000 to access the application.
+
+5. For further configuration, access the container's command line by running `docker exec -it youtube-dl-react-viewer_app_1 /bin/sh`. `pip` is pre-installed.
+
+**Please note:** youtube-dl-react-viewer is not distributed with a copy of [ytdl-org/youtube-dl](https://youtube-dl.org/). This may be added to the container using the command line.
+
+Environment variables for the backend can be specified inside the `docker-compose.yaml` file. A full list of supported variables is shown in the next section.
+
 
 ## Configuring Environment Variables
 
@@ -185,7 +208,7 @@ Currently, I have tested the app on Windows and Ubuntu and confirmed it working 
 **Other limitations**
 - **Playlists:**
     <br>
-    Because youtube-dl only returns one playlist (based on if the video url given to youtube-dl is a playlist, channel, etc.) if you have already downloaded a video and then download a playlist with the same video in it the video will not appear in the playlist in the web app (as it has already been downloaded). To mitigate this, I recommend you download videos in playlists first then download videos from uploaders/channels/individual videos. 
+    Because youtube-dl only returns one playlist (based on if the video url given to youtube-dl is a playlist, channel, etc.) if you have already downloaded a video and then download a playlist with the same video in it the video will not appear in the playlist in the web app (as it has already been downloaded). To mitigate this, I recommend you download videos in playlists first then download videos from uploaders/channels/individual videos.
 
 - **Formats/Encoding:**
     <br>
@@ -246,7 +269,7 @@ You can attempt to fix the second type of error by clicking "Show Details" and t
 **A:** There is currently no way to delete a video downloaded in the app. In order to do this manually you will need to delete the files of the video in the `/videos` and `/thumbnails` folders of the output directory, delete the video from the `archive.txt` file in the local directory, and delete the record of the video from the database. Doing this will not affect the global statistics which will now be inaccurate.
 
 ## Planned
-Planned features in no particular order. If a feature is checked it has been completed but has not made its way into the latest release. There is no timetable for features or any guarantee they will be completed in a timely manner. 
+Planned features in no particular order. If a feature is checked it has been completed but has not made its way into the latest release. There is no timetable for features or any guarantee they will be completed in a timely manner.
 
 - [ ] Dark aware theme
 - [ ] Local user statistics (videos viewed, etc.)
