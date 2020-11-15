@@ -24,6 +24,9 @@ services:
             - ytrv_downloads:/youtube-dl
         depends_on:
             - db
+        environment:
+            - SUPERUSER_PASSWORD=password
+            - JWT_TOKEN_SECRET=secret
 
 volumes:
     ytrv_db:
