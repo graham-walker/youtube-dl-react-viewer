@@ -259,11 +259,6 @@ You can attempt to fix the second type of error by clicking "Show Details" and t
 
 **A:** These files are located at the base of the configured output directory.
 #
-**Q:** Is there any way to import videos I have already downloaded into the app?
-
-**A:** There is not currently a way to do this. I might create a script at some point that allows this.
-#
-
 **Q:** Can I delete a video downloaded in the app?
 
 **A:** There is currently no way to delete a video downloaded in the app. In order to do this manually you will need to delete the files of the video in the `/videos` and `/thumbnails` folders of the output directory, delete the video from the `archive.txt` file in the local directory, and delete the record of the video from the database. Doing this will not affect the global statistics which will now be inaccurate.
