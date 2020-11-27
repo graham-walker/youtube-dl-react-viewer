@@ -65,7 +65,7 @@
 
 6. [Download the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip the contents of the release to the location of your choosing
-    - Configure the environment variables (see section below)
+    - Configure the environment variables (see the [configuring environment variables section](#configuring-environment-variables))
     - Run `sudo sh install.sh` (run `install.bat` as Administrator on Windows) to install additional dependencies
     - Run `sudo sh start-server.sh` (run `start-server.bat` as Administrator on Windows) to start the web app
     - You can also start the web app using the PM2 config file by running the command `sudo pm2 start ./youtube-dl-express-backend/pm2.config.json` (run as Administrator on Windows)
@@ -81,19 +81,20 @@
 As of release 1.1.0 youtube-dl-react-viewer supports Docker containers.
 
 1. Clone the youtube-dl-react-viewer repository `git clone https://github.com/graham-walker/youtube-dl-react-viewer`
-    - To change to a specific version, run the git checkout command `git checkout tags/v1.1.0`
 
-2. Set the working directory to `./youtube-dl-react-viewer`
+2. To select the version of the release you want to install run `git checkout tags/v1.1.1`
 
-3. Specify the container environment variables by editing the `environment:` option inside of `docker-compose.yaml`
-    - The web app's container will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the next section
+3. Set the working directory to `./youtube-dl-react-viewer`
 
-4. Run `sudo docker-compose up -d` to build the image and start the containers
+4. Specify the Docker container's environment variables by editing the `environment:` option inside of `docker-compose.yaml`
+    - The web app will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the [section below](#configuring-environment-variables)
 
-5. For further configuration, access the container's command line by running `docker exec -it youtube-dl-react-viewer_app_1 /bin/sh`
+5. Run `sudo docker-compose up -d` to build the image and start the containers
+
+6. For further configuration, access the container's command line by running `docker exec -it youtube-dl-react-viewer_app_1 /bin/sh`
     - The youtube-dl-react-viewer Dockerfile does not include or automatically install a copy of [ytdl-org/youtube-dl](https://youtube-dl.org/). This must be added to the container manually using the command line
 
-6. Access the web app by navigating to `http://localhost:5000` in your browser
+7. Access the web app by navigating to `http://localhost:5000` in your browser
 
 ## Configuring Environment Variables
 
