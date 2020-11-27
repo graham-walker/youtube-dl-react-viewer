@@ -1,17 +1,11 @@
 import fs from 'fs-extra';
-import crypto from 'crypto';
 import commander from 'commander';
 import path from 'path';
-import slash from 'slash';
-import sharp from 'sharp';
 import mongoose from 'mongoose';
 import { spawnSync, spawn } from 'child_process';
 
 import Video from './models/video.model.js';
 import Job from './models/job.model.js';
-import Statistic from './models/statistic.model.js';
-import Uploader from './models/uploader.model.js';
-import DownloadError from './models/error.model.js';
 
 import parsed from './parse-env.js';
 
