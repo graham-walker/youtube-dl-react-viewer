@@ -269,14 +269,14 @@ Planned features in no particular order. If a feature is checked it has been com
 - [ ] Dark aware theme
 - [ ] Local user statistics (videos viewed, etc.)
 - [ ] Local user's ability to create custom playlists, favorites, queue, comments
-- [ ] Verify the integrity of hashed files
+- [ ] Verify the integrity of (the already) hashed video files
 - [ ] Remember where local user left off watching a video
 - [ ] SponsorBlock Implementation
 - [ ] Search and sort uploaders like videos
 - [ ] More graphs for the global statistics page
 - [ ] Display video chapters in the video bar
 - [ ] 3D/VR video playback support
-- [ ] Refetch metadata for downloaded videos to get updated views, like counts, etc.
+- [ ] Refetch metadata for already downloaded videos to get updated views, like counts, etc.
 - [ ] Include [PetterKraabol/Twitch-Chat-Downloader](https://github.com/PetterKraabol/Twitch-Chat-Downloader) to download the chat for downloaded Twitch livestreams
 - [ ] Show video chapter titles in the video player
 
