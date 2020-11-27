@@ -233,10 +233,6 @@ Currently, I have tested the app on Windows and Ubuntu and confirmed it working 
     node --require dotenv/config index.js
     ```
 
-- **Like and Dislike Counts**
-    <br>
-    As of youtube-dl version <=2020.09.20 `like_count` and `dislike_count` do not get returned in the metadata. This means that videos downloaded by the app or the global statistics will not have these values. Hopefully, this is fixed in a future release of youtube-dl. Alternatively, you can set `YOUTUBE_DL_PATH` to a third-party fork such as blackjack4494/youtube-dlc.
-
 ## Handling Download Errors
 
 There are two types of errors that can happen while downloading videos:
