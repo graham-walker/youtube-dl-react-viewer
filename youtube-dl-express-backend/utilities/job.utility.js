@@ -63,6 +63,8 @@ export default class Downloader {
                 job.formatCode,
                 '--download-archive',
                 path.join(parsedEnv.OUTPUT_DIRECTORY, 'archive.txt'),
+                '--cache-dir',
+                path.join(parsedEnv.OUTPUT_DIRECTORY, '.cache'),
             ];
             if (parsedEnv.VERBOSE) jobArguments.push('--verbose');
             if (process.platform === 'win32') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);

@@ -471,6 +471,7 @@ const defaultArguments = `# Some options are not included here are are set when 
 # --format
 # --extract-audio
 # --download-archive
+# --cache-dir
 
 # These options may help the script run but are not necessary. They can be freely modified or removed:
 --geo-bypass
