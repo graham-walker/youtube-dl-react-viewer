@@ -82,9 +82,9 @@ As of release 1.1.0 youtube-dl-react-viewer supports Docker containers.
 
 1. Clone the youtube-dl-react-viewer repository `git clone https://github.com/graham-walker/youtube-dl-react-viewer`
 
-2. To select the version of the release you want to install run `git checkout tags/v1.1.1`
+2. Set the working directory to `./youtube-dl-react-viewer`
 
-3. Set the working directory to `./youtube-dl-react-viewer`
+3. To select the version of the release you want to install run `git checkout tags/v1.1.1`
 
 4. Specify the Docker container's environment variables by editing the `environment:` option inside of `docker-compose.yaml`
     - The web app will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the [section below](#configuring-environment-variables)
