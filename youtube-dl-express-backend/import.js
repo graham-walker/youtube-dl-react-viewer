@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import commander from 'commander';
 import path from 'path';
 import mongoose from 'mongoose';
-import { spawnSync, spawn } from 'child_process';
+import { spawnSync } from 'child_process';
 
 import Video from './models/video.model.js';
 import Job from './models/job.model.js';
