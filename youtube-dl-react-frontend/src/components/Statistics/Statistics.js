@@ -207,7 +207,7 @@ export default class StatisticsPage extends Component {
                             {statistic.recordDislikeCountVideo &&
                                 <SignificantVideo
                                     title="Most Disliked Video"
-                                    icon="eye"
+                                    icon="thumbs-down"
                                     statistic={abbreviateNumber(statistic.recordDislikeCount)}
                                     detailedStatistic={statistic.recordDislikeCount.toLocaleString() + ' dislikes'}
                                     video={statistic.recordDislikeCountVideo}
