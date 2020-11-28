@@ -167,6 +167,8 @@ export default class VideoList extends Component {
                                                     <option value="least_views">Views (Least)</option>
                                                     <option value="most_likes">Likes (Most)</option>
                                                     <option value="least_likes">Likes (Least)</option>
+                                                    <option value="most_dislikes">Dislikes (Most)</option>
+                                                    <option value="least_dislikes">Dislikes (Least)</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Form>

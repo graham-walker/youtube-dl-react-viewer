@@ -28,6 +28,10 @@ export const sortBy = (option, hasSearch = false) => {
             return { likeCount: -1 };
         case 'least_likes':
             return { likeCount: 1 };
+        case 'most_dislikes':
+            return { dislikeCount: -1 };
+        case 'least_dislikes':
+            return { dislikeCount: 1 };
         default:
             return { uploadDate: -1 };
     }
