@@ -4,7 +4,7 @@ const ObjectId = mongoose.Schema.ObjectId;
 
 const fileSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    filesize: { type: Number, required: true },
+    filesize: { type: Number, required: true, index: true },
     md5: { type: String, default: '' },
 }, { _id: false });
 
@@ -61,17 +61,17 @@ const videoSchema = new mongoose.Schema({
     uploader: { type: String, default: null },
     license: { type: String, default: null },
     creator: { type: String, default: null },
-    uploadDate: { type: Date, default: null },
+    uploadDate: { type: Date, default: null, index: true },
     uploaderId: { type: String, default: null },
     uploaderUrl: { type: String, default: null },
     channel: { type: String, default: null },
     channelId: { type: String, default: null },
     channelUrl: { type: String, default: null },
     location: { type: String, default: null },
-    duration: { type: Number, default: null },
-    viewCount: { type: Number, default: null },
-    likeCount: { type: Number, default: null },
-    dislikeCount: { type: Number, default: null },
+    duration: { type: Number, default: null, index: true },
+    viewCount: { type: Number, default: null, index: true },
+    likeCount: { type: Number, default: null, index: true },
+    dislikeCount: { type: Number, default: null, index: true },
     repostCount: { type: Number, default: null },
     averageRating: { type: Number, default: null },
     commentCount: { type: Number, default: null },
