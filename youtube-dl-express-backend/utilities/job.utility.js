@@ -21,7 +21,6 @@ export default class Downloader {
     }
 
     async download(chained = false) {
-        // if not downloading or chaining
         if (!this.downloading || chained) {
             this.downloading = true;
 
@@ -127,7 +126,7 @@ export default class Downloader {
         }
     }
 
-    isDownloading(jobId) {
+    isBusy(jobId) {
         if (!jobId) return this.downloading;
         return this.downloading && this.queued[0] === jobId;
     }
