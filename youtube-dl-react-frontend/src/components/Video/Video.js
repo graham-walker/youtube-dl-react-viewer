@@ -28,6 +28,9 @@ export default class VideoPage extends Component {
             uploaderVideos: undefined,
             playlistVideos: undefined,
             jobVideos: undefined,
+            uploaderVideosOffset: undefined,
+            playlistVideosOffset: undefined,
+            jobVideosOffset: undefined,
             similarVideos: undefined,
             activeTab: undefined,
             nextVideos: undefined,
@@ -68,6 +71,9 @@ export default class VideoPage extends Component {
                         uploaderVideos: res.data.uploaderVideos,
                         playlistVideos: res.data.playlistVideos,
                         jobVideos: res.data.jobVideos,
+                        uploaderVideosOffset: res.data.uploaderVideosOffset,
+                        playlistVideosOffset: res.data.playlistVideosOffset,
+                        jobVideosOffset: res.data.jobVideosOffset,
                         similarVideos: res.data.similarVideos,
                         nextVideos: {
                             uploader: this.getNextVideo(res.data.video, res.data.uploaderVideos),
@@ -535,7 +541,9 @@ export default class VideoPage extends Component {
                                                     <Tab.Pane eventKey="uploader">
                                                         <VideoScroller
                                                             videos={this.state.uploaderVideos}
+                                                            offset={this.state.uploaderVideosOffset}
                                                             activeVideo={video}
+                                                            activeTab={this.state.activeTab}
                                                         />
                                                     </Tab.Pane>
                                                 }
@@ -543,7 +551,9 @@ export default class VideoPage extends Component {
                                                     <Tab.Pane eventKey="playlist">
                                                         <VideoScroller
                                                             videos={this.state.playlistVideos}
+                                                            offset={this.state.playlistVideosOffset}
                                                             activeVideo={video}
+                                                            activeTab={this.state.activeTab}
                                                         />
                                                     </Tab.Pane>
                                                 }
@@ -551,7 +561,9 @@ export default class VideoPage extends Component {
                                                     <Tab.Pane eventKey="job">
                                                         <VideoScroller
                                                             videos={this.state.jobVideos}
+                                                            offset={this.state.jobVideosOffset}
                                                             activeVideo={video}
+                                                            activeTab={this.state.activeTab}
                                                         />
                                                     </Tab.Pane>
                                                 }
@@ -629,7 +641,7 @@ class VideoScroller extends Component {
                             >
                                 {active
                                     ? <FontAwesomeIcon icon="caret-right" />
-                                    : i
+                                    : i + 1 + this.props.offset
                                 }
                             </small>
                         </VideoPreview>

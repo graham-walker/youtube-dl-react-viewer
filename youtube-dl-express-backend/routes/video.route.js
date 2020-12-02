@@ -10,6 +10,7 @@ import {
     getRandomVideo,
     fields,
     getSimilarVideos,
+    limitVideoList,
 } from '../utilities/video.utility.js';
 
 const router = express.Router();
@@ -63,6 +64,9 @@ router.get('/:extractor/:id', async (req, res) => {
     let uploaderVideos;
     let playlistVideos;
     let jobVideos;
+    let uploaderVideosOffset;
+    let playlistVideosOffset;
+    let jobVideosOffset;
     try {
         video = (await Video.findOne({
             extractor: req.params.extractor,
@@ -99,6 +103,10 @@ router.get('/:extractor/:id', async (req, res) => {
             .lean()
             .exec();
 
+        [uploaderVideos, uploaderVideosOffset] = limitVideoList(uploaderVideos, video);
+        [playlistVideos, playlistVideosOffset] = limitVideoList(playlistVideos, video);
+        [jobVideos, jobVideosOffset] = limitVideoList(jobVideos, video);
+
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -115,6 +123,9 @@ router.get('/:extractor/:id', async (req, res) => {
         uploaderVideos,
         playlistVideos,
         jobVideos,
+        uploaderVideosOffset,
+        playlistVideosOffset,
+        jobVideosOffset,
         similarVideos,
         localVideoPath: slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
     });
