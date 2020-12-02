@@ -77,6 +77,12 @@ export default class AdminPage extends Component {
                         style={{ maxWidth: '1200px' }}
                     >
                         <h1 className="mb-4">Admin</h1>
+                        <h5 className="mb-4">youtube-dl</h5>
+                        <Card className="mb-4">
+                            <Card.Body>
+                                <ApplicationManager />
+                            </Card.Body>
+                        </Card>
                         <h5 className="mb-4">Download</h5>
                         <Card className="mb-4">
                             <Card.Body>
@@ -449,6 +455,50 @@ class JobForm extends Component {
                     </Accordion>
                     <Button type="submit">Save</Button>
                 </Form>
+            </>
+        );
+    }
+}
+
+class ApplicationManager extends Component {
+    static contextType = UserContext;
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            success: undefined,
+            error: undefined,
+        };
+    }
+
+    post() {
+        this.setState({ success: undefined, error: undefined }, () => {
+            axios
+                .post(
+                    `/api/admin/youtube-dl/update`
+                ).then(res => {
+                    if (res.status === 200) this.setState({
+                        success: res.data.success,
+                        error: res.data.error
+                    });
+                }).catch(err => {
+                    this.setState({ error: getErrorMessage(err) });
+                });
+        });
+    }
+
+    render() {
+        return (
+            <>
+                {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
+                {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                <Button
+                    name="update"
+                    type="submit"
+                    onClick={this.post.bind(this)}
+                >
+                    Check for updates
+                </Button>
             </>
         );
     }

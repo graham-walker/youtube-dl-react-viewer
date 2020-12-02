@@ -1,16 +1,20 @@
 import express from 'express';
 import path from 'path';
-import fs from 'fs-extra';
+import os from 'os';
+import { spawnSync } from 'child_process';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
 
 import Downloader from '../utilities/job.utility.js';
-import { spawnSync } from 'child_process';
+import ErrorManager from '../utilities/error.utility.js';
 
 const router = express.Router();
 
 const downloader = new Downloader();
+const errorManager = new ErrorManager();
+
+let updating = false;
 
 router.get('/', async (req, res) => {
     let jobs;
@@ -44,7 +48,7 @@ router.post('/jobs/save/new', async (req, res) => {
 });
 
 router.post('/jobs/save/:jobId', async (req, res) => {
-    if (downloader.isDownloading(req.params.jobId)) {
+    if (downloader.isBusy(req.params.jobId)) {
         return res.status(500).json({ error: 'Cannot save job while downloading' });
     }
 
@@ -65,6 +69,13 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 });
 
 router.post('/jobs/download/', async (req, res) => {
+    if (errorManager.isBusy()) return res.status(500).json(
+        { error: 'Cannot start download while repairing an error' }
+    );
+    if (updating) return res.status(500).json(
+        { error: 'Cannot start download while a checking youtube-dl for updates' }
+    );
+
     if (!Array.isArray(req.body)
         || req.body.length === 0
         || req.body.filter(jobId => typeof jobId !== 'string').length > 0
@@ -77,7 +88,7 @@ router.post('/jobs/download/', async (req, res) => {
             if (jobsAdded > 0) {
                 return res.json({ success: `Queued ${jobsAdded} jobs` });
             } else {
-                return res.json({ error: 'All jobs downloading or queued' });
+                return res.json({ error: 'All jobs already downloading or queued' });
             }
         case 'started':
             return res.json({ success: `Job started${jobsAdded > 1 ? `. Queued ${jobsAdded - 1} jobs` : ''}` });
@@ -102,44 +113,53 @@ router.post('/jobs/stop', async (req, res) => {
 });
 
 router.post('/errors/repair/:errorId', async (req, res) => {
-    if (downloader.isDownloading()) return res.status(500).json(
+    if (downloader.isBusy()) return res.status(500).json(
         { error: 'Cannot attempt to repair error while a job is downloading' }
     );
-
-    let error;
-    try {
-        error = await DownloadError.findOne({ _id: req.params.errorId });
-    } catch (err) {
-        return res.status(500).json({ error: 'Could not find error document' });
-    }
-
-    const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, [
-        'run',
-        'exec',
-        '--',
-        '--job-id',
-        error.jobDocument,
-        '--is-repair',
-        '--error-id',
-        error._id,
-        '--video',
-        path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', error.videoPath),
-    ], { windowsHide: true });
-
-    if (execProcess.status !== 0) return res.status(500).json(
-        {
-            error: `Exec failed to repair the download with status code: ${execProcess.status}.`
-                + ` Refresh the page to see the updated error.`
-        }
+    if (errorManager.isBusy()) return res.status(500).json(
+        { error: 'Already attempting to repair an error' }
+    );
+    if (updating) return res.status(500).json(
+        { error: 'Cannot attempt to repair error while a checking youtube-dl for updates' }
     );
 
     try {
-        await DownloadError.findByIdAndDelete(error._id);
+        let result = await errorManager.repair(req.params.errorId);
+        res.json(result);
     } catch (err) {
+        res.sendStatus(500);
+    }
+});
+
+router.post('/youtube-dl/update', async (req, res) => {
+    if (downloader.isBusy()) return res.status(500).json(
+        { error: 'Cannot check for updates to youtube-dl while a job is downloading' }
+    );
+    if (errorManager.isBusy()) return res.status(500).json(
+        { error: 'Cannot check for updates to youtube-dl while repairing an error' }
+    );
+    if (updating) return res.status(500).json(
+        { error: 'Already checking youtube-dl for updates' }
+    );
+
+    updating = true;
+    try {
+        let updateProcess = spawnSync('youtube-dl', ['-U'], { encoding: 'utf-8' });
+        if (updateProcess.status === 0) {
+            let message = updateProcess.stdout.split(os.EOL);
+            if (message[message.length - 1] === '') message.pop();
+            message = message.pop();
+            updating = false;
+            if (message.startsWith('ERROR')) return res.status(500).json({ error: message });
+            return res.json({ success: message });
+        } else {
+            updating = false;
+            return res.status(500).json({ error: 'Failed to check for updates' });
+        }
+    } catch (err) {
+        updating = false;
         return res.sendStatus(500);
     }
-
-    res.json({ success: 'Video repaired' });
 });
 
 export default router;

@@ -244,6 +244,10 @@ You can attempt to fix the second type of error by clicking "Show Details" and t
 
 ## FAQ
 
+**Q:** The version of youtube-dl I installed when configuring the web app is now out of date/not working. Is there any way I can update it automatically?
+
+**A:** You can update youtube-dl inside the web app by going to the admin control panel, navigating to the section titled "youtube-dl" and clicking "Check for updates".
+#
 **Q:** How can I add uploader icons to the web app?
 
 **A:** You must manually download and add the uploader icons. Open the output directory and place the uploader icons in the `./avatars` folder. The name of the file should match the name of the uploader but with any path unsafe characters replaced with underscores ("_").
