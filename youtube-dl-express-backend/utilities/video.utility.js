@@ -179,25 +179,19 @@ export const getSimilarVideos = async (video) => {
 }
 
 export const limitVideoList = (videosList, video, limit = 100) => {
-    try {
-        let index = -1;
-        videosList.find((videoInList, i) => {
-            if (videoInList.id === video.id && videoInList.extractor === video.extractor) {
-                index = i;
-                return;
-            }
-        });
-    
-        let least = index - Math.floor(limit / 2);
-        let len = videosList.length;
-        if (least + limit > len) least = len - limit;
-        least = (least < 0) ? 0 : least;
-        console.log('Index:', index)
-        console.log('Least:', least)
-        return [videosList.slice(least, least + limit), least];
-    } catch (err) {
-        console.error(err)
-    }
+    let index = -1;
+    videosList.find((videoInList, i) => {
+        if (videoInList.id === video.id && videoInList.extractor === video.extractor) {
+            index = i;
+            return;
+        }
+    });
+
+    let least = index - Math.floor(limit / 2);
+    let len = videosList.length;
+    if (least + limit > len) least = len - limit;
+    least = (least < 0) ? 0 : least;
+    return [videosList.slice(least, least + limit), least];
 };
 
 const createVector = (allTags, tags) => {
