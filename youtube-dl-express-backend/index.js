@@ -62,6 +62,11 @@ app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
     const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
     ffmpeg(videoPath)
         .format('webm')
+        .videoBitrate(3500)
+        .audioBitrate(128)
+        .on('error', function (err) {
+            if (parsedEnv.VERBOSE) console.error(err)
+        })
         .pipe(res, { end: true });
 });
 
