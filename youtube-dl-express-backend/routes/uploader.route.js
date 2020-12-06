@@ -3,7 +3,7 @@ import express from 'express';
 import Video from '../models/video.model.js';
 import Uploader from '../models/uploader.model.js';
 
-import { sortBy, getRandomVideo } from '../utilities/video.utility.js';
+import { search, getRandomVideo } from '../utilities/video.utility.js';
 
 const router = express.Router();
 
@@ -31,26 +31,20 @@ router.get('/:extractor/:name', async (req, res) => {
 
 router.get('/:extractor/:name/:page', async (req, res) => {
     const page = parseInt(req.params.page) || 0;
-    const pattern = { extractor: req.params.extractor, uploader: req.params.name };
+    const filter = { extractor: req.params.extractor, uploader: req.params.name };
 
     let videos;
     let totals = {};
     try {
-        totals.count = (await Video.countDocuments(pattern)) || 0;
-        videos = await Video.find(pattern)
-            .select('-_id extractor id title mediumResizedThumbnailFile directory uploader videoFile uploadDate duration width height viewCount')
-            .sort(sortBy(req.query['sort']))
-            .skip(page * parsedEnv.PAGE_SIZE)
-            .limit(parsedEnv.PAGE_SIZE)
-            .lean()
-            .exec();
+        videos = await search(req.query, page, filter);
+        totals.count = (await Video.countDocuments(filter)) || 0;
     } catch (err) {
         return res.sendStatus(500);
     }
 
     let randomVideo;
     try {
-        randomVideo = await getRandomVideo(totals.count, pattern);
+        randomVideo = await getRandomVideo({}, totals.count, filter);
     } catch (err) {
         return res.sendStatus(500);
     }
