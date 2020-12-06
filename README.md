@@ -260,9 +260,9 @@ You can attempt to fix the second type of error by clicking "Show Details" and t
 
 **A:** These files are located at the base of the configured output directory.
 #
-**Q:** Can I delete a video downloaded in the app?
+**Q:** Can I delete a video downloaded in the web app?
 
-**A:** There is currently no way to delete a video downloaded in the app. In order to do this manually you will need to delete the files of the video in the `/videos` and `/thumbnails` folders of the output directory, delete the video from the `archive.txt` file in the local directory, and delete the record of the video from the database. Doing this will not affect the global statistics which will now be inaccurate.
+**A:** There is currently no way to delete a video downloaded in the web app. In order to do this manually you will need to delete the files of the video in the `/videos` and `/thumbnails` folders of the output directory, delete the video from the `archive.txt` file in the local directory, and delete the record of the video from the database. Doing this will not affect the global statistics which will now be inaccurate.
 
 ## Planned
 Planned features in no particular order. If a feature is checked it has been completed but has not made its way into the latest release. There is no timetable for features or any guarantee they will be completed in a timely manner.
@@ -279,7 +279,6 @@ Planned features in no particular order. If a feature is checked it has been com
 - [ ] 3D/VR video playback support
 - [ ] Refetch metadata for already downloaded videos to get updated views, like counts, etc.
 - [ ] Include [PetterKraabol/Twitch-Chat-Downloader](https://github.com/PetterKraabol/Twitch-Chat-Downloader) to download the chat for downloaded Twitch livestreams
-- [ ] Show video chapter titles in the video player
 
 ## License/Credits
 
