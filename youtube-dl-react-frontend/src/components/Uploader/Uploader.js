@@ -100,10 +100,10 @@ export default class UploaderPage extends Component {
                                     <MiniStatisticColumn
                                         title="Total Filesize"
                                         icon="file"
-                                        statistic={bytesToSizeString(uploader.totalFilesize,
+                                        statistic={bytesToSizeString(uploader.totalVideoFilesize,
                                             this.context.user?.reportBytesUsingIec ?? true
                                         )}
-                                        detailedStatistic={uploader.totalFilesize.toLocaleString() + ' bytes'}
+                                        detailedStatistic={uploader.totalVideoFilesize.toLocaleString() + ' bytes'}
                                     />
                                 }
                                 {!!uploader.totalViewCount &&

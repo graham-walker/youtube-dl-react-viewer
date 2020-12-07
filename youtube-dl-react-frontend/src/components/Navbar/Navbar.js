@@ -74,7 +74,15 @@ class AppNavbar extends Component {
                                         to="/videos"
                                     >
                                         Videos
-                                </Nav.Link>
+                                    </Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link
+                                        as={NavLink}
+                                        to="/uploaders"
+                                    >
+                                        Uploaders
+                                    </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link
@@ -82,7 +90,7 @@ class AppNavbar extends Component {
                                         to="/statistics"
                                     >
                                         Statistics
-                                </Nav.Link>
+                                    </Nav.Link>
                                 </Nav.Item>
                             </Nav>
                             <Nav className="w-100 justify-content-center">

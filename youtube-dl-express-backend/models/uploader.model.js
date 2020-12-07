@@ -9,7 +9,7 @@ const tagSchema = new mongoose.Schema({
 
 const uploaderSchema = new mongoose.Schema({
     extractor: { type: String, required: true },
-    name: { type: String, required: true },
+    name: { type: String, required: true, index: true },
     totalVideoCount: { type: Number, default: 0 },
     totalDuration: { type: Number, default: 0 },
     totalFilesize: { type: Number, default: 0 },

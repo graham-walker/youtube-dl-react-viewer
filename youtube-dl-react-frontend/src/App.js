@@ -17,6 +17,7 @@ import VideoPage from './components/Video/Video';
 import Page from './components/Page/Page';
 import UploaderPage from './components/Uploader/Uploader';
 import UserContext from './contexts/user.context';
+import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
 import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -37,6 +38,15 @@ function App() {
 								<VideoList
 									url="videos/search"
 									stats
+									{...props}
+								/>
+							}
+						/>
+						<Route
+							path={['/uploaders', '/uploaders/page/:page']}
+							exact
+							render={(props) =>
+								<UploaderList
 									{...props}
 								/>
 							}

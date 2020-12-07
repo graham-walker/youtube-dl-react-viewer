@@ -39,6 +39,7 @@ $container-max-widths: (
 @import './components/Video/Video.scss';
 @import './components/Video/Description/Description.scss';
 @import './components/VideoPreview/VideoPreview.scss';
+@import './components/UploaderList/UploaderList.scss';
 
 html {
     width: 100%;
