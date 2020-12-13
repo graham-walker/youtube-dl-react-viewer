@@ -130,14 +130,6 @@ function App() {
 							To get new releases or submit issues check out the project on GitHub <FontAwesomeIcon icon="external-link-alt" />
 						</a>
 						<span className="d-block">Version: {window.scriptVersion}</span>
-						{process.env.REACT_APP_SHOW_KOFI.toLowerCase() === 'true' &&
-							<>
-								Support the project
-								<a href="https://ko-fi.com/K3K22FCAJ" target="_blank" rel="noopener noreferrer">
-									<img className="ml-2" width="150px" src="ko-fi_logo.png" alt="donation" />
-								</a>
-							</>
-						}
 					</Container>
 				</div>
 			</UserContext>
