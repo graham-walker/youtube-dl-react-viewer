@@ -93,6 +93,7 @@ let debug;
     const basename = path.basename(
         program.video.slice(0, -path.extname(program.video).length)
     );
+    const ext = path.extname(program.video).slice(1);
 
     // Basic check to make sure each video was downloaded in a unique folder
     // This isn't perfect though as it is only checking the start of the filename
@@ -219,6 +220,10 @@ let debug;
         potentialThumbnailFiles.push(
             path.join(videoDirectory, basename + '.' + extensionFromUrl(infojsonData.thumbnail))
         );
+        // For compatibility with youtube-dl version 2020.12.12+
+        potentialThumbnailFiles.push(
+            path.join(videoDirectory, basename + '.' + ext + '.' + extensionFromUrl(infojsonData.thumbnail))
+        );
     }
     if (infojsonData.hasOwnProperty('thumbnails')) {
         for (let i = 0; i < infojsonData.thumbnails.length; i++) {
@@ -232,6 +237,15 @@ let debug;
                         + extensionFromUrl(infojsonData.thumbnails[i].url)
                     )
                 );
+                // For compatibility with youtube-dl version 2020.12.12+
+                potentialThumbnailFiles.push(
+                    path.join(
+                        videoDirectory,
+                        basename + '.' + ext + '_' + infojsonData.thumbnails[i].id + '.'
+                        + extensionFromUrl(infojsonData.thumbnails[i].url)
+                    )
+                );
+                fs.appendFileSync('D:\\filenames.txt', potentialThumbnailFiles[potentialThumbnailFiles.length - 1] + '\r\n');
             }
         }
     }
@@ -434,7 +448,7 @@ let debug;
         try {
             error = await DownloadError.findOne({ _id: program.errorId });
         }
-        catch(err) {
+        catch (err) {
             console.log('Could not find error document');
             throw err;
         }
@@ -471,7 +485,7 @@ let debug;
         fps: infojsonData.fps || ffprobeVideoStreamFps,
         vcodec: infojsonData.vcodec || ffprobeVideoStream?.codec_name,
         url: infojsonData.url,
-        ext: infojsonData.ext || path.extname(program.video),
+        ext: infojsonData.ext || ext,
         playerUrl: infojsonData.player_url,
         altTitle: infojsonData.alt_title,
         displayId: infojsonData.display_id,
