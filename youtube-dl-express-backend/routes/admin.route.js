@@ -127,6 +127,7 @@ router.post('/errors/repair/:errorId', async (req, res) => {
         let result = await errorManager.repair(req.params.errorId);
         res.json(result);
     } catch (err) {
+        if (parsedEnv.VERBOSE) console.error(err);
         res.sendStatus(500);
     }
 });

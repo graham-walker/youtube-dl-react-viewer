@@ -33,7 +33,7 @@ export default class ErrorManager {
 
         if (execProcess.status !== 0) {
             this.busy = false;
-            throw {
+            return {
                 error: `Exec failed to repair the download with status`
                     + ` code: ${execProcess.status}. Refresh the page to see the updated error.`
             };
