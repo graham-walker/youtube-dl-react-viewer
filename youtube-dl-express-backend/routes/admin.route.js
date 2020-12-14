@@ -145,7 +145,7 @@ router.post('/youtube-dl/update', async (req, res) => {
 
     updating = true;
     try {
-        let updateProcess = spawnSync('youtube-dl', ['-U'], { encoding: 'utf-8' });
+        let updateProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
         if (updateProcess.status === 0) {
             let message = updateProcess.stdout.split(os.EOL);
             if (message[message.length - 1] === '') message.pop();
