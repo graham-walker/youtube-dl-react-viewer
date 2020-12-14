@@ -6,12 +6,6 @@
 
 ---
 
-**Support the project**
-
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22FCAJ)
-
----
-
 **I strongly recommend reading the entire readme before attempting to install the web app and download videos.**
 
 - [SCREENSHOTS](#screenshots)
@@ -134,8 +128,8 @@ VERBOSE                         Should the web app's server and the
                                 information when downloading a video.
 NODE_ENV                        Should be set to "production".
 ```
-Additionally, you can set the environment variable `REACT_APP_BRAND` to change the display name of the web app from "youtube-dl Viewer" to something else and you can set the environment variable `REACT_APP_SHOW_KOFI` to show or hide my donation links. Unlike the other variables, the `.env` file that contains these variables is located in `./youtube-dl-react-frontend`. Additionally, for changes to these variables to take effect you will need to rebuild the React app:
-1. Change the value of `REACT_APP_BRAND` or `REACT_APP_SHOW_KOFI`
+Additionally, you can change the environment variable `REACT_APP_BRAND` to set the display name of the web app from "youtube-dl Viewer" to something else or you can change the value of `REACT_APP_CHECK_FOR_UPDATES` to set whether the app will automatically check for new releases from the admin panel. Unlike the other variables, the `.env` file that contains these variables is located in `./youtube-dl-react-frontend`. Additionally, for changes to these variables to take effect you will need to rebuild the React app:
+1. Change the value of `REACT_APP_BRAND` or `REACT_APP_CHECK_FOR_UPDATES`
 2. Set the working directory to `./youtube-dl-react-frontend`
 3. Run `npm install --unsafe-perm`
 4. Run `npm run build`
