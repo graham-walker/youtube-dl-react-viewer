@@ -10,7 +10,7 @@ document.title = window.documentTitle;
 window.gitHubLink = 'https://github.com/graham-walker/youtube-dl-react-viewer';
 window.githubApiLink = 'https://api.github.com/repos/graham-walker/youtube-dl-react-viewer/releases/latest';
 window.gitHubLatestReleaseLink = 'https://github.com/graham-walker/youtube-dl-react-viewer/releases/latest';
-window.scriptVersion = '1.1.1';
+window.scriptVersion = '1.2.0';
 
 ReactDOM.render(
   <React.StrictMode>
