@@ -77,6 +77,11 @@ export default class AdminPage extends Component {
                         style={{ maxWidth: '1200px' }}
                     >
                         <h1 className="mb-4">Admin</h1>
+                        {
+                            !!process.env?.REACT_APP_CHECK_FOR_UPDATES
+                            && process.env.REACT_APP_CHECK_FOR_UPDATES.toLowerCase() === 'true'
+                            && <UpdateChecker />
+                        }
                         <h5 className="mb-4">youtube-dl</h5>
                         <Card className="mb-4">
                             <Card.Body>
@@ -146,7 +151,7 @@ export default class AdminPage extends Component {
                             </Tab.Container>
                         </Card>
                         <h5 className="mb-4">Failed downloads</h5>
-                        <p>If you are expecting to see a specific error here but do not, check the errors.txt or unknown errors.txt file in the output directory.</p>
+                        <Alert variant="info">If you are expecting to see a error here but do not, check the errors.txt or unknown errors.txt file in the output directory.</Alert>
                         {this.state.errors.length > 0 ?
                             this.state.errors.map(error =>
                                 <Alert variant="danger" key={error._id}>
@@ -193,6 +198,68 @@ export default class AdminPage extends Component {
                     </div>
                 }
             </PageLoadWrapper>
+        );
+    }
+}
+
+class UpdateChecker extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            message: undefined,
+            variant: undefined,
+        }
+    }
+
+    componentDidMount() {
+        axios.get(window.githubApiLink, {
+            headers: {
+                Accept: 'application/vnd.github.v3+json',
+            }
+        }).then(res => {
+            if (res.status === 200) {
+                if (res?.data?.tag_name) {
+                    if (this.getVersionScore(res.data.tag_name) > this.getVersionScore(window.scriptVersion)) {
+                        this.setState({
+                            message: <>A new release of youtube-dl-react-viewer is available ({res.data.tag_name.slice(1)} &gt; {window.scriptVersion}). <a
+                                href={window.gitHubLatestReleaseLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Download it here.
+                            </a></>,
+                            variant: 'info',
+                        });
+                    } else {
+                        this.setState({ message: `You are using the latest version of youtube-dl-react-viewer (${window.scriptVersion}).`, variant: 'success' });
+                    }
+                } else {
+                    this.setState({ message: 'Failed to check the latest version.', variant: 'danger' });
+                }
+            }
+        }).catch(err => {
+            this.setState({ message: 'Failed to check the latest version.', variant: 'danger' });
+        });
+    }
+
+    getVersionScore = (tagName) => {
+        if (tagName.startsWith('v')) tagName = tagName.slice(1);
+        let versionNumbers = tagName.split('.').reverse();
+        console.dir(versionNumbers)
+        let score = 0;
+        let scale = 1;
+        for (let i = 0; i < versionNumbers.length; i++) {
+            score += parseInt(versionNumbers[i]) * scale;
+            scale *= 100;
+        }
+        console.log(tagName, score)
+        return score;
+
+    }
+
+    render() {
+        return (
+            <Alert variant={this.state.variant}>{this.state.message}</Alert>
         );
     }
 }
