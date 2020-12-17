@@ -25,7 +25,7 @@ let debug;
     debug = parsed.env.VERBOSE;
 
     program.name('youtube-dl-exec-script')
-        .version('1.2.0') // Version is hardcoded here because on non-Windows systems this script has to be called by node instead of npm
+        .version('1.2.1') // Version is hardcoded here because on non-Windows systems this script has to be called by node instead of npm
         .requiredOption('-v, --video <path>', 'Downloaded video file location')
         .requiredOption('-j, --job-id <string>', 'Job document id')
         .option(

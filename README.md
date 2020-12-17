@@ -72,13 +72,12 @@
 8. (Optional) In order to run the web app automatically after startup or after a system reboot you must configure PM2. See these resources for help configuring PM2 on [Linux/MacOS](https://pm2.keymetrics.io/docs/usage/startup/#saving-current-processes) and [Windows](https://stackoverflow.com/questions/42758985/windows-auto-start-pm2-and-node-apps)
 
 ## Running in Docker
-As of release 1.1.0 youtube-dl-react-viewer supports Docker containers.
 
 1. Clone the youtube-dl-react-viewer repository `git clone https://github.com/graham-walker/youtube-dl-react-viewer`
 
 2. Set the working directory to `./youtube-dl-react-viewer`
 
-3. To select the version of the release you want to install run `git checkout tags/v1.1.1`
+3. To select the version of the release you want to install run `git checkout tags/v1.2.1`
 
 4. Specify the Docker container's environment variables by editing the `environment:` option inside of `docker-compose.yaml`
     - The web app will not start if the values for the environment variables `SUPERUSER_PASSWORD` and `JWT_TOKEN_SECRET` are their default values. A full list of supported variables is shown in the [section below](#configuring-environment-variables)
@@ -89,6 +88,8 @@ As of release 1.1.0 youtube-dl-react-viewer supports Docker containers.
     - The youtube-dl-react-viewer Dockerfile does not include or automatically install a copy of [ytdl-org/youtube-dl](https://youtube-dl.org/). This must be added to the container manually using the command line
 
 7. Access the web app by navigating to `http://localhost:5000` in your browser
+
+*Releases before 1.1.0 do not support Docker containers.*
 
 ## Configuring Environment Variables
 
