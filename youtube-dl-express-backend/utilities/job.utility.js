@@ -51,9 +51,13 @@ export default class Downloader {
 
             fs.ensureDirSync(parsedEnv.OUTPUT_DIRECTORY);
 
+            let execCommand = `npm run exec -- --youtube-dl-version ${youtubeDlVersion} --job-id ${job._id} --video`;
+            // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
+            if (process.platform !== 'win32') execCommand = `node --require dotenv/config exec.js --youtube-dl-version ${youtubeDlVersion} --job-id ${job._id} --video`;
+
             let jobArguments = [
                 '--exec',
-                `npm run exec -- --youtube-dl-version ${youtubeDlVersion} --job-id ${job._id} --video`,
+                execCommand,
                 '--write-info-json',
                 '--prefer-ffmpeg',
                 '--output',

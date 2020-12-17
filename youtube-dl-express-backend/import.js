@@ -175,10 +175,9 @@ const program = commander.program;
                 }
             }
             console.log(`Adding video file to database...`);
-            const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, [
-                'run',
-                'exec',
-                '--',
+
+            // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
+            let execArguments = [
                 '--job-id',
                 job._id,
                 '--downloaded',
@@ -186,7 +185,17 @@ const program = commander.program;
                 '--is-import',
                 '--video',
                 path.join(outputPath, basename + (program.overrideExt ? program.overrideExt : infojsonData.ext)),
-            ], { windowsHide: true });
+            ];
+            if (process.platform === 'win32') {
+                execArguments.unshift('--');
+                execArguments.unshift('exec');
+                execArguments.unshift('run');
+            } else {
+                execArguments.unshift('exec.js');
+                execArguments.unshift('dotenv/config');
+                execArguments.unshift('--require');
+            }
+            const execProcess = await spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
 
             if (execProcess.status !== 0) {
                 let err = `Failed to add video to the database (exec returned status code: "${execProcess.status}"). Check the admin panel of the web app for more details`;

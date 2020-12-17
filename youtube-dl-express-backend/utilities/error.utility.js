@@ -18,10 +18,8 @@ export default class ErrorManager {
             return { error: 'Could not find error document' };
         }
 
-        const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, [
-            'run',
-            'exec',
-            '--',
+        // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
+        let execArguments = [
             '--job-id',
             error.jobDocument,
             '--is-repair',
@@ -29,7 +27,17 @@ export default class ErrorManager {
             error._id,
             '--video',
             path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', error.videoPath),
-        ], { windowsHide: true });
+        ];
+        if (process.platform === 'win32') {
+            execArguments.unshift('--');
+            execArguments.unshift('exec');
+            execArguments.unshift('run');
+        } else {
+            execArguments.unshift('exec.js');
+            execArguments.unshift('dotenv/config');
+            execArguments.unshift('--require');
+        }
+        const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, execArguments, { windowsHide: true });
 
         if (execProcess.status !== 0) {
             this.busy = false;
