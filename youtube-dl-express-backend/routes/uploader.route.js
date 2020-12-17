@@ -34,7 +34,6 @@ router.get('/page/:page', async (req, res) => {
     } catch (err) {
         return res.sendStatus(500);
     }
-    if (uploaders.length === 0) return res.sendStatus(404);
 
     res.json({
         uploaders: uploaders,

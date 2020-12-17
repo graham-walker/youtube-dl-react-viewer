@@ -82,7 +82,7 @@ export default class UploaderList extends Component {
                         <p className="text-muted mb-0">
                             <small>
                                 {uploader.totalVideoCount.toLocaleString()} video{(uploader.totalVideoCount !== 1) && 's'}
-                            <span> &middot; </span>
+                                <span> &middot; </span>
                                 {bytesToSizeString(uploader.totalVideoFilesize,
                                     this.context.user?.reportBytesUsingIec ?? true)}
                             </small>
@@ -115,16 +115,21 @@ export default class UploaderList extends Component {
                     <h5 className="mb-4">
                         Across {this.state.totalWebsites} different websites
                     </h5>
-                    <Pageinator baseUrl="uploaders/page" page={this.props.match.params.page || 1} maxPages={this.state.maxPages} />
-                    <Row
-                        style={{
-                            marginLeft: '-0.25rem',
-                            marginRight: '-0.25rem'
-                        }}
-                    >
-                        {uploaders}
-                    </Row>
-                    <Pageinator baseUrl="uploaders/page" page={this.props.match.params.page || 1} maxPages={this.state.maxPages} bottom/>
+                    {this.state.uploaders.length === 0
+                        ? <p className="text-center font-weight-bold">No results found</p>
+                        : <>
+                            <Pageinator baseUrl="uploaders/page" page={this.props.match.params.page || 1} maxPages={this.state.maxPages} />
+                            <Row
+                                style={{
+                                    marginLeft: '-0.25rem',
+                                    marginRight: '-0.25rem'
+                                }}
+                            >
+                                {uploaders}
+                            </Row>
+                            <Pageinator baseUrl="uploaders/page" page={this.props.match.params.page || 1} maxPages={this.state.maxPages} bottom />
+                        </>
+                    }
                 </>}
             </PageLoadWrapper>
         );
