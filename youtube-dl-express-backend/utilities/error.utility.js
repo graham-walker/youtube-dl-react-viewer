@@ -37,7 +37,7 @@ export default class ErrorManager {
             execArguments.unshift('dotenv/config');
             execArguments.unshift('--require');
         }
-        const execProcess = await spawnSync(`npm${process.platform === 'win32' ? '.cmd' : ''}`, execArguments, { windowsHide: true });
+        const execProcess = await spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
 
         if (execProcess.status !== 0) {
             this.busy = false;
