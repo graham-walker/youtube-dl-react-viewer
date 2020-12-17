@@ -245,7 +245,6 @@ let debug;
                         + extensionFromUrl(infojsonData.thumbnails[i].url)
                     )
                 );
-                fs.appendFileSync('D:\\filenames.txt', potentialThumbnailFiles[potentialThumbnailFiles.length - 1] + '\r\n');
             }
         }
     }
