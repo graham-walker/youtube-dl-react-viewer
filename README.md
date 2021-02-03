@@ -98,9 +98,9 @@ The web app's server requires the configuring of several environment variables b
 MONGOOSE_URL                    URL used to connect to your database. If the
                                 database does not exist it will be created.
 BACKEND_PORT                    Port the server will run on.
-YOUTUBE_DL_PATH                 Path to youtube-dl. You can also specify a
-                                3rd party fork of youtube-dl such as
-                                blackjack4494/yt-dlc.
+YOUTUBE_DL_PATH                 Path to youtube-dl. 3rd party forks of
+                                youtube-dl should work as drop in
+                                replacements.
 FFMPEG_PATH                     Path to ffmpeg (On Windows youtube-dl does
                                 not support environment variables as
                                 parameters, use C:/Path/To/ffmpeg.exe
