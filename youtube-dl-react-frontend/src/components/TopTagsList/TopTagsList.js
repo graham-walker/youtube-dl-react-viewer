@@ -8,7 +8,7 @@ const TopTagsList = props => {
     return (
         tags.map((tag, i) =>
             <Link
-                to={`/videos?${queryString.stringify({ search: tag.name })}`}
+                to={`/videos?${queryString.stringify({ search: `"${tag.name}"` })}`}
                 key={i}
             >
                 <Badge

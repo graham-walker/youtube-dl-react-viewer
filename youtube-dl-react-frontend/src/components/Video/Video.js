@@ -171,7 +171,7 @@ export default class VideoPage extends Component {
     }
 
     createSearchLink(str) {
-        return `/videos?${queryString.stringify({ search: str })}`;
+        return `/videos?${queryString.stringify({ search: `"${str}"` })}`;
     }
 
     handleInputChange = (e) => {
