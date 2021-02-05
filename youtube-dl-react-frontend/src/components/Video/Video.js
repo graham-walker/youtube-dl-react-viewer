@@ -10,8 +10,8 @@ import { UserContext } from '../../contexts/user.context';
 import { bytesToSizeString, abbreviateNumber, resolutionToBadge } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import history from '../../utilities/history.utility';
+import { createSearchLink } from '../../utilities/search.utility';
 import ISO6391 from 'iso-639-1';
-import queryString from 'query-string';
 import videojs from 'video.js';
 import 'videojs-flash';
 import axios from '../../utilities/axios.utility';
@@ -170,10 +170,6 @@ export default class VideoPage extends Component {
         }
     }
 
-    createSearchLink(str) {
-        return `/videos?${queryString.stringify({ search: `"${str}"` })}`;
-    }
-
     handleInputChange = (e) => {
         var { name, checked } = e.target;
         localStorage.setItem(name, checked);
@@ -202,13 +198,13 @@ export default class VideoPage extends Component {
                                 </video>
                             </div>
                             {!!video.location
-                                ? <Link to={this.createSearchLink(video.location)}>
+                                ? <Link to={createSearchLink(video.location)}>
                                     <FontAwesomeIcon icon="map-marker-alt" /> {video.location}
                                 </Link>
                                 : video.hashtags.slice(0, 3).map((hashtag, i) =>
                                     <React.Fragment key={i}>
                                         {i > 0 && ', '}
-                                        <Link to={this.createSearchLink(hashtag)}>
+                                        <Link to={createSearchLink(hashtag)}>
                                             {hashtag}
                                         </Link>
                                     </React.Fragment>
@@ -355,7 +351,7 @@ export default class VideoPage extends Component {
                                         <TableStatistic statistic={
                                             video.tags.map((tag, i) =>
                                                 <Link
-                                                    to={this.createSearchLink(tag)}
+                                                    to={createSearchLink(tag)}
                                                     key={i}
                                                 >
                                                     <Badge className="mr-1" variant="secondary">
@@ -370,7 +366,7 @@ export default class VideoPage extends Component {
                                             {
                                                 video.categories.map((category, i) =>
                                                     <Link
-                                                        to={this.createSearchLink(category)}
+                                                        to={createSearchLink(category)}
                                                         key={i}
                                                     >
                                                         <Badge className="mr-1" variant="secondary">
@@ -382,19 +378,19 @@ export default class VideoPage extends Component {
                                             title="Categories"
                                         />
                                     }
-                                    <TableStatistic statistic={video.series} title="Series" />
-                                    <TableStatistic statistic={video.season} title="Season" />
+                                    <TableStatistic statistic={video.series} title="Series" link />
+                                    <TableStatistic statistic={video.season} title="Season" link />
                                     <TableStatistic statistic={video.seasonNumber} title="Season number" />
-                                    <TableStatistic statistic={video.episode} title="Episode" />
+                                    <TableStatistic statistic={video.episode} title="Episode" link />
                                     <TableStatistic statistic={video.episodeNumber} title="Episode number" />
-                                    <TableStatistic statistic={video.location} title="Location" />
-                                    <TableStatistic statistic={video.track} title="Track" />
+                                    <TableStatistic statistic={video.location} title="Location" link />
+                                    <TableStatistic statistic={video.track} title="Track" link />
                                     <TableStatistic statistic={video.trackNumber} title="Track number" />
-                                    <TableStatistic statistic={video.artist} title="Artist" />
-                                    <TableStatistic statistic={video.genre} title="Genre" />
-                                    <TableStatistic statistic={video.album} title="Album" />
-                                    <TableStatistic statistic={video.albumType} title="Album type" />
-                                    <TableStatistic statistic={video.albumArtist} title="Album artist" />
+                                    <TableStatistic statistic={video.artist} title="Artist" link />
+                                    <TableStatistic statistic={video.genre} title="Genre" link />
+                                    <TableStatistic statistic={video.album} title="Album" link />
+                                    <TableStatistic statistic={video.albumType} title="Album type" link />
+                                    <TableStatistic statistic={video.albumArtist} title="Album artist" link />
                                     <TableStatistic statistic={video.discNumber} title="Disc number" />
                                     <TableStatistic statistic={video.releaseYear} title="Release year" />
                                     <TableStatistic statistic={video.license} title="License" />
@@ -659,7 +655,14 @@ const TableStatistic = (props) => {
         !!props.statistic
             ? <tr>
                 <th style={{ whiteSpace: 'nowrap', padding: '0.25rem 0.75rem' }}>{props.title}</th>
-                <td className="w-100" style={{ padding: '0.25rem 0.75rem' }}>{props.statistic}{!!props.unit && ' ' + props.unit}</td>
+                <td className="w-100" style={{ padding: '0.25rem 0.75rem' }}>
+                    {!!props.link
+                        ? <Link to={createSearchLink(props.statistic)}>
+                            {props.statistic}{!!props.unit && ' ' + props.unit}
+                        </Link>
+                        : <>{props.statistic}{!!props.unit && ' ' + props.unit}</>
+                    }
+                </td>
             </tr>
             : null
     );

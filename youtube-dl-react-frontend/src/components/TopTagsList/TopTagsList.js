@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
-import queryString from 'query-string';
+import { createSearchLink } from '../../utilities/search.utility';
 
 const TopTagsList = props => {
     const tags = props.tags.sort((a, b) => b.count - a.count).slice(0, 5);
     return (
         tags.map((tag, i) =>
             <Link
-                to={`/videos?${queryString.stringify({ search: `"${tag.name}"` })}`}
+                to={createSearchLink(tag.name)}
                 key={i}
             >
                 <Badge
