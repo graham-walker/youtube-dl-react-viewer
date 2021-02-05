@@ -180,6 +180,17 @@ export default class VideoPage extends Component {
 
     render() {
         let video = this.state.video;
+        let seriesData;
+        if (video) {
+            seriesData = <>
+                <FontAwesomeIcon icon="tv" />
+                {!!video.series && ' ' + video.series}
+                {video.seasonNumber !== null ? ' S' + video.seasonNumber : false}
+                {video.seasonNumber !== null && video.episodeNumber !== null ? <> &middot;</> : false}
+                {video.episodeNumber !== null ? ' E' + video.episodeNumber : false}
+            </>;
+        }
+        
         return (
             <PageLoadWrapper
                 loading={this.state.loading}
@@ -197,10 +208,14 @@ export default class VideoPage extends Component {
                                 >
                                 </video>
                             </div>
-                            {!!video.location
-                                ? <Link to={createSearchLink(video.location)}>
-                                    <FontAwesomeIcon icon="map-marker-alt" /> {video.location}
-                                </Link>
+                            {!!video.series || video.seasonNumber !== null || video.episodeNumber !== null || !!video.location
+                                ? (!!video.series || video.seasonNumber !== null || video.episodeNumber !== null)
+                                    ? !!video.series
+                                        ? <Link to={createSearchLink(video.series)}>{seriesData}</Link>
+                                        : <span className="text-muted">{seriesData}</span>
+                                    : <Link to={createSearchLink(video.location)}>
+                                        <FontAwesomeIcon icon="map-marker-alt" /> {video.location}
+                                    </Link>
                                 : video.hashtags.slice(0, 3).map((hashtag, i) =>
                                     <React.Fragment key={i}>
                                         {i > 0 && ', '}
