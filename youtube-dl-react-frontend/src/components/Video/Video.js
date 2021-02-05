@@ -382,11 +382,12 @@ export default class VideoPage extends Component {
                                             title="Categories"
                                         />
                                     }
-                                    <TableStatistic statistic={video.license} title="License" />
+                                    <TableStatistic statistic={video.series} title="Series" />
                                     <TableStatistic statistic={video.season} title="Season" />
                                     <TableStatistic statistic={video.seasonNumber} title="Season number" />
                                     <TableStatistic statistic={video.episode} title="Episode" />
                                     <TableStatistic statistic={video.episodeNumber} title="Episode number" />
+                                    <TableStatistic statistic={video.location} title="Location" />
                                     <TableStatistic statistic={video.track} title="Track" />
                                     <TableStatistic statistic={video.trackNumber} title="Track number" />
                                     <TableStatistic statistic={video.artist} title="Artist" />
@@ -396,6 +397,7 @@ export default class VideoPage extends Component {
                                     <TableStatistic statistic={video.albumArtist} title="Album artist" />
                                     <TableStatistic statistic={video.discNumber} title="Disc number" />
                                     <TableStatistic statistic={video.releaseYear} title="Release year" />
+                                    <TableStatistic statistic={video.license} title="License" />
                                 </tbody>
                             </Table>
                             <hr />
