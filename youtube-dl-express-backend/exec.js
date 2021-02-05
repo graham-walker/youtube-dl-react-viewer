@@ -245,6 +245,14 @@ let debug;
                         + extensionFromUrl(infojsonData.thumbnails[i].url)
                     )
                 );
+                // For compatibility with yt-dlp version 2021.02.04+
+                potentialThumbnailFiles.push(
+                    path.join(
+                        videoDirectory,
+                        basename + '.' + infojsonData.thumbnails[i].id + '.'
+                        + extensionFromUrl(infojsonData.thumbnails[i].url)
+                    )
+                );
             }
         }
     }
