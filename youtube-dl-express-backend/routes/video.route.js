@@ -17,11 +17,6 @@ const router = express.Router();
 
 router.get('/search/:page', async function (req, res) {
     const page = parseInt(req.params.page) || 0;
-    let pattern = {};
-    let options = {};
-    if (req.query.search) {
-
-    }
 
     let videos;
     try {
