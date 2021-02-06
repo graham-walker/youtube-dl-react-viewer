@@ -20,7 +20,7 @@ router.get('/search/:page', async function (req, res) {
     let pattern = {};
     let options = {};
     if (req.query.search) {
-        
+
     }
 
     let videos;
@@ -72,7 +72,7 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' uploaderDocument fps webpageUrl dateDownloaded width height'
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
-        + ' releaseYear format tbr asr vbr vcodec acodec ext ' + fields
+        + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId ' + fields
         )
             .populate('uploaderDocument jobDocument')
             .exec()
@@ -80,14 +80,16 @@ router.get('/:extractor/:id', async (req, res) => {
         if (!video) return res.sendStatus(404);
 
         if (video.uploader) uploaderVideos = await Video.find(
-            { uploader: video.uploader },
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height')
+            { extractor: video.extractor, uploader: video.uploader },
+            '-_id extractor id title uploader duration directory'
+            + ' smallResizedThumbnailFile viewCount width height'
+        )
             .sort({ uploadDate: -1 })
             .lean()
             .exec();
 
-        if (video.playlist) playlistVideos = await Video.find(
-            { playlist: video.playlist },
+        if (video.playlistId) playlistVideos = await Video.find(
+            { extractor: video.extractor, playlistId: video.playlistId },
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height')
             .sort({ playlistIndex: 1 })
             .lean()
