@@ -230,8 +230,11 @@ class UpdateChecker extends Component {
                             </a></>,
                             variant: 'info',
                         });
-                    } else {
+                    } else if (this.getVersionScore(res.data.tag_name) === this.getVersionScore(window.scriptVersion)) {
                         this.setState({ message: `You are using the latest version of youtube-dl-react-viewer (${window.scriptVersion}).`, variant: 'success' });
+                    } else {
+                        this.setState({ message: `You are using a development version of youtube-dl-react-viewer (${window.scriptVersion}).
+                        Functionality may be missing or broken. Using development versions could cause irreversible damage to the database.`, variant: 'warning' });
                     }
                 } else {
                     this.setState({ message: 'Failed to check the latest version.', variant: 'danger' });
