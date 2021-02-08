@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter, NavLink } from 'react-router-dom';
-import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import LoginForm from '../LoginForm/LoginForm';
 import { UserContext } from '../../contexts/user.context';
@@ -48,15 +48,19 @@ class AppNavbar extends Component {
                 <Navbar
                     sticky="top"
                     bg="light"
-                    expand="lg"
+                    expand="xl"
                     className="justify-content-center"
                 >
                     <Container>
                         <LinkContainer to="/">
-                            <Navbar.Brand className="d-flex d-lg-none mr-auto">
-                                {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+                            <Navbar.Brand className="d-xl-none mr-auto">
+                                <>
+                                    {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+                                    <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>
+                                </>
                             </Navbar.Brand>
                         </LinkContainer>
+
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse
                             id="basic-navbar-nav"
@@ -64,8 +68,11 @@ class AppNavbar extends Component {
                         >
                             <Nav className="w-100 justify-content-left">
                                 <LinkContainer to="/">
-                                    <Navbar.Brand className="d-none d-lg-block">
-                                        {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+                                    <Navbar.Brand className="d-none d-xl-block">
+                                        <>
+                                            {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+                                            <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>
+                                        </>
                                     </Navbar.Brand>
                                 </LinkContainer>
                                 <Nav.Item>
