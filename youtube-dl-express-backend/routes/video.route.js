@@ -75,24 +75,25 @@ router.get('/:extractor/:id', async (req, res) => {
         if (!video) return res.sendStatus(404);
 
         if (video.uploader) uploaderVideos = await Video.find(
-            { extractor: video.extractor, uploader: video.uploader },
-            '-_id extractor id title uploader duration directory'
-            + ' smallResizedThumbnailFile viewCount width height'
-        )
+            { uploaderDocument: video.uploaderDocument },
+            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            .populate('uploaderDocument', 'extractor id name')
             .sort({ uploadDate: -1 })
             .lean()
             .exec();
 
         if (video.playlistId) playlistVideos = await Video.find(
             { extractor: video.extractor, playlistId: video.playlistId },
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height')
+            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            .populate('uploaderDocument', 'extractor id name')
             .sort({ playlistIndex: 1 })
             .lean()
             .exec();
 
         jobVideos = await Video.find(
             { jobDocument: video.jobDocument },
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height')
+            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            .populate('uploaderDocument', 'extractor id name')
             .sort({ dateDownloaded: -1 })
             .lean()
             .exec();

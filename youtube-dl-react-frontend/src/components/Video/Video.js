@@ -237,7 +237,7 @@ export default class VideoPage extends Component {
                                     >
                                         <Media>
                                             <Link
-                                                to={`/uploaders/${video.extractor}/${video.uploader}`}
+                                                to={`/uploaders/${video.uploaderDocument.extractor}/${video.uploaderDocument.id}`}
                                                 className="mr-3"
                                             >
                                                 <Image
@@ -250,13 +250,13 @@ export default class VideoPage extends Component {
                                             </Link>
                                             <Media.Body>
                                                 <Link
-                                                    to={`/uploaders/${video.extractor}/${video.uploader}`}
+                                                    to={`/uploaders/${video.uploaderDocument.extractor}/${video.uploaderDocument.id}`}
                                                     className="text-dark">
-                                                    {video.uploader}
+                                                    {video.uploaderDocument.name}
                                                 </Link>
                                                 <small className="text-muted d-block">
-                                                    {video.uploaderDocument.totalVideoCount.toLocaleString()} video
-                                                    {video.uploaderDocument.totalVideoCount !== 1 && 's'}
+                                                    {video.uploaderDocument.statistics.totalVideoCount.toLocaleString()} video
+                                                    {video.uploaderDocument.statistics.totalVideoCount !== 1 && 's'}
                                                 </small>
                                             </Media.Body>
                                         </Media>

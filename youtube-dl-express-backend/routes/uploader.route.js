@@ -21,7 +21,8 @@ router.get('/page/:page', async (req, res) => {
 
     try {
         uploaders = await Uploader
-            .find({}, '-_id extractor name totalVideoCount totalVideoFilesize lastDateUploaded')
+            .find({}, '-_id extractor id name statistics.totalVideoCount'
+                + ' statistics.totalVideoFilesize statistics.lastDateUploaded')
             .collation({ locale: 'en' })
             .sort({ name: 1 })
             .skip(page * perPage)
@@ -43,12 +44,12 @@ router.get('/page/:page', async (req, res) => {
     });
 });
 
-router.get('/:extractor/:name', async (req, res) => {
+router.get('/:extractor/:id', async (req, res) => {
     let uploader;
     try {
         uploader = await Uploader.findOne({
             extractor: req.params.extractor,
-            name: req.params.name
+            id: req.params.id,
         });
     }
     catch (err) {
@@ -58,16 +59,29 @@ router.get('/:extractor/:name', async (req, res) => {
 
     uploader = uploader.toJSON();
     const returnTags = 5;
-    uploader.tags.slice(0, returnTags);
-    uploader.categories.slice(0, returnTags);
-    uploader.hashtags.slice(0, returnTags);
+    uploader.statistics.tags.slice(0, returnTags);
+    uploader.statistics.categories.slice(0, returnTags);
+    uploader.statistics.hashtags.slice(0, returnTags);
 
     res.json({ uploader });
 });
 
-router.get('/:extractor/:name/:page', async (req, res) => {
+router.get('/:extractor/:id/:page', async (req, res) => {
     const page = parseInt(req.params.page) || 0;
-    const filter = { extractor: req.params.extractor, uploader: req.params.name };
+
+    let uploader;
+    try {
+        uploader = await Uploader.findOne({
+            extractor: req.params.extractor,
+            id: req.params.id,
+        });
+    }
+    catch (err) {
+        return res.sendStatus(500);
+    }
+    if (!uploader) return res.sendStatus(404);
+
+    const filter = { uploaderDocument: uploader._id };
 
     let videos;
     let totals = {};

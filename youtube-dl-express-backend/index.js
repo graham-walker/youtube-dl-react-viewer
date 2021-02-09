@@ -20,82 +20,90 @@ import superuserMiddleware from './middleware/superuser.middleware.js';
 import User from './models/user.model.js';
 
 import parsed from './parse-env.js';
+import applyUpdates from './utilities/update.utility.js';
 
-// Parse environment variables
-if (parsed.err) throw parsed.err;
-global.parsedEnv = parsed.env;
+(async () => {
+    // Parse environment variables
+    if (parsed.err) throw parsed.err;
+    global.parsedEnv = parsed.env;
 
-// Connect to the database
-mongoose.connect(parsedEnv.MONGOOSE_URL, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-});
-
-// Create the express server
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
-
-// Add routes to the server
-app.use('/api/auth', globalPasswordMiddleware, authRouter);
-app.use('/api/users', [globalPasswordMiddleware, authenticationMiddleware], userRouter);
-app.use('/api/videos', globalPasswordMiddleware, videoRouter);
-app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
-app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
-app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
-
-const staticFolders = ['videos', 'thumbnails', 'avatars'];
-const outputDirectory = parsedEnv.OUTPUT_DIRECTORY;
-
-// Create the static folders
-for (let folder of staticFolders) {
-    fs.ensureDirSync(path.join(outputDirectory, folder));
-    app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
-}
-
-// Transcode videos
-app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
-    res.contentType('webm');
-    const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
-    ffmpeg(videoPath)
-        .format('webm')
-        .videoBitrate(3500)
-        .audioBitrate(128)
-        .on('error', function (err) {
-            if (parsedEnv.VERBOSE) console.error(err)
-        })
-        .pipe(res, { end: true });
-});
-
-// Serve the react app build in production
-if (parsedEnv.NODE_ENV === 'production') {
-    app.use(express.static('../youtube-dl-react-frontend/build'));
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(
-            path.join(process.cwd(), '../youtube-dl-react-frontend/build/index.html')
-        ));
+    // Connect to the database
+    await mongoose.connect(parsedEnv.MONGOOSE_URL, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
     });
-}
 
-// Start the server
-const backendPort = parsedEnv.BACKEND_PORT;
-app.listen(backendPort, () => {
-    console.log('Server started on port:', backendPort);
-});
+    // Apply updates when the version number changes
+    await applyUpdates();
 
-// Create the superuser
-const superuserUsername = parsedEnv.SUPERUSER_USERNAME;
-const superuserPassword = parsedEnv.SUPERUSER_PASSWORD;
-const user = new User({
-    username: superuserUsername,
-    password: superuserPassword,
-    isSuperuser: true
-});
-user.save(function (err) {
-    if (err && (err.name !== 'MongoError' || err.code !== 11000)) {
-        throw err;
+    // Create the express server
+    const app = express();
+
+    app.use(cors());
+    app.use(express.json());
+    app.use(cookieParser());
+
+    // Add routes to the server
+    app.use('/api/auth', globalPasswordMiddleware, authRouter);
+    app.use('/api/users', [globalPasswordMiddleware, authenticationMiddleware], userRouter);
+    app.use('/api/videos', globalPasswordMiddleware, videoRouter);
+    app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
+    app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
+    app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
+
+    const staticFolders = ['videos', 'thumbnails', 'avatars'];
+    const outputDirectory = parsedEnv.OUTPUT_DIRECTORY;
+
+    // Create the static folders
+    for (let folder of staticFolders) {
+        fs.ensureDirSync(path.join(outputDirectory, folder));
+        app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
     }
+
+    // Transcode videos
+    app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
+        res.contentType('webm');
+        const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
+        ffmpeg(videoPath)
+            .format('webm')
+            .videoBitrate(3500)
+            .audioBitrate(128)
+            .on('error', function (err) {
+                if (parsedEnv.VERBOSE) console.error(err)
+            })
+            .pipe(res, { end: true });
+    });
+
+    // Serve the react app build in production
+    if (parsedEnv.NODE_ENV === 'production') {
+        app.use(express.static('../youtube-dl-react-frontend/build'));
+        app.get('*', (req, res) => {
+            res.sendFile(path.join(
+                path.join(process.cwd(), '../youtube-dl-react-frontend/build/index.html')
+            ));
+        });
+    }
+
+    // Start the server
+    const backendPort = parsedEnv.BACKEND_PORT;
+    app.listen(backendPort, () => {
+        console.log('Server started on port:', backendPort);
+    });
+
+    // Create the superuser
+    const superuserUsername = parsedEnv.SUPERUSER_USERNAME;
+    const superuserPassword = parsedEnv.SUPERUSER_PASSWORD;
+    const user = new User({
+        username: superuserUsername,
+        password: superuserPassword,
+        isSuperuser: true
+    });
+    user.save(function (err) {
+        if (err && (err.name !== 'MongoError' || err.code !== 11000)) {
+            throw err;
+        }
+    });
+})().catch(err => {
+    throw err;
 });

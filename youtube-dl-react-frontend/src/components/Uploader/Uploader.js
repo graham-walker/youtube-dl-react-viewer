@@ -43,7 +43,8 @@ export default class UploaderPage extends Component {
     }
 
     render() {
-        let uploader = this.state.uploader;
+        const uploader = this.state.uploader;
+        const statistics = uploader?.statistics;
 
         return (
             <PageLoadWrapper
@@ -72,89 +73,89 @@ export default class UploaderPage extends Component {
                                 {uploader.name}
                             </h3>
                             <Row className="text-center justify-content-md-center">
-                                {uploader.lastDateUploaded &&
+                                {statistics.lastDateUploaded &&
                                     <MiniStatisticColumn
                                         title="Last Upload"
                                         icon="calendar-alt"
-                                        statistic={dateToTimeSinceString(new Date(uploader.lastDateUploaded))}
-                                        detailedStatistic={new Date(uploader.lastDateUploaded).toLocaleString()}
+                                        statistic={dateToTimeSinceString(new Date(statistics.lastDateUploaded))}
+                                        detailedStatistic={new Date(statistics.lastDateUploaded).toLocaleString()}
                                     />
                                 }
-                                {!!uploader.totalVideoCount &&
+                                {!!statistics.totalVideoCount &&
                                     <MiniStatisticColumn
                                         title="Video Count"
                                         icon="video"
-                                        statistic={abbreviateNumber(uploader.totalVideoCount)}
-                                        detailedStatistic={uploader.totalVideoCount.toLocaleString() + ' videos'}
+                                        statistic={abbreviateNumber(statistics.totalVideoCount)}
+                                        detailedStatistic={statistics.totalVideoCount.toLocaleString() + ' videos'}
                                     />
                                 }
-                                {!!uploader.totalDuration &&
+                                {!!statistics.totalDuration &&
                                     <MiniStatisticColumn
                                         title="Total Duration"
                                         icon="clock"
-                                        statistic={secondsToDetailedString(uploader.totalDuration, true)}
-                                        detailedStatistic={secondsToDetailedString(uploader.totalDuration)}
+                                        statistic={secondsToDetailedString(statistics.totalDuration, true)}
+                                        detailedStatistic={secondsToDetailedString(statistics.totalDuration)}
                                     />
                                 }
-                                {!!uploader.totalFilesize &&
+                                {!!statistics.totalFilesize &&
                                     <MiniStatisticColumn
                                         title="Total Filesize"
                                         icon="file"
-                                        statistic={bytesToSizeString(uploader.totalVideoFilesize,
+                                        statistic={bytesToSizeString(statistics.totalVideoFilesize,
                                             this.context.user?.reportBytesUsingIec ?? true
                                         )}
-                                        detailedStatistic={uploader.totalVideoFilesize.toLocaleString() + ' bytes'}
+                                        detailedStatistic={statistics.totalVideoFilesize.toLocaleString() + ' bytes'}
                                     />
                                 }
-                                {!!uploader.totalViewCount &&
+                                {!!statistics.totalViewCount &&
                                     <MiniStatisticColumn
                                         title="Total Views"
                                         icon="eye"
-                                        statistic={abbreviateNumber(uploader.totalViewCount)}
-                                        detailedStatistic={uploader.totalViewCount.toLocaleString() + ' views'}
+                                        statistic={abbreviateNumber(statistics.totalViewCount)}
+                                        detailedStatistic={statistics.totalViewCount.toLocaleString() + ' views'}
                                     />
                                 }
-                                {!!uploader.totalLikeCount &&
+                                {!!statistics.totalLikeCount &&
                                     <MiniStatisticColumn
                                         title="Total Likes"
                                         icon="thumbs-up"
-                                        statistic={abbreviateNumber(uploader.totalLikeCount)}
-                                        detailedStatistic={uploader.totalLikeCount.toLocaleString() + ' likes'}
+                                        statistic={abbreviateNumber(statistics.totalLikeCount)}
+                                        detailedStatistic={statistics.totalLikeCount.toLocaleString() + ' likes'}
                                     />
                                 }
-                                {!!uploader.totalDislikeCount &&
+                                {!!statistics.totalDislikeCount &&
                                     <MiniStatisticColumn
                                         title="Total Dislikes"
                                         icon="thumbs-down"
-                                        statistic={abbreviateNumber(uploader.totalDislikeCount)}
-                                        detailedStatistic={uploader.totalDislikeCount.toLocaleString() + ' dislikes'}
+                                        statistic={abbreviateNumber(statistics.totalDislikeCount)}
+                                        detailedStatistic={statistics.totalDislikeCount.toLocaleString() + ' dislikes'}
                                     />
                                 }
                             </Row>
-                            {uploader.tags.length > 0 &&
+                            {statistics.tags.length > 0 &&
                                 <div>
                                     <small>Tags: </small>
                                     <TopTags
                                         title="tags"
-                                        tags={uploader.tags}
+                                        tags={statistics.tags}
                                     />
                                 </div>
                             }
-                            {uploader.categories.length > 0 &&
+                            {statistics.categories.length > 0 &&
                                 <div>
                                     <small>Categories: </small>
                                     <TopTags
                                         title="categories"
-                                        tags={uploader.categories}
+                                        tags={statistics.categories}
                                     />
                                 </div>
                             }
-                            {uploader.hashtags.length > 0 &&
+                            {statistics.hashtags.length > 0 &&
                                 <div>
                                     <small>Hashtags: </small>
                                     <TopTags
                                         title="hashtags"
-                                        tags={uploader.hashtags}
+                                        tags={statistics.hashtags}
                                     />
                                 </div>
                             }

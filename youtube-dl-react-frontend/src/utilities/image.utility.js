@@ -21,10 +21,13 @@ export const getImage = (video, type, size = 'small') => {
                     throw new Error('Invalid size');
             }
         case 'avatar':
-            if (!video.hasOwnProperty('uploader') &&
-                !video.hasOwnProperty('name')
+            if (video.hasOwnProperty('name')) video = { uploaderDocument: video }; // An uploader is being passed instead of a video
+            if (
+                !video.hasOwnProperty('uploaderDocument')
+                || !video.uploaderDocument.hasOwnProperty('extractor')
+                || !video.uploaderDocument.hasOwnProperty('name')
             ) return 'default-avatar.jpg';
-            return `/static/avatars/${makeSafe(video.extractor, ' -')}/${makeSafe(video.uploader ?? video.name, '_')}.jpg`;
+            return `/static/avatars/${makeSafe(video.uploaderDocument.extractor, ' -')}/${makeSafe(video.uploaderDocument.name, '_')}.jpg`;
         default:
             throw new Error('Invalid type');
     }

@@ -8,10 +8,22 @@ router.get('/', async (req, res) => {
     let statistic;
     try {
         statistic = await Statistic.findOne({ accessKey: 'videos' })
-            .populate('recordViewCountVideo')
-            .populate('recordLikeCountVideo')
-            .populate('recordDislikeCountVideo')
-            .populate('oldestVideo');
+            .populate({
+                path: 'statistics.recordViewCountVideo',
+                populate: { path: 'uploaderDocument', select: 'extractor id name' },
+            })
+            .populate({
+                path: 'statistics.recordLikeCountVideo',
+                populate: { path: 'uploaderDocument', select: 'extractor id name' },
+            })
+            .populate({
+                path: 'statistics.recordDislikeCountVideo',
+                populate: { path: 'uploaderDocument', select: 'extractor id name' },
+            })
+            .populate({
+                path: 'statistics.oldestVideo',
+                populate: { path: 'uploaderDocument', select: 'extractor id name' },
+            });
     }
     catch (err) {
         return res.sendStatus(500);
@@ -26,11 +38,11 @@ router.get('/', async (req, res) => {
 
     statistic = statistic.toJSON();
     const returnTags = 5;
-    statistic.tags.slice(0, returnTags);
-    statistic.categories.slice(0, returnTags);
-    statistic.hashtags.slice(0, returnTags);
+    statistic.statistics.tags.slice(0, returnTags);
+    statistic.statistics.categories.slice(0, returnTags);
+    statistic.statistics.hashtags.slice(0, returnTags);
 
-    res.json({ statistic });
+    res.json({ statistic: statistic.statistics });
 });
 
 export default router;

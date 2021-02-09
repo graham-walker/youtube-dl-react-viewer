@@ -62,7 +62,7 @@ export default class UploaderList extends Component {
             >
 
                 <Media>
-                    <Link to={`/uploaders/${uploader.extractor}/${uploader.name}`}>
+                    <Link to={`/uploaders/${uploader.extractor}/${uploader.id}`}>
                         <Image
                             width={145}
                             height={145}
@@ -74,16 +74,16 @@ export default class UploaderList extends Component {
                     </Link>
                     <Media.Body className="align-self-center">
                         <Link
-                            to={`/uploaders/${uploader.extractor}/${uploader.name}`}
+                            to={`/uploaders/${uploader.extractor}/${uploader.id}`}
                             className="uploader-title-link text-dark"
                         >
                             <h5 title={uploader.name}>{uploader.name}</h5>
                         </Link>
                         <p className="text-muted mb-0">
                             <small>
-                                {uploader.totalVideoCount.toLocaleString()} video{(uploader.totalVideoCount !== 1) && 's'}
+                                {uploader.statistics.totalVideoCount.toLocaleString()} video{(uploader.statistics.totalVideoCount !== 1) && 's'}
                                 <span> &middot; </span>
-                                {bytesToSizeString(uploader.totalVideoFilesize,
+                                {bytesToSizeString(uploader.statistics.totalVideoFilesize,
                                     this.context.user?.reportBytesUsingIec ?? true)}
                             </small>
                         </p>

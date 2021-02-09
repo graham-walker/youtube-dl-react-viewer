@@ -14,12 +14,12 @@ const VideoPreview = props => {
     const userContext = useContext(UserContext);
 
     const video = props.video;
-    const uploaderLink = `/uploaders/${video.extractor}/${video.uploader}`
+    const uploaderLink = `/uploaders/${video.uploaderDocument?.extractor}/${video.uploaderDocument?.id}`
     const videoLink = `/videos/${video.extractor}/${video.id}`;
 
     const videoInfo = <>
         <Media>
-            {!!props.icon && video.uploader &&
+            {!!props.icon && video.uploaderDocument &&
                 <Link
                     to={uploaderLink}
                     className="mr-2"
@@ -42,12 +42,12 @@ const VideoPreview = props => {
                 >
                     {video.title}
                 </Link>
-                {video.uploader &&
+                {video.uploaderDocument &&
                     <Link
                         className="video-uploader-link"
                         to={uploaderLink}
                     >
-                        <small>{video.uploader}</small>
+                        <small>{video.uploaderDocument.name}</small>
                     </Link>
                 }
                 {!!props.simple ||
@@ -95,9 +95,6 @@ const VideoPreview = props => {
             paddingBottom: '56.25%',
             overflow: 'hidden',
             position: 'relative',
-            // backgroundImage: `url('${getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}'), url('/default-thumbnail.jpg')`,
-            // backgroundSize: 'cover',
-            // backgroundRepeat: 'no-repeat',
         }}
     >
         <Image
@@ -109,7 +106,6 @@ const VideoPreview = props => {
                 height: '100%',
                 objectFit: 'contain',
             }}
-            // style={{ height: 'auto', width: 'auto' }}
             src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
             onLoad={(e) => e.target.parentElement.style.setProperty('background-color', '#000', 'important')}
             onError={(e) => defaultImage(e, 'thumbnail')}

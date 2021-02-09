@@ -11,9 +11,11 @@ import Video from './models/video.model.js';
 import Job from './models/job.model.js';
 import Statistic from './models/statistic.model.js';
 import Uploader from './models/uploader.model.js';
+import Playlist from './models/playlist.model.js';
 import DownloadError from './models/error.model.js';
 
 import parsed from './parse-env.js';
+import { incrementStatistics } from './utilities/statistic.utility.js';
 
 const program = commander.program;
 
@@ -25,7 +27,7 @@ let debug;
     debug = parsed.env.VERBOSE;
 
     program.name('youtube-dl-exec-script')
-        .version('1.2.1') // Version is hardcoded here because on non-Windows systems this script has to be called by node instead of npm
+        .version('1.3.0') // Version is hardcoded here because on non-Windows systems this script has to be called by node instead of npm
         .requiredOption('-v, --video <path>', 'Downloaded video file location')
         .requiredOption('-j, --job-id <string>', 'Job document id')
         .option(
@@ -384,6 +386,14 @@ let debug;
         chapters = infojsonData.chapters;
     }
 
+    let likeDislikeRatio;
+    if (
+        typeof infojsonData?.like_count === 'number'
+        && typeof infojsonData?.dislike_count === 'number'
+    ) {
+        likeDislikeRatio = (infojsonData.like_count - infojsonData.dislike_count) / (infojsonData.like_count + infojsonData.dislike_count) || 0;
+    }
+
     // If there are files we could not determine the identity of throw an error
     if (files.length > 0) {
         console.error(`Failed to determine the identity of ${files.length} files:`);
@@ -424,18 +434,57 @@ let debug;
     }
 
     let uploader;
-    if (infojsonData.uploader) {
+    if (infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id) {
         try {
             uploader = await Uploader.findOne({
                 extractor: infojsonData.extractor,
-                name: infojsonData.uploader
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
             });
             if (!uploader) uploader = await new Uploader({
                 extractor: infojsonData.extractor,
-                name: infojsonData.uploader
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
+                name: infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id,
             }).save();
         } catch (err) {
             console.error('Failed to retrieve uploader document');
+            throw err;
+        }
+    }
+
+    let playlistUploader;
+    if (infojsonData.playlist_uploader || infojsonData.playlist_uploader_id) {
+        try {
+            playlistUploader = await Uploader.findOne({
+                extractor: infojsonData.extractor,
+                id: infojsonData.playlist_uploader_id || infojsonData.playlist_uploader,
+            });
+            if (!playlistUploader) playlistUploader = await new Uploader({
+                extractor: infojsonData.extractor,
+                id: infojsonData.playlist_uploader_id || infojsonData.playlist_uploader,
+                name: infojsonData.playlist_uploader || infojsonData.playlist_uploader_id,
+            }).save();
+        } catch (err) {
+            console.error('Failed to retrieve playlist uploader document');
+            throw err;
+        }
+    }
+
+    let playlist;
+    if (infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id) {
+        try {
+            playlist = await Playlist.findOne({
+                extractor: infojsonData.extractor,
+                id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
+            });
+            if (!playlist) playlist = await new Playlist({
+                extractor: infojsonData.extractor,
+                id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
+                name: infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id,
+                description: infojsonData.playlist_description,
+                uploaderDocument: playlistUploader,
+            }).save();
+        } catch (err) {
+            console.error('Failed to retrieve playlist document');
             throw err;
         }
     }
@@ -558,7 +607,9 @@ let debug;
         playlistUploader: infojsonData.playlist_uploader,
         playlistUploaderId: infojsonData.playlist_uploader_id,
         playlistUploaderUrl: infojsonData.playlist_uploader_url,
+        playlistDescription: infojsonData.playlist_description,
         hashtags: hashtags,
+        likeDislikeRatio: likeDislikeRatio,
         directory: slash(path.relative(path.join(parsed.env.OUTPUT_DIRECTORY, 'videos'), videoDirectory)),
         totalFilesize: videoFilesize + infoFilesize + (descriptionFilesize || 0) + (annotationsFilesize || 0) + totalThumbnailFilesize + (mediumResizedThumbnailFilesize || 0) + (smallResizedThumbnailFilesize || 0) + totalSubtitleFilesize,
         totalOriginalFilesize: videoFilesize + infoFilesize + (descriptionFilesize || 0) + (annotationsFilesize || 0) + totalThumbnailFilesize + totalSubtitleFilesize,
@@ -606,8 +657,9 @@ let debug;
         arguments: program.isImport ? null : program.isRepair ? error.arguments : job.arguments,
         overrideUploader: program.isRepair ? error.overrideUploader : job.overrideUploader,
         originalUploader: originalUploader,
-        jobDocument: job._id,
         uploaderDocument: uploader?._id,
+        playlistDocument: playlist?._id,
+        jobDocument: job._id,
         youtubeDlVersion: program.isImport ? null : program.isRepair ? error.youtubeDlVersion : program.youtubeDlVersion,
         youtubeDlPath: program.isImport ? null : program.isRepair ? error.youtubeDlPath : parsed.env.YOUTUBE_DL_PATH,
         imported: program.isRepair ? error.imported : program.isImport,
@@ -628,8 +680,39 @@ let debug;
     }
 
     if (!alreadyExists) {
-        if (uploader) await updateStatisticFields(video, uploader);
-        await updateStatisticFields(video, statistic);
+        
+        // Increment global statistics
+        statistic.statistics = incrementStatistics(video, statistic.statistics);
+        await statistic.save();
+
+        job.statistics = incrementStatistics(video, job.statistics);
+        await job.save();
+
+        if (uploader) {
+            uploader.statistics = incrementStatistics(video, uploader.statistics);
+
+            if (video.uploadDate === uploader.statistics.lastDateUploaded) {
+                uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
+            }
+
+            await uploader.save();
+        }
+
+        if (playlistUploader && video.uploadDate === playlistUploader.statistics.lastDateUploaded) {
+            playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
+            await playlistUploader.save();
+        }
+
+        if (playlist) {
+            playlist.statistics = incrementStatistics(video, playlist.statistics);
+
+            if (video.uploadDate === playlist.statistics.lastDateUploaded) {
+                playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
+                playlist.description = video.playlistDescription || playlist.description;
+            }
+
+            await playlist.save();
+        }
 
         console.log(`Successfully inserted document into the database`);
     }
@@ -775,68 +858,6 @@ const generateThumbnailFile = async (sourceData, width, height, filepath) => {
         return [filesize, md5, metadata.width, metadata.height];
     } catch (err) {
         console.error(`Failed to create resized thumbnail file: ${filepath}`);
-        throw err;
-    }
-}
-
-const updateStatisticFields = async (video, statistic) => {
-    // Update the uploader and video statistics
-    if (statistic.collection.name === 'statistics') {
-        if (video.uploadDate && (!statistic.oldestVideoUploadDate || video.uploadDate.getTime() < statistic.oldestVideoUploadDate.getTime())) {
-            statistic.oldestVideoUploadDate = video.uploadDate;
-            statistic.oldestVideo = video._id;
-        }
-    }
-
-    if (statistic.collection.name === 'uploaders') {
-        if (video.uploadDate && (!statistic.lastDateUploaded || video.uploadDate.getTime() > statistic.lastDateUploaded.getTime())) {
-            statistic.lastDateUploaded = video.uploadDate;
-        }
-    }
-
-    // save shared properties
-    statistic.totalVideoCount++;
-    statistic.totalDuration += video.duration || 0;
-    statistic.totalFilesize += video.totalFilesize;
-    statistic.totalOriginalFilesize += video.totalOriginalFilesize;
-    statistic.totalVideoFilesize += video.videoFile.filesize;
-    statistic.totalInfoFilesize += video.infoFile.filesize;
-    statistic.totalDescriptionFilesize += video.descriptionFile?.filesize || 0;
-    statistic.totalAnnotationsFilesize += video.annotationsFile?.filesize || 0
-    statistic.totalThumbnailFilesize += video.thumbnailFiles.reduce((a, b) => a + (b.filesize || 0), 0);
-    statistic.totalResizedThumbnailFilesize += (video.mediumResizedThumbnailFile?.filesize || 0) + (video.smallResizedThumbnailFile?.filesize || 0);
-    statistic.totalSubtitleFilesize += video.subtitleFiles.reduce((a, b) => a + (b.filesize || 0), 0);
-    statistic.totalViewCount += video.viewCount || 0;
-    statistic.totalLikeCount += video.likeCount || 0;
-    statistic.totalDislikeCount += video.dislikeCount || 0;
-    if (video.viewCount && video.viewCount > statistic.recordViewCount) {
-        statistic.recordViewCount = video.viewCount;
-        statistic.recordViewCountVideo = video._id;
-    }
-    if (video.likeCount && video.likeCount > statistic.recordLikeCount) {
-        statistic.recordLikeCount = video.likeCount;
-        statistic.recordLikeCountVideo = video._id;
-    }
-    if (video.dislikeCount && video.dislikeCount > statistic.recordDislikeCount) {
-        statistic.recordDislikeCount = video.dislikeCount;
-        statistic.recordDislikeCountVideo = video._id;
-    }
-    const props = ['tags', 'categories', 'hashtags'];
-    for (let i = 0; i < props.length; i++) {
-        for (let j = 0; j < video[props[i]].length; j++) {
-            const index = statistic[props[i]].map(e => e.name).indexOf(video[props[i]][j]);
-            if (index === -1) {
-                statistic[props[i]].push({ name: video[props[i]][j], count: 1 });
-            } else {
-                statistic[props[i]][index].count++;
-            }
-        }
-    }
-
-    try {
-        await statistic.save();
-    } catch (err) {
-        console.error(`Failed to save ${group[i].collection.name} document`);
         throw err;
     }
 }

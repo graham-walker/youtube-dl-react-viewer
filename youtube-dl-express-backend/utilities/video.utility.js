@@ -17,6 +17,7 @@ export const search = async (query, page, filter = {}) => {
         width: 1,
         height: 1,
         viewCount: 1,
+        uploaderDocument: 1,
     }
     if (sortField.name !== 'videoFile.filesize') fields[sortField.name] = 1;
 
@@ -30,7 +31,7 @@ export const search = async (query, page, filter = {}) => {
         {
             $sort:
                 (query['sort'] === 'relevance' && query.search)
-                    ? { score: { $meta: 'textScore' }, [sortField.name]: sortField.direction  }
+                    ? { score: { $meta: 'textScore' }, [sortField.name]: sortField.direction }
                     : { propertyIsNull: 1, [sortField.name]: sortField.direction }
         },
         { $project: { propertyType: 0, propertyIsNull: 0 } },
@@ -39,7 +40,8 @@ export const search = async (query, page, filter = {}) => {
     ];
     if (query.search) pipeline.unshift({ $match: { $text: { $search: query.search } } });
 
-    return await Video.aggregate(pipeline);
+    let videos = await Video.aggregate(pipeline);
+    return await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
 }
 
 export const sortBy = (option) => {
@@ -173,7 +175,7 @@ export const getSimilarVideos = async (video) => {
     let videos = await Video
         .find(
             {},
-            'id extractor duration directory smallResizedThumbnailFile uploadDate videoFile width height viewCount '
+            'id extractor duration directory smallResizedThumbnailFile uploadDate videoFile viewCount width height uploaderDocument '
             + fields
         )
         .sort({ uploadDate: -1 })
@@ -220,7 +222,7 @@ export const getSimilarVideos = async (video) => {
     videos.length = Math.min(videos.length, 50);
     if (videos.length === 0) videos = undefined;
 
-    return videos;
+    return await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
 }
 
 export const limitVideoList = (videosList, video, limit = 100) => {
