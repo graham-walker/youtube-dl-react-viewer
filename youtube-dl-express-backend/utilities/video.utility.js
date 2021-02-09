@@ -72,6 +72,10 @@ export const sortBy = (option) => {
             return { name: 'dislikeCount', direction: -1 };
         case 'least_dislikes':
             return { name: 'dislikeCount', direction: 1 };
+        case 'ratio_likes':
+            return { name: 'likeDislikeRatio', direction: -1 };
+        case 'ratio_dislikes':
+            return { name: 'likeDislikeRatio', direction: 1 };
         default:
             return { name: 'uploadDate', direction: -1 };
     }
