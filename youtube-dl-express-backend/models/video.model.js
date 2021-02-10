@@ -126,7 +126,7 @@ const videoSchema = new mongoose.Schema({
     smallResizedThumbnailFile: { type: thumbnailSchema, default: null },
     subtitleFiles: [{ type: subtitleSchema }],
     unindexedFiles: [{ type: String }],
-    dateDownloaded: { type: Date, default: new Date() },
+    dateDownloaded: { type: Date, default: new Date(), index: true },
     formatCode: { type: String, default: null },
     isAudioOnly: { type: Boolean, default: null },
     urls: { type: String, default: null },

@@ -157,8 +157,8 @@ export default class VideoList extends Component {
                                                     value={this.state['sort']}
                                                 >
                                                     <option value="relevance">Relevance</option>
-                                                    <option value="newest_date">Uploaded (Newest)</option>
-                                                    <option value="oldest_date">Uploaded (Oldest)</option>
+                                                    <option value="newest_date">Date Uploaded (Newest)</option>
+                                                    <option value="oldest_date">Date Uploaded (Oldest)</option>
                                                     <option value="longest_duration">Duration (Longest)</option>
                                                     <option value="shortest_duration">Duration (Shortest)</option>
                                                     <option value="largest_size">Filesize (Largest)</option>
@@ -171,6 +171,8 @@ export default class VideoList extends Component {
                                                     <option value="least_dislikes">Dislikes (Least)</option>
                                                     <option value="ratio_likes">Likes to Dislikes (Ratio)</option>
                                                     <option value="ratio_dislikes">Dislikes to Likes (Ratio)</option>
+                                                    <option value="newest_download">Date Downloaded (Newest)</option>
+                                                    <option value="oldest_download">Date Downloaded (Oldest)</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Form>
