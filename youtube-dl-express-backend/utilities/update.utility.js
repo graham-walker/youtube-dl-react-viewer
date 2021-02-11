@@ -126,9 +126,17 @@ const applyUpdates = async () => {
 
             await video.save();
 
-            process.stdout.clearLine(1);
-            process.stdout.cursorTo(0);
-            process.stdout.write((((i + 1) / videos.length) * 100).toFixed(2) + '%...');
+            let progress = (((i + 1) / videos.length) * 100).toFixed(2) + '%...';
+
+            // clearLine & cursorTo may not be available in Docker if there is no TTY
+            if (process.stdout.isTTY) {
+                process.stdout.clearLine(1);
+                process.stdout.cursorTo(0);
+                process.stdout.write(progress);
+            }
+            else {
+                console.log(progress);
+            }
         }
 
         await statistic.save();
