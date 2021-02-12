@@ -1,4 +1,5 @@
 import Video from '../models/video.model.js';
+import Statistic from '../models/statistic.model.js';
 
 export const search = async (query, page, filter = {}) => {
     let sortField = sortBy(query['sort']);
@@ -154,21 +155,13 @@ export const fields = Object.keys(weightedFields).join(' ');
 export const getSimilarVideos = async (video) => {
     let $group = { _id: null };
     let $project = {};
+    let aggregatedFields = {};
+    let statistic = await Statistic.findOne({ accessKey: 'videos' });
     for (let field in weightedFields) {
         if (weightedFields[field].type === 'dot') {
-            $group[field] = { $push: '$' + field };
-            $project[field] = {
-                $reduce: {
-                    input: '$' + field,
-                    initialValue: [],
-                    in: { $setUnion: ['$$value', '$$this'] }
-                }
-            };
+            aggregatedFields[field] = statistic.statistics[field].map(item => item.name);
         }
     }
-
-    let aggregatedFields = (await Video.aggregate([{ $group }, { $project }]))[0];
-    delete aggregatedFields._id;
 
     let keywords = [];
     for (let field in weightedFields) {
