@@ -123,6 +123,37 @@ let debug;
         && file !== basename + '.info.json'
     );
 
+    // Get the video metadata file
+    const infoFile = path.join(videoDirectory, basename + '.info.json');
+    let [infojsonData, infoFilesize, infoMd5] = getFileData(infoFile, true);
+
+    // Parse metadata from the video metadata file
+    try {
+        infojsonData = JSON.parse(infojsonData);
+    } catch (err) {
+        console.error(`Failed to parse video metadata file: ${infoFile}`);
+        throw err;
+    }
+
+    // Make sure video metadata has the required properties
+    const requiredProperties = ['id', 'extractor', 'title'];
+    for (let i = 0; i < requiredProperties.length; i++) {
+        if (!infojsonData.hasOwnProperty(requiredProperties[i])) {
+            const err = 'Video metadata file does not have required property:'
+                + ` ${requiredProperties[i]}`;
+            console.error(err);
+            throw new Error(err);
+        }
+    }
+
+    // Make sure the video doesn't already exist in the database
+    let video = await Video.findOne({ extractor: infojsonData.extractor, id: infojsonData.id });
+    if (video) {
+        console.warn(`Document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} already exists in the database`);
+        mongoose.disconnect();
+        process.exit(0);
+    }
+
     // Hash the video file
     console.log('Generating MD5 hash for video file...');
     let videoMd5;
@@ -182,29 +213,6 @@ let debug;
 
     // TODO: Here is where I might collect metadata from --write-metadata and
     // --xattrs but the data appears to be redundant
-
-    // Get the video metadata file
-    const infoFile = path.join(videoDirectory, basename + '.info.json');
-    let [infojsonData, infoFilesize, infoMd5] = getFileData(infoFile, true);
-
-    // Parse metadata from the video metadata file
-    try {
-        infojsonData = JSON.parse(infojsonData);
-    } catch (err) {
-        console.error(`Failed to parse video metadata file: ${infoFile}`);
-        throw err;
-    }
-
-    // Make sure video metadata has the required properties
-    const requiredProperties = ['id', 'extractor', 'title'];
-    for (let i = 0; i < requiredProperties.length; i++) {
-        if (!infojsonData.hasOwnProperty(requiredProperties[i])) {
-            const err = 'Video metadata file does not have required property:'
-                + ` ${requiredProperties[i]}`;
-            console.error(err);
-            throw new Error(err);
-        }
-    }
 
     // Get the description file (if it exists)
     const descriptionFile = path.join(videoDirectory, basename + '.description');
@@ -476,13 +484,21 @@ let debug;
                 extractor: infojsonData.extractor,
                 id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
             });
-            if (!playlist) playlist = await new Playlist({
-                extractor: infojsonData.extractor,
-                id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
-                name: infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id,
-                description: infojsonData.playlist_description,
-                uploaderDocument: playlistUploader,
-            }).save();
+            if (!playlist) {
+                playlist = await new Playlist({
+                    extractor: infojsonData.extractor,
+                    id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
+                    name: infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id,
+                    description: infojsonData.playlist_description,
+                    uploaderDocument: playlistUploader,
+                }).save();
+
+                // Update the uploader playlist created count
+                if (playlistUploader) {
+                    playlistUploader.playlistCreatedCount++;
+                    await playlistUploader.save();
+                }
+            }
         } catch (err) {
             console.error('Failed to retrieve playlist document');
             throw err;
@@ -512,7 +528,7 @@ let debug;
     }
 
     // Insert the document
-    let video = new Video({
+    video = new Video({
         extractor: infojsonData.extractor,
         extractorKey: infojsonData.extractor_key,
         id: infojsonData.id,
@@ -666,57 +682,47 @@ let debug;
         scriptVersion: program.version(),
     });
 
-    let alreadyExists = false;
     try {
         await video.save();
     } catch (err) {
-        if (err.name === 'MongoError' && err.code === 11000) {
-            console.warn(`Document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} already exists in the database`);
-            alreadyExists = true;
-        } else {
-            console.error(`Failed to insert document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} into the database`);
-            throw err;
-        }
+        console.error(`Failed to insert document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} into the database`);
+        throw err;
     }
 
-    if (!alreadyExists) {
-        
-        // Increment global statistics
-        statistic.statistics = incrementStatistics(video, statistic.statistics);
-        await statistic.save();
+    // Increment statistics
+    statistic.statistics = incrementStatistics(video, statistic.statistics, true);
+    await statistic.save();
 
-        job.statistics = incrementStatistics(video, job.statistics);
-        await job.save();
+    job.statistics = incrementStatistics(video, job.statistics, true);
+    await job.save();
 
-        if (uploader) {
-            uploader.statistics = incrementStatistics(video, uploader.statistics);
+    if (uploader) {
+        uploader.statistics = incrementStatistics(video, uploader.statistics, true);
 
-            if (video.uploadDate === uploader.statistics.lastDateUploaded) {
-                uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
-            }
-
-            await uploader.save();
+        if (video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
+            uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
         }
 
-        if (playlistUploader && video.uploadDate === playlistUploader.statistics.lastDateUploaded) {
-            playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
-            await playlistUploader.save();
-        }
-
-        if (playlist) {
-            playlist.statistics = incrementStatistics(video, playlist.statistics);
-
-            if (video.uploadDate === playlist.statistics.lastDateUploaded) {
-                playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
-                playlist.description = video.playlistDescription || playlist.description;
-            }
-
-            await playlist.save();
-        }
-
-        console.log(`Successfully inserted document into the database`);
+        await uploader.save();
     }
 
+    if (playlistUploader && video.uploadDate === playlistUploader.statistics.newestVideoDateUploaded) {
+        playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
+        await playlistUploader.save();
+    }
+
+    if (playlist) {
+        playlist.statistics = incrementStatistics(video, playlist.statistics, true);
+
+        if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
+            playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
+            playlist.description = video.playlistDescription || playlist.description;
+        }
+
+        await playlist.save();
+    }
+
+    console.log(`Successfully inserted document into the database`);
     mongoose.disconnect();
     process.exit(0);
 })().catch(async err => {
