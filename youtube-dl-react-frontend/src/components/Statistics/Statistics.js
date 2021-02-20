@@ -217,8 +217,8 @@ export default class StatisticsPage extends Component {
                                 <SignificantVideo
                                     title="Oldest Video"
                                     icon="hourglass-end"
-                                    statistic={'Uploaded ' + dateToTimeSinceString(new Date(statistic.oldestVideoUploadDate))}
-                                    detailedStatistic={'Uploaded on ' + new Date(statistic.oldestVideoUploadDate).toLocaleDateString()}
+                                    statistic={'Uploaded ' + dateToTimeSinceString(new Date(statistic.oldestVideoDateUploaded))}
+                                    detailedStatistic={'Uploaded on ' + new Date(statistic.oldestVideoDateUploaded).toLocaleDateString()}
                                     video={statistic.oldestVideo}
                                 />
                             }
