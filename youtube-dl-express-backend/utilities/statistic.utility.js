@@ -1,4 +1,10 @@
-export const incrementStatistics = (video, statistics) => {
+export const incrementStatistics = (video, statistics, keepArrayFormat = false) => {
+    
+    // If a mongoose object was passed, convert it into a plain object as incrementing
+    // the statistics converts the statistics into a form that is faster to increment
+    // but will make the document validation fail
+    if ('toObject' in statistics) statistics = statistics.toObject();
+
     statistics.totalVideoCount++;
     statistics.totalDuration += video.duration || 0;
     statistics.totalFilesize += video.totalFilesize;
@@ -25,24 +31,46 @@ export const incrementStatistics = (video, statistics) => {
         statistics.recordDislikeCount = video.dislikeCount;
         statistics.recordDislikeCountVideo = video._id;
     }
-    if (video.uploadDate && (!statistics.lastDateUploaded || video.uploadDate.getTime() > statistics.lastDateUploaded.getTime())) {
-        statistics.lastDateUploaded = video.uploadDate;
+    if (video.uploadDate && (!statistics.newestVideoDateUploaded || video.uploadDate.getTime() > statistics.newestVideoDateUploaded.getTime())) {
+        statistics.newestVideoDateUploaded = video.uploadDate;
+        statistics.newestVideo = video._id;
     }
-    if (video.uploadDate && (!statistics.oldestVideoUploadDate || video.uploadDate.getTime() < statistics.oldestVideoUploadDate.getTime())) {
-        statistics.oldestVideoUploadDate = video.uploadDate;
+    if (video.uploadDate && (!statistics.oldestVideoDateUploaded || video.uploadDate.getTime() < statistics.oldestVideoDateUploaded.getTime())) {
+        statistics.oldestVideoDateUploaded = video.uploadDate;
         statistics.oldestVideo = video._id;
     }
+
+    // Convert tags, categories, and hashtags from Array to Object for much faster lookup times
     const props = ['tags', 'categories', 'hashtags'];
-    for (let i = 0; i < props.length; i++) {
-        for (let j = 0; j < video[props[i]].length; j++) {
-            const index = statistics[props[i]].map(e => e.name).indexOf(video[props[i]][j]);
-            if (index === -1) {
-                statistics[props[i]].push({ name: video[props[i]][j], count: 1 });
+    for (let prop of props) {
+        if (Array.isArray(statistics[prop])) {
+            let indexed = {};
+            statistics[prop].map(e => {
+                indexed[e.name] = e.count;
+            });
+            statistics[prop] = indexed;
+        }
+        for (let name of video[prop]) {
+            if (statistics[prop].hasOwnProperty(name)) {
+                statistics[prop][name]++;
             } else {
-                statistics[props[i]][index].count++;
+                statistics[prop][name] = 1;
             }
         }
     }
 
+    if (keepArrayFormat) return convertStatistics(statistics);
+    return statistics;
+}
+
+export const convertStatistics = (statistics) => {
+    const props = ['tags', 'categories', 'hashtags'];
+    for (let prop of props) {
+        let converted = [];
+        for (const [name, count] of Object.entries(statistics[prop])) {
+            converted.push({ name, count });
+        }
+        statistics[prop] = converted;
+    }
     return statistics;
 }

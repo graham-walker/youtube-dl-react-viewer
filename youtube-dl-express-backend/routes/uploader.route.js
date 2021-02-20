@@ -21,8 +21,8 @@ router.get('/page/:page', async (req, res) => {
 
     try {
         uploaders = await Uploader
-            .find({}, '-_id extractor id name statistics.totalVideoCount'
-                + ' statistics.totalVideoFilesize statistics.lastDateUploaded')
+            .find({}, '-_id extractor id name playlistCreatedCount statistics.totalVideoCount'
+                + ' statistics.totalVideoFilesize statistics.newestVideoDateUploaded')
             .collation({ locale: 'en' })
             .sort({ name: 1 })
             .skip(page * perPage)

@@ -6,6 +6,7 @@ const uploaderSchema = new mongoose.Schema({
     extractor: { type: String, required: true },
     id: { type: String, required: true, index: true },
     name: { type: String, required: true },
+    playlistCreatedCount: { type: Number, default: 0 },
     statistics: { type: statisticSchema, default: () => ({}) },
 }, {
     timestamps: true,
