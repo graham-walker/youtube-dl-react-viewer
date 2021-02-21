@@ -83,6 +83,8 @@ export default class UploaderList extends Component {
                             <small>
                                 {uploader.statistics.totalVideoCount.toLocaleString()} video{(uploader.statistics.totalVideoCount !== 1) && 's'}
                                 <span> &middot; </span>
+                                {uploader.playlistCreatedCount.toLocaleString()} playlist{(uploader.playlistCreatedCount !== 1) && 's'}
+                                <span> &middot; </span>
                                 {bytesToSizeString(uploader.statistics.totalVideoFilesize,
                                     this.context.user?.reportBytesUsingIec ?? true)}
                             </small>

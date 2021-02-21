@@ -36,6 +36,7 @@ $container-max-widths: (
 }
 
 @import './components/Admin/Admin.scss';
+@import './components/Playlist/Playlist.scss';
 @import './components/Video/Video.scss';
 @import './components/Video/Description/Description.scss';
 @import './components/VideoPreview/VideoPreview.scss';

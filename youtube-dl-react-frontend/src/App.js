@@ -16,6 +16,7 @@ import StatisticsPage from './components/Statistics/Statistics';
 import VideoPage from './components/Video/Video';
 import Page from './components/Page/Page';
 import UploaderPage from './components/Uploader/Uploader';
+import Playlist from './components/Playlist/Playlist';
 import UserContext from './contexts/user.context';
 import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
@@ -59,9 +60,15 @@ function App() {
 							}
 						/>
 						<Route
-							path="/uploaders/:extractor/:name/"
+							path="/uploaders/:extractor/:id/"
 							exact
 							render={(props) => <UploaderPage {...props} />
+							}
+						/>
+						<Route
+							path="/playlists/:extractor/:id/"
+							exact
+							render={(props) => <Playlist {...props} />
 							}
 						/>
 						<Route

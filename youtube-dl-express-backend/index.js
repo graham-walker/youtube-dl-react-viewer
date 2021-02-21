@@ -10,6 +10,7 @@ import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
 import videoRouter from './routes/video.route.js';
 import uploaderRouter from './routes/uploader.route.js';
+import playlistRouter from './routes/playlist.route.js'
 import statisticRouter from './routes/statistic.route.js';
 import adminRouter from './routes/admin.route.js';
 
@@ -49,6 +50,7 @@ import applyUpdates from './utilities/update.utility.js';
     app.use('/api/users', [globalPasswordMiddleware, authenticationMiddleware], userRouter);
     app.use('/api/videos', globalPasswordMiddleware, videoRouter);
     app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
+    app.use('/api/playlists', globalPasswordMiddleware, playlistRouter);
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
 
@@ -105,5 +107,6 @@ import applyUpdates from './utilities/update.utility.js';
         }
     });
 })().catch(err => {
-    throw err;
+    console.error(err);
+    process.exit(1);
 });

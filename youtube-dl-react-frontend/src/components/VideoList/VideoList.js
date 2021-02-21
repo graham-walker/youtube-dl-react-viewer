@@ -90,6 +90,7 @@ export default class VideoList extends Component {
     render() {
         const videos = this.state.videos.map(video =>
             <Col
+                style={this.props?.layout === 'playlist' ? { flex: '0 0 100%', maxWidth: '100%' } : {}}
                 className="mb-3 px-1 col-xxl-2"
                 lg="3"
                 sm="6"
@@ -98,7 +99,9 @@ export default class VideoList extends Component {
             >
                 <VideoPreview
                     video={video}
-                    width="100%"
+                    width={this.props?.layout === 'playlist' ? '168px' : '100%'}
+                    small={this.props?.layout === 'playlist' ? true : false}
+                    horizontal={this.props?.layout === 'playlist' ? true : false}
                 />
             </Col>
         );

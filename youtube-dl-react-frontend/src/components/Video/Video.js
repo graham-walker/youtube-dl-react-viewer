@@ -190,7 +190,7 @@ export default class VideoPage extends Component {
                 {video.episodeNumber !== null ? ' E' + video.episodeNumber : false}
             </>;
         }
-        
+
         return (
             <PageLoadWrapper
                 loading={this.state.loading}
@@ -550,17 +550,24 @@ export default class VideoPage extends Component {
                                                 </Nav>
                                             </div>
                                             <Tab.Content>
-                                                {!!video.uploader &&
-                                                    <Tab.Pane eventKey="uploader">
-                                                        <VideoScroller
-                                                            videos={this.state.uploaderVideos}
-                                                            offset={this.state.uploaderVideosOffset}
-                                                            activeVideo={video}
-                                                            activeTab={this.state.activeTab}
-                                                        />
-                                                    </Tab.Pane>
+                                                {!!video.uploaderDocument &&
+                                                    <>
+                                                        <Tab.Pane eventKey="uploader">
+                                                            <VideoScroller
+                                                                videos={this.state.uploaderVideos}
+                                                                offset={this.state.uploaderVideosOffset}
+                                                                activeVideo={video}
+                                                                activeTab={this.state.activeTab}
+                                                            />
+                                                            <div className="text-center my-1">
+                                                                <Link to={`/uploaders/${video.uploaderDocument.extractor}/${video.uploaderDocument.id}`}>
+                                                                    View All
+                                                                </Link>
+                                                            </div>
+                                                        </Tab.Pane>
+                                                    </>
                                                 }
-                                                {!!video.playlist &&
+                                                {!!video.playlistDocument &&
                                                     <Tab.Pane eventKey="playlist">
                                                         <VideoScroller
                                                             videos={this.state.playlistVideos}
@@ -568,6 +575,11 @@ export default class VideoPage extends Component {
                                                             activeVideo={video}
                                                             activeTab={this.state.activeTab}
                                                         />
+                                                        <div className="text-center my-1">
+                                                            <Link to={`/playlists/${video.playlistDocument.extractor}/${video.playlistDocument.id}`}>
+                                                                View All
+                                                            </Link>
+                                                        </div>
                                                     </Tab.Pane>
                                                 }
                                                 {!!video.jobDocument &&
@@ -578,6 +590,11 @@ export default class VideoPage extends Component {
                                                             activeVideo={video}
                                                             activeTab={this.state.activeTab}
                                                         />
+                                                        <div className="text-center my-1">
+                                                            <Link to={`/jobs/${video.jobDocument._id}`}>
+                                                                View All
+                                                            </Link>
+                                                        </div>
                                                     </Tab.Pane>
                                                 }
                                             </Tab.Content>

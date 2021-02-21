@@ -1,14 +1,15 @@
 import Video from '../models/video.model.js';
 import Statistic from '../models/statistic.model.js';
 
-export const search = async (query, page, filter = {}) => {
-    let sortField = sortBy(query['sort']);
+export const search = async (query, page, filter = {}, relevanceMeans = 'uploadDate', relevanceDirection = -1) => {
+    let sortField = sortBy(query['sort'], relevanceMeans, relevanceDirection);
 
     let fields = {
         _id: 0,
         extractor: 1,
         id: 1,
         title: 1,
+        smallResizedThumbnailFile: 1,
         mediumResizedThumbnailFile: 1,
         directory: 1,
         uploader: 1,
@@ -45,10 +46,10 @@ export const search = async (query, page, filter = {}) => {
     return await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
 }
 
-export const sortBy = (option) => {
+export const sortBy = (option, relevanceMeans, relevanceDirection) => {
     switch (option) {
         case 'relevance':
-            return { name: 'uploadDate', direction: -1 };
+            return { name: relevanceMeans, direction: relevanceDirection };
         case 'newest_date':
             return { name: 'uploadDate', direction: -1 };
         case 'oldest_date':
@@ -82,7 +83,7 @@ export const sortBy = (option) => {
         case 'oldest_download':
             return { name: 'dateDownloaded', direction: 1 };
         default:
-            return { name: 'uploadDate', direction: -1 };
+            return { name: relevanceMeans, direction: relevanceDirection };
     }
 }
 

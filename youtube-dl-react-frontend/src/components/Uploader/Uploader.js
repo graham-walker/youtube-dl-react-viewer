@@ -28,7 +28,7 @@ export default class UploaderPage extends Component {
 
     componentDidMount() {
         axios
-            .get(`/api/uploaders/${this.props.match.params.extractor}/${this.props.match.params.name}`)
+            .get(`/api/uploaders/${this.props.match.params.extractor}/${this.props.match.params.id}`)
             .then(res => {
                 if (res.status === 200) {
                     this.setState({
@@ -163,7 +163,7 @@ export default class UploaderPage extends Component {
                     </Row>
                     <VideoList
                         location={this.props.location}
-                        url={`uploaders/${this.props.match.params.extractor}/${this.props.match.params.name}`}
+                        url={`uploaders/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                     />
                 </>}
             </PageLoadWrapper>

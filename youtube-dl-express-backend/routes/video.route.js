@@ -67,9 +67,9 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' uploaderDocument fps webpageUrl dateDownloaded width height'
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
-        + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId ' + fields
+        + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId playlistDocument' + fields
         )
-            .populate('uploaderDocument jobDocument')
+            .populate('uploaderDocument playlistDocument jobDocument')
             .exec()
         )?.toJSON();
         if (!video) return res.sendStatus(404);
