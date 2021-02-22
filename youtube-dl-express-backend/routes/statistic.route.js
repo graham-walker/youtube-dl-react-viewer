@@ -36,13 +36,7 @@ router.get('/', async (req, res) => {
         }
     }
 
-    statistic = statistic.toJSON();
-    const returnTags = 5;
-    statistic.statistics.tags.slice(0, returnTags);
-    statistic.statistics.categories.slice(0, returnTags);
-    statistic.statistics.hashtags.slice(0, returnTags);
-
-    res.json({ statistic: statistic.statistics });
+    res.json({ statistic: statistic.toJSON().statistics });
 });
 
 export default router;

@@ -57,13 +57,7 @@ router.get('/:extractor/:id', async (req, res) => {
     }
     if (!uploader) return res.sendStatus(404);
 
-    uploader = uploader.toJSON();
-    const returnTags = 5;
-    uploader.statistics.tags.slice(0, returnTags);
-    uploader.statistics.categories.slice(0, returnTags);
-    uploader.statistics.hashtags.slice(0, returnTags);
-
-    res.json({ uploader });
+    res.json({ uploader: uploader.toJSON() });
 });
 
 router.get('/:extractor/:id/:page', async (req, res) => {
