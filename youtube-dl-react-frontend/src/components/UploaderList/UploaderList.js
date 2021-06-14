@@ -91,7 +91,7 @@ export default class UploaderList extends Component {
                         </p>
                         <p className="text-muted mb-0">
                             <small>
-                                Last upload was {dateToTimeSinceString(new Date(uploader.lastDateUploaded))}
+                                Last upload was {dateToTimeSinceString(new Date(uploader.statistics.newestVideoDateUploaded))}
                             </small>
                         </p>
                         <p className="text-muted mb-0">

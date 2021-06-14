@@ -73,12 +73,12 @@ export default class UploaderPage extends Component {
                                 {uploader.name}
                             </h3>
                             <Row className="text-center justify-content-md-center">
-                                {statistics.lastDateUploaded &&
+                                {statistics.newestVideoDateUploaded &&
                                     <MiniStatisticColumn
                                         title="Last Upload"
                                         icon="calendar-alt"
-                                        statistic={dateToTimeSinceString(new Date(statistics.lastDateUploaded))}
-                                        detailedStatistic={new Date(statistics.lastDateUploaded).toLocaleString()}
+                                        statistic={dateToTimeSinceString(new Date(statistics.newestVideoDateUploaded))}
+                                        detailedStatistic={new Date(statistics.newestVideoDateUploaded).toLocaleString()}
                                     />
                                 }
                                 {!!statistics.totalVideoCount &&

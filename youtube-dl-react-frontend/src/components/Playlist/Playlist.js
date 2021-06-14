@@ -91,8 +91,8 @@ export default class Playlist extends Component {
                                         {abbreviateNumber(statistics.totalViewCount)} view{statistics.totalViewCount !== 1 && 's'}
                                     </span>
                                     <> &middot; </>
-                                    <span title={new Date(statistics.lastDateUploaded).toLocaleString()}>
-                                        Updated {dateToTimeSinceString(new Date(statistics.lastDateUploaded))}
+                                    <span title={new Date(statistics.newestVideoDateUploaded).toLocaleString()}>
+                                        Updated {dateToTimeSinceString(new Date(statistics.newestVideoDateUploaded))}
                                     </span>
                                 </p>
                                 {!!uploader && <>
