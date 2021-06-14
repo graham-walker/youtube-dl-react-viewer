@@ -20,9 +20,9 @@ import Playlist from './components/Playlist/Playlist';
 import UserContext from './contexts/user.context';
 import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
-import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv);
+library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale);
 
 function App() {
 	return (

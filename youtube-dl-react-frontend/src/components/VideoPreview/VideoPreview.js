@@ -2,11 +2,13 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Badge, Image, Media } from 'react-bootstrap';
 import { UserContext } from '../../contexts/user.context';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     dateToTimeSinceString,
     videoDurationToOverlay,
     resolutionToBadge,
-    abbreviateNumber
+    abbreviateNumber,
+    bytesToSizeString,
 } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 
@@ -115,6 +117,7 @@ const VideoPreview = props => {
                 {videoDurationToOverlay(video.duration)}
             </span>
         }
+        <VideoStatBadge video={video} type={props.badge} />
     </div>;
 
     if (!!props.horizontal) {
@@ -150,6 +153,93 @@ const VideoPreview = props => {
             </div>
         );
     }
+}
+
+const VideoStatBadge = props => {
+    const video = props.video;
+
+    if (props.type) {
+        let badgeProps;
+        try {
+            switch (props.type) {
+                case 'largest_size':
+                case 'smallest_size':
+                    badgeProps = {
+                        icon: 'file',
+                        text: bytesToSizeString(video.videoFile.filesize),
+                        title: video.videoFile.filesize.toLocaleString() + ' bytes',
+                    };
+                    break;
+                case 'most_likes':
+                case 'least_likes':
+                    badgeProps = {
+                        icon: 'thumbs-up',
+                        text: abbreviateNumber(video.likeCount),
+                        title: video.likeCount.toLocaleString() + ' likes',
+                    };
+                    break;
+                case 'most_dislikes':
+                case 'least_dislikes':
+                    badgeProps = {
+                        icon: 'thumbs-down',
+                        text: abbreviateNumber(video.dislikeCount),
+                        title: video.dislikeCount.toLocaleString() + ' dislikes',
+                    };
+                    break;
+                case 'ratio_likes':
+                case 'ratio_dislikes':
+                    let likeNumber;
+                    let dislikeNumber;
+
+                    if (video.likeCount > video.dislikeCount) {
+                        if (video.dislikeCount === 0) {
+                            likeNumber = 1;
+                            dislikeNumber = 0;
+                        } else {
+                            likeNumber = Number((video.likeCount / video.dislikeCount).toFixed(2));
+                            dislikeNumber = 1;
+                        }
+                    } else {
+                        if (video.likeCount === 0) {
+                            likeNumber = 0;
+                            dislikeNumber = 1;
+                        } else {
+                            likeNumber = 1;
+                            dislikeNumber = Number((video.dislikeCount / video.likeCount).toFixed(2));
+                        }
+                    }
+
+                    badgeProps = {
+                        icon: 'balance-scale',
+                        text: `${likeNumber} : ${dislikeNumber}`,
+                        title: `${likeNumber} like${likeNumber !== 1 ? 's' : ''} per ${dislikeNumber} dislike${dislikeNumber !== 1 ? 's' : ''}`,
+                    };
+                    break;
+
+                case 'newest_download':
+                case 'oldest_download':
+                    badgeProps = {
+                        icon: 'calendar-alt',
+                        text: dateToTimeSinceString(new Date(video.dateDownloaded)),
+                        title: new Date(video.dateDownloaded).toLocaleString(),
+                    };
+                    break;
+            }
+            if (badgeProps) {
+                return (
+                    <Badge
+                        variant="primary"
+                        className="video-badge"
+                        title={badgeProps.title}
+                    >
+                        <FontAwesomeIcon icon={badgeProps.icon} />
+                        <> {badgeProps.text}</>
+                    </Badge>
+                );
+            }
+        } catch { };
+    }
+    return <></>;
 }
 
 export default VideoPreview;

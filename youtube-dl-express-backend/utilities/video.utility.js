@@ -20,6 +20,8 @@ export const search = async (query, page, filter = {}, relevanceMeans = 'uploadD
         height: 1,
         viewCount: 1,
         uploaderDocument: 1,
+        likeCount: 1,
+        dislikeCount: 1,
     }
     if (sortField.name !== 'videoFile.filesize') fields[sortField.name] = 1;
 
