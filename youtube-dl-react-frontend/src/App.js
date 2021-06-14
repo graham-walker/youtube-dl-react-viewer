@@ -125,20 +125,6 @@ function App() {
 						/>
 					</Switch>
 				</Container>
-				<div className="mt-auto bg-light text-center">
-					<Container style={{ padding: '2rem 1rem' }}>
-
-						<a
-							className="text-dark"
-							href={window.gitHubLink}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							To get new releases or submit issues check out the project on GitHub <FontAwesomeIcon icon="external-link-alt" />
-						</a>
-						<span className="d-block">Version: {window.scriptVersion}</span>
-					</Container>
-				</div>
 			</UserContext>
 		</Router>
 	);
