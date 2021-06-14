@@ -146,6 +146,8 @@ const applyUpdates = async () => {
             // Add a new field to videos for likeDislikeRatio
             if (video.likeCount !== null && video.dislikeCount !== null) {
                 video.likeDislikeRatio = (video.likeCount - video.dislikeCount) / (video.likeCount + video.dislikeCount) || 0;
+            } else {
+                video.likeDislikeRatio = null;
             }
 
             await video.save();
