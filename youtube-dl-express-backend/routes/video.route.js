@@ -109,7 +109,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
     let similarVideos;
     try {
-        similarVideos = await getSimilarVideos(video);
+        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled') similarVideos = await getSimilarVideos(video);
     } catch (err) {
         return res.sendStatus(500);
     }

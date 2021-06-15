@@ -156,8 +156,8 @@ const weightedFields = {
 export const fields = Object.keys(weightedFields).join(' ');
 
 export const getSimilarVideos = async (video) => {
-    let $group = { _id: null };
-    let $project = {};
+    // let $group = { _id: null };
+    // let $project = {};
     let aggregatedFields = {};
     let statistic = await Statistic.findOne({ accessKey: 'videos' });
     for (let field in weightedFields) {
@@ -190,12 +190,14 @@ export const getSimilarVideos = async (video) => {
     for (let field in weightedFields) {
         switch (weightedFields[field].type) {
             case 'dot':
-                let vector = createVector(aggregatedFields[field], video[field]);
-                let maxScore = vector.length > 0 ? vector.reduce((a, b) => a + b) : 0;
-                if (maxScore > 0) {
-                    for (let i = 0; i < videos.length; i++) {
-                        let score = dot(vector, createVector(aggregatedFields[field], videos[i][field]));
-                        videos[i].score += (score / maxScore) * weightedFields[field].weight;
+                if (parsedEnv.DISPLAY_SIMILAR_VIDEOS === 'complex') {
+                    let vector = createVector(aggregatedFields[field], video[field]);
+                    let maxScore = vector.length > 0 ? vector.reduce((a, b) => a + b) : 0;
+                    if (maxScore > 0) {
+                        for (let i = 0; i < videos.length; i++) {
+                            let score = dot(vector, createVector(aggregatedFields[field], videos[i][field]));
+                            videos[i].score += (score / maxScore) * weightedFields[field].weight;
+                        }
                     }
                 }
                 break;

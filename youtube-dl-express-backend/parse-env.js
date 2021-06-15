@@ -75,6 +75,11 @@ const expected = {
         type: Boolean,
         default: true,
     },
+    'DISPLAY_SIMILAR_VIDEOS': {
+        type: String,
+        allowed: ['complex', 'simple', 'disabled'],
+        default: 'complex',
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',
