@@ -6,6 +6,7 @@ import User from '../models/user.model.js';
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
+    if (!parsedEnv.ENABLE_USER_REGISTRATION) return res.status(500).json({ error: 'User registration is disabled' });
     const { username, password } = req.body;
     const user = new User({ username, password });
     try {

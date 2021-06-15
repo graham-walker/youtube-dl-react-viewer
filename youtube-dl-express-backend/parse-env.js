@@ -71,6 +71,10 @@ const expected = {
         type: Boolean,
         default: false,
     },
+    'ENABLE_USER_REGISTRATION': {
+        type: Boolean,
+        default: true,
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',
