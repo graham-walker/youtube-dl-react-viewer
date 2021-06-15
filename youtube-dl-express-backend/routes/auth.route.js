@@ -6,13 +6,18 @@ import User from '../models/user.model.js';
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
-    if (!parsedEnv.ENABLE_USER_REGISTRATION) return res.status(500).json({ error: 'User registration is disabled' });
+    if (!parsedEnv.ENABLE_USER_REGISTRATION) return res.status(500).json({ error: 'Registration is disabled' });
     const { username, password } = req.body;
     const user = new User({ username, password });
     try {
         await user.save();
     } catch (err) {
-        return res.sendStatus(500);
+        console.error(err);
+        if (err.code === 11000 && err.keyPattern.username === 1) {
+            return res.status(500).json({ error: 'Username is taken' });
+        } else {
+            return res.sendStatus(500);
+        }
     }
     res.sendStatus(200);
 });
