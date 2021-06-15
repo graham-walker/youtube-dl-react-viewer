@@ -1,15 +1,21 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import sharp from 'sharp';
+import fs from 'fs-extra';
+import { v4 as uuidv4 } from 'uuid';
 
 import User from '../models/user.model.js';
 
 const router = express.Router();
+const avatarUpload = multer({ storage: multer.memoryStorage() });
 
 router.get('/settings', async (req, res) => {
     let user;
     try {
         user = await User.findOne(
             { _id: req.userId },
-            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec'
+            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar'
         );
     } catch (err) {
         return res.sendStatus(500);
@@ -19,14 +25,35 @@ router.get('/settings', async (req, res) => {
     res.json({ user: user.toJSON() });
 });
 
-router.post('/settings', async (req, res) => {
+router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     let user;
     try {
-        user = await User.findOne({ _id: req.userId });
+        user = await User.findOne({ _id: req.userId },
+            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar');
     } catch (err) {
         return res.sendStatus(500);
     }
     if (!user) return res.sendStatus(500);
+
+    if (req.file) {
+        try {
+            const avatarDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'users/avatars');
+            const avatar = uuidv4() + '.webp';
+            fs.ensureDirSync(avatarDirectory);
+            await sharp(req.file.buffer)
+                .resize({
+                    fit: sharp.fit.cover,
+                    width: 256,
+                    height: 256,
+                })
+                .webp({ quality: 100, lossless: true })
+                .toFile(path.join(avatarDirectory, avatar));
+            if (user.avatar && fs.existsSync(path.join(avatarDirectory, user.avatar))) fs.unlinkSync(path.join(avatarDirectory, user.avatar));
+            user.avatar = avatar;
+        } catch (err) {
+            return res.status(500).json({ error: 'Failed to change profile image' });
+        }
+    }
 
     user.username = req.body.username;
     if (req.body.password) user.password = req.body.password;
@@ -40,7 +67,12 @@ router.post('/settings', async (req, res) => {
     } catch (err) {
         return res.sendStatus(500);
     }
-    res.json(req.body);
+    
+    user = user.toJSON();
+    delete user._id;
+    delete user.password;
+
+    res.json(user);
 });
 
 export default router;

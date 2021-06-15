@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter, NavLink } from 'react-router-dom';
-import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container, Badge } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container, Badge, Image } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import LoginForm from '../LoginForm/LoginForm';
 import { UserContext } from '../../contexts/user.context';
 import history from '../../utilities/history.utility';
 import queryString from 'query-string';
+import { defaultImage } from '../../utilities/image.utility';
 
 class AppNavbar extends Component {
     static contextType = UserContext;
@@ -44,6 +45,7 @@ class AppNavbar extends Component {
     render() {
         if (history.location.pathname !== '/global'
             && history.location.pathname !== '/global/') {
+            const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.jpg';
             return (
                 <Navbar
                     sticky="top"
@@ -126,27 +128,41 @@ class AppNavbar extends Component {
                                 {this.context.user ?
                                     <>
                                         <NavDropdown
-                                            title={this.context.user.username}
+                                            title={
+                                                <>
+                                                    {this.context.user.username}
+                                                    <Image
+                                                        width={36}
+                                                        height={36}
+                                                        src={avatar}
+                                                        onError={(e) => { defaultImage(e, 'avatar') }}
+                                                        roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                                        style={{ marginLeft: '0.5em' }}
+                                                    />
+                                                </>
+
+                                            }
                                             alignRight
+                                            className="user-dropdown"
                                         >
                                             <NavDropdown.Item
                                                 as={NavLink}
                                                 to="/settings"
                                             >
                                                 Settings
-                                        </NavDropdown.Item>
+                                            </NavDropdown.Item>
                                             {this.context.user.isSuperuser &&
                                                 <NavDropdown.Item
                                                     as={NavLink}
                                                     to="/admin"
                                                 >
                                                     Admin
-                                            </NavDropdown.Item>
+                                                </NavDropdown.Item>
                                             }
                                             <NavDropdown.Divider />
                                             <NavDropdown.Item onClick={() => history.push('/logout')}>
                                                 Log Out
-                                        </NavDropdown.Item>
+                                            </NavDropdown.Item>
                                         </NavDropdown>
                                     </>
                                     :

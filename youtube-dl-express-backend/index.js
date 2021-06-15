@@ -54,7 +54,7 @@ import applyUpdates from './utilities/update.utility.js';
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
 
-    const staticFolders = ['videos', 'thumbnails', 'avatars'];
+    const staticFolders = ['videos', 'thumbnails', 'avatars', 'users/avatars'];
     const outputDirectory = parsedEnv.OUTPUT_DIRECTORY;
 
     // Create the static folders

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Image } from 'react-bootstrap';
 import AuthService from '../../services/auth.service';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import { UserContext } from '../../contexts/user.context';
 import Page from '../Page/Page';
 import { getErrorMessage } from '../../utilities/format.utility';
 import axios from '../../utilities/axios.utility';
+import { defaultImage } from '../../utilities/image.utility';
 
 export default class SettingsPage extends Component {
     static contextType = UserContext;
@@ -65,6 +66,7 @@ class SettingsForm extends Component {
             enableSponsorblock: false,
             useCircularAvatars: false,
             reportBytesUsingIec: false,
+            avatar: '',
         };
     }
 
@@ -75,6 +77,7 @@ class SettingsForm extends Component {
     handleInputChange = (e) => {
         var { value, name, type } = e.target;
         if (type === 'checkbox') value = e.target.checked;
+        if (type === 'file') value = e.target.files[0];
         this.setState({ [name]: value });
     }
 
@@ -92,8 +95,13 @@ class SettingsForm extends Component {
             }
             delete user.verifyPassword;
 
+            var formData = new FormData();
+            for (var key in user) {
+                formData.append(key, user[key]);
+            }
+
             axios
-                .post('/api/users/settings', user).then(res => {
+                .post('/api/users/settings', formData).then(res => {
                     if (res.status === 200) {
                         this.setState({ success: 'Settings Saved' });
                         let user = AuthService.getCurrentUser();
@@ -101,6 +109,7 @@ class SettingsForm extends Component {
                             user[key] = res.data[key];
                         }
                         this.context.updateUser(user);
+                        localStorage.setItem('user', JSON.stringify(user));
                     }
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
@@ -109,11 +118,28 @@ class SettingsForm extends Component {
     }
 
     render() {
+        const avatar = this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.jpg';
         return (
             <>
-                { !!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
-                { !!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
+                {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 <Form onSubmit={this.onSubmit}>
+                    <Form.Group controlId="avatar">
+                        <Form.Label>Profile Image</Form.Label>
+                        <Image
+                            width={145}
+                            height={145}
+                            src={avatar}
+                            onError={(e) => { defaultImage(e, 'avatar') }}
+                            roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                            style={{ display: 'block', marginBottom: '0.5rem' }}
+                        />
+                        <Form.Control
+                            type="file"
+                            name="avatar"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
                     <Form.Group controlId="username">
                         <Form.Label>Username</Form.Label>
                         <Form.Control

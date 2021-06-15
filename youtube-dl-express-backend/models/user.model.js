@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     enableSponsorblock: { type: Boolean, default: true },
     reportBytesUsingIec: { type: Boolean, default: true },
     useCircularAvatars: { type: Boolean, default: true },
+    avatar: { type: String, default: null },
 }, {
     timestamps: true,
 });
