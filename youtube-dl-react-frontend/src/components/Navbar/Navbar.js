@@ -96,6 +96,14 @@ class AppNavbar extends Component {
                                 <Nav.Item>
                                     <Nav.Link
                                         as={NavLink}
+                                        to="/tags"
+                                    >
+                                        Tags
+                                    </Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link
+                                        as={NavLink}
                                         to="/statistics"
                                     >
                                         Statistics

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import Navbar from './components/Navbar/Navbar';
 import LoginForm from './components/LoginForm/LoginForm';
@@ -13,6 +12,7 @@ import Logout from './components/Logout/Logout';
 import SettingsPage from './components/Settings/Settings';
 import AdminPage from './components/Admin/Admin';
 import StatisticsPage from './components/Statistics/Statistics';
+import TagsList from './components/TagsList/TagsList';
 import VideoPage from './components/Video/Video';
 import Page from './components/Page/Page';
 import UploaderPage from './components/Uploader/Uploader';
@@ -75,6 +75,11 @@ function App() {
 							path="/statistics"
 							exact
 							component={StatisticsPage}
+						/>
+						<Route
+							path="/tags"
+							exact
+							component={TagsList}
 						/>
 						<Route
 							path="/login"

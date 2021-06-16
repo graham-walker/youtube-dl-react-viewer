@@ -39,4 +39,23 @@ router.get('/', async (req, res) => {
     res.json({ statistic: statistic.toJSON().statistics });
 });
 
+router.get('/tags', async (req, res) => {
+    let statistic;
+    try {
+        statistic = await Statistic.findOne({ accessKey: 'videos' }, 'statistics.tags statistics.categories statistics.hashtags');
+    }
+    catch (err) {
+        return res.sendStatus(500);
+    }
+    if (!statistic) {
+        try {
+            statistic = await new Statistic().save();
+        } catch (err) {
+            return res.sendStatus(500);
+        }
+    }
+
+    res.json(statistic.toJSON().statistics);
+});
+
 export default router;
