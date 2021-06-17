@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Badge, Accordion, Row, Col, Card } from 'react-bootstrap';
+import { Form, Button, Badge, Accordion, Row, Col, Card, Spinner } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import axios from '../../utilities/axios.utility';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { createSearchLink } from '../../utilities/search.utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default class TagsList extends Component {
     constructor(props) {
@@ -18,8 +19,11 @@ export default class TagsList extends Component {
             tags: [],
             categories: [],
             hashtags: [],
-            sort: 'alphabetical',
+            sort: 'count',
             show: 'tags',
+            hasMore: true,
+            display: [],
+            page: 0,
         };
     }
 
@@ -36,7 +40,7 @@ export default class TagsList extends Component {
                         tags: res.data.tags,
                         categories: res.data.categories,
                         hashtags: res.data.hashtags,
-                    });
+                    }, () => { this.getTags(); });
                 }
             }).catch(err => {
                 this.setState({ error: err });
@@ -48,12 +52,12 @@ export default class TagsList extends Component {
         if (prevProps.location.search !== this.props.location.search) {
             let parsed = queryString.parse(this.props.location.search);
             parsed = this.queryStringDefaults(parsed);
-            this.setState({ sort: parsed['sort'], show: parsed.show });
+            this.setState({ sort: parsed['sort'], show: parsed.show, page: 0, display: [], hasMore: true }, () => { this.getTags(); });
         }
     }
 
     queryStringDefaults(parsed) {
-        if (!['alphabetical', 'count'].includes(parsed['sort'])) parsed['sort'] = 'alphabetical';
+        if (!['alphabetical', 'count'].includes(parsed['sort'])) parsed['sort'] = 'count';
         if (!['tags', 'categories', 'hashtags'].includes(parsed.show)) parsed.show = 'tags';
         return parsed;
     }
@@ -65,7 +69,7 @@ export default class TagsList extends Component {
             const stringified = queryString.stringify({
                 search: parsed?.search,
                 sort: this.state['sort'],
-                show: this.state['show'],
+                show: this.state.show,
             });
             history.push(`${this.props.location.pathname}${stringified ? '?' + stringified : ''}`);
         });
@@ -79,7 +83,35 @@ export default class TagsList extends Component {
         }
     }
 
+    getTags = () => {
+        let tags = this.state.page === 0 ? this.sortTags(this.state[this.state.show]) : this.state[this.state.show];
+        this.setState({ [this.state.show]: tags }, () => {
+            this.setState({
+                display: [...this.state.display, ...this.state[this.state.show].slice(this.state.page * 1000, (this.state.page * 1000) + 1000)],
+                page: this.state.page + 1,
+                hasMore: (this.state.page + 1) * 1000 < this.state[this.state.show].length,
+            });
+        });
+
+    }
+
     render() {
+        const display = this.state.display.map((tag, i) =>
+            <h5>
+                <Link
+                    to={createSearchLink(tag.name)}
+                    key={i}
+                >
+                    <Badge
+                        variant={'secondary'}
+                        className="ml-1"
+                    >
+                        {tag.name} ({tag.count.toLocaleString()})
+                    </Badge>
+                </Link>
+            </h5>
+        );
+
         return (
             <PageLoadWrapper
                 loading={this.state.loading}
@@ -135,8 +167,8 @@ export default class TagsList extends Component {
                                                                 value={this.state['sort']}
                                                                 inline
                                                             >
-                                                                <option value="alphabetical">Alphabetical</option>
                                                                 <option value="count">Count</option>
+                                                                <option value="alphabetical">Alphabetical</option>
                                                             </Form.Control>
                                                         </Form.Group>
                                                     </Col>
@@ -147,27 +179,30 @@ export default class TagsList extends Component {
                                 </>
                             </Accordion.Collapse>
                         </Accordion>
-                        {this.state[this.state.show].length > 0 ?
-                            <h5>
-                                {this.sortTags(this.state[this.state.show]).map((tag, i) =>
-                                    <Link
-                                        to={createSearchLink(tag.name)}
-                                        key={i}
-                                    >
-                                        <Badge
-                                            variant={'secondary'}
-                                            className="ml-1"
-                                        >
-                                            {tag.name} ({tag.count.toLocaleString()})
-                                        </Badge>
-                                    </Link>
-
-                                )}
-                            </h5>
-                            : <p className="text-center font-weight-bold">
-                                No results found
-                            </p>
-                        }
+                        <InfiniteScroll
+                            dataLength={this.state.display.length}
+                            next={this.getTags}
+                            hasMore={this.state.hasMore}
+                            loader={
+                                <div className="text-center">
+                                    <Spinner animation="border" />
+                                </div>
+                            }
+                            endMessage={
+                                <p className="text-center font-weight-bold">
+                                    {this.state[this.state.show].length === 0 ? 'No results found' : 'No more results'}
+                                </p>
+                            }
+                            style={{ overflow: 'hidden' }}>
+                            <Row
+                                style={{
+                                    marginLeft: '-0.25rem',
+                                    marginRight: '-0.25rem'
+                                }}
+                            >
+                                {display}
+                            </Row>
+                        </InfiniteScroll>
                     </div>
                 }
             </PageLoadWrapper>
