@@ -109,7 +109,7 @@ const VideoPreview = props => {
                 objectFit: 'contain',
             }}
             src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
-            onLoad={(e) => e.target.parentElement.style.setProperty('background-color', '#000', 'important')}
+            onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
             onError={(e) => defaultImage(e, 'thumbnail')}
         />
         {!!video.duration &&
