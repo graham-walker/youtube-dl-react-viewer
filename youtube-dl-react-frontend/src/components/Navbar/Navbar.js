@@ -58,7 +58,7 @@ class AppNavbar extends Component {
                             <Navbar.Brand className="d-xl-none mr-auto">
                                 <>
                                     {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
-                                    <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>
+                                    {process.env.REACT_APP_SHOW_VERSION_TAG === 'true' && <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
                                 </>
                             </Navbar.Brand>
                         </LinkContainer>
@@ -73,7 +73,7 @@ class AppNavbar extends Component {
                                     <Navbar.Brand className="d-none d-xl-block">
                                         <>
                                             {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
-                                            <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>
+                                            {process.env.REACT_APP_SHOW_VERSION_TAG === 'true' && <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
                                         </>
                                     </Navbar.Brand>
                                 </LinkContainer>
