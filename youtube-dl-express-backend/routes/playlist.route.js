@@ -13,17 +13,14 @@ router.get('/:extractor/:id', async (req, res) => {
         playlist = await Playlist.findOne({
             extractor: req.params.extractor,
             id: req.params.id,
-        })
-            .populate('uploaderDocument statistics.newestVideo');
+        }, 'name uploaderDocument statistics').populate('uploaderDocument statistics.newestVideo');
     }
     catch (err) {
         return res.sendStatus(500);
     }
     if (!playlist) return res.sendStatus(404);
 
-    playlist = playlist.toObject();
-
-    res.json({ playlist });
+    res.json({ playlist: playlist.toJSON() });
 });
 
 router.get('/:extractor/:id/:page', async (req, res) => {
@@ -49,7 +46,6 @@ router.get('/:extractor/:id/:page', async (req, res) => {
         videos = await search(req.query, page, filter, 'playlistIndex', 1);
         totals.count = (await Video.countDocuments(filter)) || 0;
     } catch (err) {
-        console.error(err)
         return res.sendStatus(500);
     }
 
