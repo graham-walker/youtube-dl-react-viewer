@@ -56,10 +56,7 @@ class AppNavbar extends Component {
                     <Container>
                         <LinkContainer to="/">
                             <Navbar.Brand className="d-xl-none mr-auto">
-                                <>
-                                    {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
-                                    {process.env.REACT_APP_SHOW_VERSION_TAG === 'true' && <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
-                                </>
+                                <NavbarBrandContent />
                             </Navbar.Brand>
                         </LinkContainer>
 
@@ -71,10 +68,7 @@ class AppNavbar extends Component {
                             <Nav className="w-100 justify-content-left">
                                 <LinkContainer to="/">
                                     <Navbar.Brand className="d-none d-xl-block">
-                                        <>
-                                            {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
-                                            {process.env.REACT_APP_SHOW_VERSION_TAG === 'true' && <small> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
-                                        </>
+                                        <NavbarBrandContent />
                                     </Navbar.Brand>
                                 </LinkContainer>
                                 <Nav.Item>
@@ -199,6 +193,22 @@ class AppNavbar extends Component {
             return null;
         }
     }
+}
+
+const NavbarBrandContent = props => {
+    return (
+        <>
+            <Image
+                width={36}
+                height={36}
+                src={process.env.REACT_APP_LIGHT_THEME_LOGO || '/logo-navbar-light.png'}
+                onError={(e) => { e.target.src = '/logo-navbar-light.png'; }}
+                style={{ marginRight: '0.25em' }}
+            />
+            {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+            {process.env.REACT_APP_SHOW_VERSION_TAG !== 'false' && <small style={{ verticalAlign: 'text-top' }}> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
+        </>
+    );
 }
 
 export default withRouter(AppNavbar);
