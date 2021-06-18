@@ -17,6 +17,7 @@ import VideoPage from './components/Video/Video';
 import Page from './components/Page/Page';
 import UploaderPage from './components/Uploader/Uploader';
 import Playlist from './components/Playlist/Playlist';
+import Job from './components/Job/Job';
 import UserContext from './contexts/user.context';
 import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
@@ -69,6 +70,12 @@ function App() {
 							path="/playlists/:extractor/:id/"
 							exact
 							render={(props) => <Playlist {...props} />
+							}
+						/>
+						<Route
+							path="/jobs/:_id/"
+							exact
+							render={(props) => <Job {...props} />
 							}
 						/>
 						<Route

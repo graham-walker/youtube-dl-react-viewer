@@ -10,7 +10,8 @@ import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
 import videoRouter from './routes/video.route.js';
 import uploaderRouter from './routes/uploader.route.js';
-import playlistRouter from './routes/playlist.route.js'
+import playlistRouter from './routes/playlist.route.js';
+import jobRouter from './routes/job.route.js';
 import statisticRouter from './routes/statistic.route.js';
 import adminRouter from './routes/admin.route.js';
 
@@ -51,6 +52,7 @@ import applyUpdates from './utilities/update.utility.js';
     app.use('/api/videos', globalPasswordMiddleware, videoRouter);
     app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
     app.use('/api/playlists', globalPasswordMiddleware, playlistRouter);
+    app.use('/api/jobs', globalPasswordMiddleware, jobRouter);
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
 
