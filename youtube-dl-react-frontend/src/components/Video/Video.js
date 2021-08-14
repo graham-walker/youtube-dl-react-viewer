@@ -35,6 +35,8 @@ export default class VideoPage extends Component {
             activeTab: undefined,
             nextVideos: undefined,
             localVideoPath: undefined,
+            resumeTime: undefined,
+            activityDocument: undefined,
             loop: localStorage.getItem('loop') === 'true' ?? false,
             autoplay: localStorage.getItem('autoplay') === 'true' ?? false,
             transcodeVideos: localStorage.getItem('transcodeVideos') === 'true' ?? false,
@@ -44,18 +46,24 @@ export default class VideoPage extends Component {
 
     componentDidMount() {
         this.getVideo();
+        this.interval = setInterval(() => {
+            if (this.player && !this.player.paused()) this.saveActivity();
+        }, 10000);
     }
 
     componentWillUnmount() {
-        if (this.player) {
-            this.player.dispose();
-        }
+        this.saveActivity();
+        if (this.player) this.player.dispose();
+        clearInterval(this.interval);
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.location.pathname !==
             `/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`
-        ) this.getVideo();
+        ) {
+            this.saveActivity();
+            this.getVideo();
+        }
     }
 
     getVideo() {
@@ -95,6 +103,8 @@ export default class VideoPage extends Component {
                                         : undefined
                             : this.state.activeTab,
                         localVideoPath: res.data.localVideoPath,
+                        resumeTime: res.data.resumeTime,
+                        activityDocument: res.data.activityDocument,
                     }, () => {
                         document.title = `${res.data.video.title} - ${window.documentTitle}`;
 
@@ -112,6 +122,13 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.videoReady();
+
+                                this.player.on('loadedmetadata', () => {
+                                    if (this.state.resumeTime) {
+                                        let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
+                                        this.player.currentTime(resumeTime);
+                                    }
+                                });
 
                                 this.player.on('ended', () => {
                                     this.onVideoEnd();
@@ -164,6 +181,7 @@ export default class VideoPage extends Component {
     }
 
     onVideoEnd() {
+        this.saveActivity();
         if (!this.state.loop && this.state.autoplay) {
             const nextVideo = this.state.nextVideos[this.state.activeTab];
             if (nextVideo) history.push(`/videos/${nextVideo.extractor}/${nextVideo.id}`);
@@ -176,6 +194,18 @@ export default class VideoPage extends Component {
         this.setState({ [name]: checked }, () => {
             if (name === 'transcodeVideos') this.videoReady();
         });
+    }
+
+    saveActivity() {
+        if (this.context.user?.recordWatchHistory && this.player) {
+            let stopTime = this.player.currentTime();
+            axios
+                .post(`/api/activity/record`, {
+                    eventType: 'watched',
+                    activityDocument: this.state.activityDocument,
+                    stopTime,
+                });
+        }
     }
 
     render() {
@@ -433,14 +463,14 @@ export default class VideoPage extends Component {
                                 download={video.videoFile.name}
                             >
                                 <FontAwesomeIcon icon="download" /> Download
-                                    </Button>
+                            </Button>
                             <Button
                                 variant="primary"
                                 className="mb-2 mr-2"
                                 href={'vlc://' + window.location.origin + '/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
-                                    </Button>
+                            </Button>
                             {window.location.hostname === 'localhost' &&
                                 <Button
                                     variant="primary"
@@ -448,7 +478,7 @@ export default class VideoPage extends Component {
                                     href={'vlc://file:///' + encodeURI(this.state.localVideoPath).replace(/!/g, '%21')}
                                 >
                                     <FontAwesomeIcon icon="play" /> Open in VLC (local)
-                                        </Button>
+                                </Button>
                             }
                         </Col>
                         <Col

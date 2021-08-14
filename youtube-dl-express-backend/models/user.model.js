@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
     reportBytesUsingIec: { type: Boolean, default: true },
     useCircularAvatars: { type: Boolean, default: true },
     avatar: { type: String, default: null },
+    recordWatchHistory: { type: Boolean, default: true },
 }, {
     timestamps: true,
 });

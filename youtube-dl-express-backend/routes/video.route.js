@@ -3,6 +3,7 @@ import path from 'path';
 import slash from 'slash';
 
 import Video from '../models/video.model.js';
+import Activity from '../models/activity.model.js';
 
 import {
     search,
@@ -63,7 +64,7 @@ router.get('/:extractor/:id', async (req, res) => {
         video = (await Video.findOne({
             extractor: req.params.extractor,
             id: req.params.id
-        }, 'id extractor viewCount uploadDate videoFile directory resolution'
+        }, '_id id extractor viewCount uploadDate videoFile directory resolution'
         + ' uploaderDocument fps webpageUrl dateDownloaded width height'
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
@@ -114,6 +115,28 @@ router.get('/:extractor/:id', async (req, res) => {
         return res.sendStatus(500);
     }
 
+    let resumeTime;
+    try {
+        if (req.user?.resumeVideos) {
+            let activity = await Activity.findOne({ eventType: 'watched', userDocument: req.user._id, videoDocument: video._id }).sort({ createdAt: -1 }).exec();
+            resumeTime = activity?.stopTime;
+        }
+    } catch (err) { return res.sendStatus(500); }
+
+    let activity;
+    try {
+        if (req.user?.recordWatchHistory) {
+            activity = await new Activity({
+                eventType: 'watched',
+                stopTime: resumeTime ?? 0,
+                userDocument: req.user._id,
+                videoDocument: video._id,
+            }).save();
+        }
+    } catch (err) { return res.sendStatus(500); }
+
+    delete video._id;
+
     res.json({
         video,
         uploaderVideos,
@@ -124,6 +147,8 @@ router.get('/:extractor/:id', async (req, res) => {
         jobVideosOffset,
         similarVideos,
         localVideoPath: slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
+        resumeTime,
+        activityDocument: activity?._id,
     });
 });
 

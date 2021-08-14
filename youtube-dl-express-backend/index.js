@@ -13,11 +13,13 @@ import uploaderRouter from './routes/uploader.route.js';
 import playlistRouter from './routes/playlist.route.js';
 import jobRouter from './routes/job.route.js';
 import statisticRouter from './routes/statistic.route.js';
+import activityRouter from './routes/activity.route.js';
 import adminRouter from './routes/admin.route.js';
 
 import authenticationMiddleware from './middleware/authentication.middleware.js';
 import globalPasswordMiddleware from './middleware/global-password.middleware.js';
 import superuserMiddleware from './middleware/superuser.middleware.js';
+import userMiddleware from './middleware/user.middleware.js';
 
 import User from './models/user.model.js';
 
@@ -49,11 +51,12 @@ import applyUpdates from './utilities/update.utility.js';
     // Add routes to the server
     app.use('/api/auth', globalPasswordMiddleware, authRouter);
     app.use('/api/users', [globalPasswordMiddleware, authenticationMiddleware], userRouter);
-    app.use('/api/videos', globalPasswordMiddleware, videoRouter);
+    app.use('/api/videos', [globalPasswordMiddleware, userMiddleware], videoRouter);
     app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
     app.use('/api/playlists', globalPasswordMiddleware, playlistRouter);
     app.use('/api/jobs', globalPasswordMiddleware, jobRouter);
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
+    app.use('/api/activity', [globalPasswordMiddleware, authenticationMiddleware], activityRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
 
     const staticFolders = ['videos', 'thumbnails', 'avatars', 'users/avatars'];

@@ -18,12 +18,13 @@ import Page from './components/Page/Page';
 import UploaderPage from './components/Uploader/Uploader';
 import Playlist from './components/Playlist/Playlist';
 import Job from './components/Job/Job';
+import ActivityPage from './components/Activity/Activity';
 import UserContext from './contexts/user.context';
 import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
-import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale);
+library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory);
 
 function App() {
 	return (
@@ -105,6 +106,11 @@ function App() {
 									<RegisterForm />
 								</Page>
 							}
+						/>
+						<Route
+							path="/activity"
+							exact
+							component={ActivityPage}
 						/>
 						<Route
 							path="/settings"

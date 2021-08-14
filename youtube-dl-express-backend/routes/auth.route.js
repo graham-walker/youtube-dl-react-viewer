@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
     try {
         user = await User.findOne(
             { username },
-            'username password isSuperuser resumeVideos enableSponsorblock enableAutoplay reportBytesUsingIec useCircularAvatars avatar'
+            'username password isSuperuser resumeVideos enableSponsorblock enableAutoplay reportBytesUsingIec useCircularAvatars avatar recordWatchHistory'
         );
     } catch (err) {
         return res.sendStatus(500);

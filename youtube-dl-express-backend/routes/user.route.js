@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import { v4 as uuidv4 } from 'uuid';
 
 import User from '../models/user.model.js';
+import Activity from '../models/activity.model.js';
 
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
@@ -15,7 +16,7 @@ router.get('/settings', async (req, res) => {
     try {
         user = await User.findOne(
             { _id: req.userId },
-            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar'
+            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory'
         );
     } catch (err) {
         return res.sendStatus(500);
@@ -29,7 +30,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     let user;
     try {
         user = await User.findOne({ _id: req.userId },
-            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar');
+            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory');
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -61,6 +62,15 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user.enableSponsorblock = req.body.enableSponsorblock;
     user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.useCircularAvatars = req.body.useCircularAvatars;
+    user.recordWatchHistory = req.body.recordWatchHistory;
+
+    if (!user.recordWatchHistory) {
+        try {
+            await Activity.deleteMany({ userDocument: user });
+        } catch (err) {
+            return res.sendStatus(500);
+        }
+    }
 
     try {
         await user.save();
@@ -71,6 +81,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user = user.toJSON();
     delete user._id;
     delete user.password;
+    delete user.updatedAt;
 
     res.json(user);
 });

@@ -149,6 +149,12 @@ class AppNavbar extends Component {
                                         >
                                             <NavDropdown.Item
                                                 as={NavLink}
+                                                to="/activity"
+                                            >
+                                                Activity
+                                            </NavDropdown.Item>
+                                            <NavDropdown.Item
+                                                as={NavLink}
                                                 to="/settings"
                                             >
                                                 Settings

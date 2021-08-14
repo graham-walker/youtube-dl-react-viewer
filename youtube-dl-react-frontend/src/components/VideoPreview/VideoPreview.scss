@@ -36,6 +36,34 @@
 .video-badge {
     position: absolute;
     top: 0;
-    right: 0;
     margin: 4px;
+
+    &.badge-dark {
+        background-color: #000;
+    }
+}
+
+.badge-left {
+    left: 0;
+}
+
+.badge-right {
+    right: 0;
+}
+
+.video-watchtime {
+    background-color: #000;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.video-watchtimebar {
+    background-color: red;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
 }

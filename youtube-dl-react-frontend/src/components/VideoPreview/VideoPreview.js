@@ -107,6 +107,7 @@ const VideoPreview = props => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
+                filter: props.watched ? 'brightness(75%)' : 'none'
             }}
             src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
             onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
@@ -117,7 +118,21 @@ const VideoPreview = props => {
                 {videoDurationToOverlay(video.duration)}
             </span>
         }
+        {!!props.watched &&
+            <Badge
+                variant="dark"
+                className="video-badge badge-left"
+            >
+                <FontAwesomeIcon icon="history" />
+                <> Watched</>
+            </Badge>
+        }
         <VideoStatBadge video={video} type={props.badge} />
+        {!!props.stopTime &&
+            <div className="video-watchtime">
+                <div className="video-watchtimebar" style={{width: ((props.stopTime / video.duration) * 100) + '%'}}></div>
+            </div>
+        }
     </div>;
 
     if (!!props.horizontal) {
@@ -229,7 +244,7 @@ const VideoStatBadge = props => {
                 return (
                     <Badge
                         variant="primary"
-                        className="video-badge"
+                        className="video-badge badge-right"
                         title={badgeProps.title}
                     >
                         <FontAwesomeIcon icon={badgeProps.icon} />

@@ -67,6 +67,7 @@ class SettingsForm extends Component {
             useCircularAvatars: false,
             reportBytesUsingIec: false,
             avatar: '',
+            recordWatchHistory: false,
         };
     }
 
@@ -171,20 +172,6 @@ class SettingsForm extends Component {
                         />
                     </Form.Group>
                     <Form.Group
-                        controlId="resumeVideos"
-                        className="d-none"
-                    >
-                        <Form.Check
-                            custom
-                            checked={this.state.resumeVideos}
-                            type="checkbox"
-                            name="resumeVideos"
-                            label="Automatically resume videos from where you played them last"
-                            id="resumeVideos"
-                            onChange={this.handleInputChange}
-                        />
-                    </Form.Group>
-                    <Form.Group
                         controlId="enableSponsorblock"
                         className="d-none"
                     >
@@ -218,6 +205,29 @@ class SettingsForm extends Component {
                             label="Calculate filesizes using a divisor of 1024 bytes instead of 1000 bytes (On Windows, MiB is equivalent to MB)"
                             id="reportBytesUsingIec"
                             onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="recordWatchHistory">
+                        <Form.Check
+                            custom
+                            checked={this.state.recordWatchHistory}
+                            type="checkbox"
+                            name="recordWatchHistory"
+                            label="Save video watched history"
+                            id="recordWatchHistory"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="resumeVideos">
+                        <Form.Check
+                            custom
+                            checked={this.state.resumeVideos}
+                            type="checkbox"
+                            name="resumeVideos"
+                            label="Automatically resume videos where you left off"
+                            id="resumeVideos"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.recordWatchHistory}
                         />
                     </Form.Group>
                     <Button type="submit">Save</Button>
