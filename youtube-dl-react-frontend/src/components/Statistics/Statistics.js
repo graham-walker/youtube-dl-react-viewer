@@ -98,7 +98,7 @@ export default class StatisticsPage extends Component {
                                     />
                                 </Row>
                                 <h5>
-                                    Tags:
+                                    Top Tags:
                                 <TopTags
                                         title="tags"
                                         tags={statistic.tags}
@@ -106,7 +106,7 @@ export default class StatisticsPage extends Component {
                                     />
                                 </h5>
                                 <h5>
-                                    Categories:
+                                    Top Categories:
                                 <TopTags
                                         title="tags"
                                         tags={statistic.categories}
@@ -114,7 +114,7 @@ export default class StatisticsPage extends Component {
                                     />
                                 </h5>
                                 <h5 className="mb-4">
-                                    Hashtags:
+                                    Top Hashtags:
                                 <TopTags
                                         title="tags"
                                         tags={statistic.hashtags}
