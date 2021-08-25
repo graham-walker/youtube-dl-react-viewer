@@ -205,7 +205,7 @@ const program = commander.program;
             }
 
             try {
-                fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'archive.txt'), infojsonData.extractor_key.toLowerCase() + '' + infojsonData.id + (process.platform === 'win32' ? '\r\n' : '\n'));
+                fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'archive.txt'), infojsonData.extractor_key.toLowerCase() + ' ' + infojsonData.id + (process.platform === 'win32' ? '\r\n' : '\n'));
             }
             catch (err) {
                 console.error(`Failed to append video extractor and id to: "${path.join(parsed.env.OUTPUT_DIRECTORY, 'archive.txt')}"`);
