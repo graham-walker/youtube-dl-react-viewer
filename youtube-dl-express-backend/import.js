@@ -196,6 +196,10 @@ const program = commander.program;
                 execArguments.unshift('--require');
             }
             const execProcess = await spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
+            if (parsed.env.VERBOSE) {
+                console.log('Printing exec output:');
+                console.log(execProcess.stdout);
+            }
 
             if (execProcess.status !== 0) {
                 let err = `Failed to add video to the database (exec returned status code: "${execProcess.status}"). Check the admin panel of the web app for more details`;

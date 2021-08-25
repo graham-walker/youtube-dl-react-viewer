@@ -17,6 +17,10 @@ export default class ErrorManager {
             this.busy = false;
             return { error: 'Could not find error document' };
         }
+        if (!error) {
+            this.busy = false;
+            return { error: 'Could not find error document' };
+        }
 
         // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
         let execArguments = [
