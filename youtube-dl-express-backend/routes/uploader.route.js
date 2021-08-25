@@ -4,6 +4,7 @@ import Video from '../models/video.model.js';
 import Uploader from '../models/uploader.model.js';
 
 import { search, getRandomVideo } from '../utilities/video.utility.js';
+import { applyTags } from '../utilities/statistic.utility.js';
 
 const router = express.Router();
 
@@ -57,7 +58,14 @@ router.get('/:extractor/:id', async (req, res) => {
     }
     if (!uploader) return res.sendStatus(404);
 
-    res.json({ uploader: uploader.toJSON() });
+    try {
+        uploader = uploader.toJSON();
+        uploader = await applyTags(uploader, { count: -1 }, 10);
+    } catch (err) {
+        res.sendStatus(500);
+    }
+
+    res.json({ uploader });
 });
 
 router.get('/:extractor/:id/:page', async (req, res) => {

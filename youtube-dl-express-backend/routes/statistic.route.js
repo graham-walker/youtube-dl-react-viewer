@@ -2,6 +2,8 @@ import express from 'express';
 
 import Statistic from '../models/statistic.model.js';
 
+import { applyTags } from '../utilities/statistic.utility.js';
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -36,13 +38,20 @@ router.get('/', async (req, res) => {
         }
     }
 
-    res.json({ statistic: statistic.toJSON().statistics });
+    try {
+        statistic = statistic.toJSON();
+        statistic = await applyTags(statistic, { count: -1 }, 10);
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+
+    res.json({ statistic: statistic.statistics });
 });
 
 router.get('/tags', async (req, res) => {
     let statistic;
     try {
-        statistic = await Statistic.findOne({ accessKey: 'videos' }, 'statistics.tags statistics.categories statistics.hashtags');
+        statistic = await Statistic.findOne({ accessKey: 'videos' }, '_id');
     }
     catch (err) {
         return res.sendStatus(500);
@@ -55,7 +64,15 @@ router.get('/tags', async (req, res) => {
         }
     }
 
-    res.json(statistic.toJSON().statistics);
+    try {
+        statistic = statistic.toJSON();
+        statistic.statistics = {};
+        statistic = await applyTags(statistic);
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+
+    res.json(statistic.statistics);
 });
 
 export default router;

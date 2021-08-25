@@ -1,8 +1,9 @@
-export const incrementStatistics = (video, statistics, keepArrayFormat = false) => {
-    
-    // If a mongoose object was passed, convert it into a plain object as incrementing
-    // the statistics converts the statistics into a form that is faster to increment
-    // but will make the document validation fail
+import Tag from '../models/tag.model.js';
+
+export const incrementStatistics = async (video, parentDocument) => {
+    let statistics = parentDocument.statistics;
+    parentDocument = parentDocument._id;
+
     if ('toObject' in statistics) statistics = statistics.toObject();
 
     statistics.totalVideoCount++;
@@ -40,37 +41,34 @@ export const incrementStatistics = (video, statistics, keepArrayFormat = false) 
         statistics.oldestVideo = video._id;
     }
 
-    // Convert tags, categories, and hashtags from Array to Object for much faster lookup times
-    const props = ['tags', 'categories', 'hashtags'];
-    for (let prop of props) {
-        if (Array.isArray(statistics[prop])) {
-            let indexed = {};
-            statistics[prop].map(e => {
-                indexed[e.name] = e.count;
-            });
-            statistics[prop] = indexed;
-        }
-        for (let name of video[prop]) {
-            if (statistics[prop].hasOwnProperty(name)) {
-                statistics[prop][name]++;
+    const types = ['tags', 'categories', 'hashtags'];
+    for (let type of types) {
+        for (let videoTagName of video[type]) {
+            let tag = await Tag.findOne({ name: videoTagName, type, parentDocument });
+            if (tag) {
+                tag.count += 1;
+                await tag.save();
             } else {
-                statistics[prop][name] = 1;
+                await new Tag({
+                    name: videoTagName,
+                    type,
+                    parentDocument
+                }).save();
             }
         }
     }
 
-    if (keepArrayFormat) return convertStatistics(statistics);
     return statistics;
 }
 
-export const convertStatistics = (statistics) => {
-    const props = ['tags', 'categories', 'hashtags'];
-    for (let prop of props) {
-        let converted = [];
-        for (const [name, count] of Object.entries(statistics[prop])) {
-            converted.push({ name, count });
+export const applyTags = async (statistic, sort = {}, limit = 0) => {
+    const types = ['tags', 'categories', 'hashtags'];
+    for (let type of types) {
+        try {
+            statistic.statistics[type] = await Tag.find({ type, parentDocument: statistic._id }, '-_id name count').sort(sort).limit(limit).lean().exec();
+        } catch (err) {
+            throw err;
         }
-        statistics[prop] = converted;
     }
-    return statistics;
+    return statistic;
 }

@@ -4,8 +4,9 @@ import Statistic from '../models/statistic.model.js';
 import Uploader from '../models/uploader.model.js';
 import Playlist from '../models/playlist.model.js';
 import Job from '../models/job.model.js';
+import Tag from '../models/tag.model.js';
 
-import { incrementStatistics, convertStatistics } from './statistic.utility.js';
+import { incrementStatistics } from './statistic.utility.js';
 
 const updateIds = {
     '1.3.0': 1,
@@ -18,7 +19,7 @@ const applyUpdates = async () => {
     let hasUpdates = false;
     if (Math.max(...Object.keys(updateIds).map(x => updateIds[x]), 0) > version.lastUpdateCompleted) {
         console.log('Applying updates. This may take a considerable amount of time'
-            + ' depending on the size of the database...');
+            + ' depending on the size of the amount of videos...');
         console.time('Took');
         hasUpdates = true;
     }
@@ -28,9 +29,11 @@ const applyUpdates = async () => {
         await Uploader.deleteMany({});
         await Uploader.syncIndexes({});
 
-        // Delete all playlists, incase I am running this multiple times debug
+        // Delete all playlists and tags, if running this update multiple times to debug
         await Playlist.deleteMany({});
         await Playlist.syncIndexes({});
+        await Tag.deleteMany({});
+        await Tag.syncIndexes({});
 
         // Reset the statistics on Jobs
         await Job.updateMany({}, { $set: { statistics: { default: () => ({}) } } });
@@ -40,20 +43,18 @@ const applyUpdates = async () => {
         await Statistic.syncIndexes({});
         let statistic = await new Statistic().save();
 
-        let allStatistics = {};
-
         let videos = await Video.find({});
         for (let i = 0; i < videos.length; i++) {
             let video = videos[i];
 
             // Increment the global statistics
-            if (!allStatistics.hasOwnProperty('global')) allStatistics.global = { collection: statistic.collection, id: statistic._id, statistics: null };
-            allStatistics.global.statistics = incrementStatistics(video, allStatistics.global.statistics || statistic.statistics);
+            statistic.statistics = await incrementStatistics(video, statistic);
+            await statistic.save();
 
             // Add video statistics to job
             let job = await Job.findOne({ _id: video.jobDocument });
-            if (!allStatistics.hasOwnProperty(['job' + job._id])) allStatistics['job' + job._id] = { collection: job.collection, id: job._id, statistics: null };
-            allStatistics['job' + job._id].statistics = incrementStatistics(video, allStatistics['job' + job._id].statistics || job.statistics);
+            job.statistics = await incrementStatistics(video, job);
+            await job.save();
 
             // Create/update the uploader with updated fields
             let uploader;
@@ -77,8 +78,8 @@ const applyUpdates = async () => {
                 }
 
                 // Increment uploader statistics
-                if (!allStatistics.hasOwnProperty(['uploader' + uploader._id])) allStatistics['uploader' + uploader._id] = { collection: uploader.collection, id: uploader._id, statistics: null };
-                allStatistics['uploader' + uploader._id].statistics = incrementStatistics(video, allStatistics['uploader' + uploader._id].statistics || uploader.statistics);
+                uploader.statistics = await incrementStatistics(video, uploader);
+                await uploader.save();
             }
 
             video.uploaderDocument = uploader?._id;
@@ -136,8 +137,8 @@ const applyUpdates = async () => {
                 }
 
                 // Increment playlist statistics
-                if (!allStatistics.hasOwnProperty(['playlist' + playlist._id])) allStatistics['playlist' + playlist._id] = { collection: playlist.collection, id: playlist._id, statistics: null };
-                allStatistics['playlist' + playlist._id].statistics = incrementStatistics(video, allStatistics['playlist' + playlist._id].statistics || playlist.statistics);
+                playlist.statistics = await incrementStatistics(video, playlist);
+                await playlist.save();
             }
 
             // Add a new field to reference the playlist document
@@ -152,26 +153,9 @@ const applyUpdates = async () => {
 
             await video.save();
 
-            let progress = `Rebuilding documents... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`;
+            let progress = `Migrating database to version 1.3.0... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`;
 
             // clearLine & cursorTo may not be available in Docker if there is no TTY
-            if (process.stdout.isTTY) {
-                process.stdout.clearLine(1);
-                process.stdout.cursorTo(0);
-                process.stdout.write(progress);
-            } else {
-                console.log(progress);
-            }
-        }
-        if (process.stdout.isTTY) console.log();
-
-        // Save all statistics
-        let values = Object.values(allStatistics);
-        for (let i = 0; i < values.length; i++) {
-            let stat = values[i];
-            await stat.collection.findOneAndUpdate({ _id: stat.id }, { $set: { statistics: convertStatistics(stat.statistics) } });
-
-            let progress = `Converting statistics... ${(((i + 1) / values.length) * 100).toFixed(2)}%`;
             if (process.stdout.isTTY) {
                 process.stdout.clearLine(1);
                 process.stdout.cursorTo(0);

@@ -1,6 +1,8 @@
 import Video from '../models/video.model.js';
 import Statistic from '../models/statistic.model.js';
 
+import { applyTags } from './statistic.utility.js';
+
 export const search = async (query, page, filter = {}, relevanceMeans = 'uploadDate', relevanceDirection = -1) => {
     let sortField = sortBy(query['sort'], relevanceMeans, relevanceDirection);
 
@@ -156,10 +158,9 @@ const weightedFields = {
 export const fields = Object.keys(weightedFields).join(' ');
 
 export const getSimilarVideos = async (video) => {
-    // let $group = { _id: null };
-    // let $project = {};
     let aggregatedFields = {};
     let statistic = await Statistic.findOne({ accessKey: 'videos' });
+    statistic = await applyTags(statistic);
     for (let field in weightedFields) {
         if (weightedFields[field].type === 'dot') {
             aggregatedFields[field] = statistic.statistics[field].map(item => item.name);

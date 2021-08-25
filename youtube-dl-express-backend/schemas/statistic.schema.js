@@ -2,11 +2,6 @@ import mongoose from 'mongoose';
 
 const ObjectId = mongoose.Schema.ObjectId;
 
-const tagSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    count: { type: Number, default: 1 },
-}, { _id: false });
-
 const statisticSchema = new mongoose.Schema({
     totalVideoCount: { type: Number, default: 0 },
     totalDuration: { type: Number, default: 0 },
@@ -32,9 +27,6 @@ const statisticSchema = new mongoose.Schema({
     newestVideoDateUploaded: { type: Date, default: null },
     oldestVideo: { type: ObjectId, ref: 'Video', default: null },
     newestVideo: { type: ObjectId, ref: 'Video', default: null },
-    tags: [tagSchema],
-    categories: [tagSchema],
-    hashtags: [tagSchema],
 }, { _id: false });
 
 export default statisticSchema;

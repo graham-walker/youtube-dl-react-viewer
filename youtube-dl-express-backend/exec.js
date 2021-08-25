@@ -690,14 +690,14 @@ let debug;
     }
 
     // Increment statistics
-    statistic.statistics = incrementStatistics(video, statistic.statistics, true);
+    statistic.statistics = await incrementStatistics(video, statistic);
     await statistic.save();
 
-    job.statistics = incrementStatistics(video, job.statistics, true);
+    job.statistics = await incrementStatistics(video, job);
     await job.save();
 
     if (uploader) {
-        uploader.statistics = incrementStatistics(video, uploader.statistics, true);
+        uploader.statistics = await incrementStatistics(video, uploader);
 
         if (video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
             uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
@@ -712,7 +712,7 @@ let debug;
     }
 
     if (playlist) {
-        playlist.statistics = incrementStatistics(video, playlist.statistics, true);
+        playlist.statistics = await incrementStatistics(video, playlist);
 
         if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
             playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;

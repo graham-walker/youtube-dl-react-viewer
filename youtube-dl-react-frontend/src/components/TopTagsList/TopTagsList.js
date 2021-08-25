@@ -4,7 +4,7 @@ import { Badge } from 'react-bootstrap';
 import { createSearchLink } from '../../utilities/search.utility';
 
 const TopTagsList = props => {
-    const tags = props.tags.sort((a, b) => b.count - a.count).slice(0, 5);
+    const tags = props.tags.sort((a, b) => b.count - a.count);
     return (
         tags.map((tag, i) =>
             <Link
