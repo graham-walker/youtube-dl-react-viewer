@@ -32,6 +32,10 @@ const commentSchema = new mongoose.Schema({
     text: { type: String, default: null },
     timestamp: { type: Number, default: null },
     parent: { type: String, default: null },
+    like_count: { type: Number, default: null },
+    is_favorited: { type: Boolean, default: false },
+    author_thumbnail: {type: String, default: null},
+    author_is_uploader: { type: Boolean, default: false },
 }, { _id: false });
 
 const videoSchema = new mongoose.Schema({

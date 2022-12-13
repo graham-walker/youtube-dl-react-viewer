@@ -15,6 +15,7 @@ import ISO6391 from 'iso-639-1';
 import videojs from 'video.js';
 import 'videojs-flash';
 import axios from '../../utilities/axios.utility';
+import Comments from './Comments/Comments';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -480,6 +481,10 @@ export default class VideoPage extends Component {
                                     <FontAwesomeIcon icon="play" /> Open in VLC (local)
                                 </Button>
                             }
+                            <hr />
+                            <div className="video-description">
+                                <Comments comments={video?.comments} player={this.player} uploader={video?.uploader} />
+                            </div>
                         </Col>
                         <Col
                             xs="12"
