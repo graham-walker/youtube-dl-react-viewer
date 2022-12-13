@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Media, Image, Table, Badge, Tab, Nav, Form, Button } from 'react-bootstrap';
+import { Row, Col, Media, Image, Table, Badge, Tab, Nav, Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MiniStatisticColumn from '../MiniStatisticsColumn/MiniStatisticsColumn';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
@@ -40,7 +40,7 @@ export default class VideoPage extends Component {
             activityDocument: undefined,
             loop: localStorage.getItem('loop') === 'true' ?? false,
             autoplay: localStorage.getItem('autoplay') === 'true' ?? false,
-            transcodeVideos: localStorage.getItem('transcodeVideos') === 'true' ?? false,
+            spoofContentType: localStorage.getItem('spoofContentType') === 'true' ?? true,
         };
         this.videoRef = React.createRef();
     }
@@ -162,11 +162,11 @@ export default class VideoPage extends Component {
 
     videoReady() {
         const video = this.state.video;
-        const baseSrc = `/${this.state.transcodeVideos ? 'transcoded' : 'static'}/videos/` + encodeURIComponent(video.directory) + '/';
+        const baseSrc = `/${this.state.spoofContentType ? 'transcoded' : 'static'}/videos/` + encodeURIComponent(video.directory) + '/';
         this.player.poster(getImage(this.state.video, 'thumbnail', 'medium'));
         this.player.src({
             src: baseSrc + encodeURIComponent(video.videoFile.name),
-            type: this.state.transcodeVideos || video.videoFile.name.endsWith('.mkv')
+            type: this.state.spoofContentType || video.videoFile.name.endsWith('.mkv')
                 ? 'video/webm'
                 : undefined
         });
@@ -193,7 +193,7 @@ export default class VideoPage extends Component {
         var { name, checked } = e.target;
         localStorage.setItem(name, checked);
         this.setState({ [name]: checked }, () => {
-            if (name === 'transcodeVideos') this.videoReady();
+            if (name === 'spoofContentType') this.videoReady();
         });
     }
 
@@ -517,14 +517,30 @@ export default class VideoPage extends Component {
                                             />
                                         </Form.Group>
                                         <Form.Group>
-                                            <Form.Check
-                                                checked={this.state.transcodeVideos}
-                                                type="switch"
-                                                name="transcodeVideos"
-                                                label="Transcode video"
-                                                id="transcodeVideos"
-                                                onChange={this.handleInputChange}
-                                            />
+                                            <div className="d-flex align-items-center">
+                                                <Form.Check
+                                                    checked={this.state.spoofContentType}
+                                                    type="switch"
+                                                    name="spoofContentType"
+                                                    label="Spoof type"
+                                                    id="spoofContentType"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                                <OverlayTrigger
+                                                    placement="bottom"
+                                                    delay={{ show: 250, hide: 400 }}
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Spoof the content type of .MKV files to attempt to play them in the browser. Works on some browsers (Firefox) but not others (Edge).
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon
+                                                        className="ml-1 text-muted"
+                                                        icon="info-circle"
+                                                    />
+                                                </OverlayTrigger>
+                                            </div>
                                         </Form.Group>
                                     </Form>
                                     <div className="card mb-3">

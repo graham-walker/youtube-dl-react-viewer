@@ -70,16 +70,24 @@ import applyUpdates from './utilities/update.utility.js';
 
     // Transcode videos
     app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
-        res.contentType('webm');
-        const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
-        ffmpeg(videoPath)
-            .format('webm')
-            .videoBitrate(3500)
-            .audioBitrate(128)
-            .on('error', function (err) {
-                if (parsedEnv.VERBOSE) console.error(err)
-            })
-            .pipe(res, { end: true });
+        try {
+            res.contentType('webm');
+            const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
+            // ffmpeg(videoPath)
+            //     .format('webm')
+            //     // .videoBitrate(3500)
+            //     // .audioBitrate(128)
+            //     .on('error', function (err) {
+            //         if (parsedEnv.VERBOSE) console.error(err)
+            //     })
+            //     .pipe(res, { end: true });
+            res.status(206);
+            let stream = fs.createReadStream(videoPath)
+            stream.pipe(res);
+        } catch (err) {
+            if (parsedEnv.VERBOSE) console.error(err);
+            res.sendStatus(500);
+        }
     });
 
     // Serve the react app build in production
