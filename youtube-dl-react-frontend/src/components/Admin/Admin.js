@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tab, Form, Button, Accordion, Card, Nav, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
-import { getErrorMessage } from '../../utilities/format.utility';
+import { getErrorMessage, getWarningColor } from '../../utilities/format.utility';
 import { UserContext } from '../../contexts/user.context';
 import axios from '../../utilities/axios.utility';
 
@@ -107,7 +107,7 @@ export default class AdminPage extends Component {
                                         {this.state.jobs.map(job =>
                                             <Nav.Link
                                                 eventKey={job._id}
-                                                className="tab-constrained"
+                                                className={`tab-constrained${getWarningColor(job, ' ')}`}
                                                 title={job.name}
                                                 key={job._id}
                                             >
@@ -164,7 +164,7 @@ export default class AdminPage extends Component {
                                             className="d-inline-block"
                                         >
                                             Show Details
-                                    </Accordion.Toggle>
+                                        </Accordion.Toggle>
                                         <Accordion.Collapse eventKey="0">
                                             <>
                                                 <pre className="pre-scrollable">
@@ -233,8 +233,10 @@ class UpdateChecker extends Component {
                     } else if (this.getVersionScore(res.data.tag_name) === this.getVersionScore(window.scriptVersion)) {
                         this.setState({ message: `You are using the latest version of youtube-dl-react-viewer (${window.scriptVersion}).`, variant: 'success' });
                     } else {
-                        this.setState({ message: `You are using a development version of youtube-dl-react-viewer (${window.scriptVersion}).
-                        Functionality may be missing or broken. Using development versions could cause irreversible damage to the database.`, variant: 'warning' });
+                        this.setState({
+                            message: `You are using a development version of youtube-dl-react-viewer (${window.scriptVersion}).
+                        Functionality may be missing or broken. Using development versions could cause irreversible damage to the database.`, variant: 'warning'
+                        });
                     }
                 } else {
                     this.setState({ message: 'Failed to check the latest version.', variant: 'danger' });
@@ -328,11 +330,13 @@ class JobDownloader extends Component {
                             value={this.state.selected}
                             disabled={this.props.jobs.length === 0}
                             multiple
+                            style={{ resize: 'vertical', minHeight: 300 }}
                         >
                             {this.props.jobs.map(job =>
                                 <option
                                     value={job._id}
                                     key={job._id}
+                                    className={getWarningColor(job)}
                                 >
                                     {job.name}
                                 </option>
@@ -438,7 +442,7 @@ class JobForm extends Component {
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 {this.props.job?.lastCompleted &&
-                    <p className="text-muted">Last completed: {this.props.job.lastCompleted.toLocaleString()}</p>
+                    <p className="text-muted">Last completed downloading: {new Date(this.props.job.lastCompleted).toLocaleString()}</p>
                 }
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group controlId={'name' + (this.props.job?._id || 'new')}>

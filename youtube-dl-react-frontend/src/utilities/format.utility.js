@@ -125,3 +125,14 @@ export const getErrorMessage = (err) => {
         return 'Unknown error';
     }
 }
+
+export const getWarningColor = (job, prefix = '') => {
+    if (!job.lastCompleted) return '';
+    const depth = process.env?.REACT_APP_OUT_OF_DATE_COLOR_DAYS ?? 30;
+    const daysSince = depth - Math.min(Math.round(Math.abs((new Date(job.lastCompleted) - new Date()) / 145440000)), depth);
+    const percent = daysSince / depth;
+    console.log(job.name, daysSince, percent)
+    if (percent == 0) return prefix + 'text-danger';
+    if (percent <= 0.5) return prefix + 'text-warning';
+    return prefix + 'text-success';
+}
