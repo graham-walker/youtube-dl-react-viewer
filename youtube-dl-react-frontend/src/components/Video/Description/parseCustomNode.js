@@ -22,7 +22,7 @@ export const parseCustomNode = (node, idx, player) => {
                 {node.textContent}
             </Link>;
         case 'settime':
-            return <a key={idx} href="javascript:void(0)" onClick={() => {
+            return <span className="fake-link" key={idx} onClick={() => {
                 if (player) {
                     window.scrollTo(0, 0);
                     player.currentTime(parseInt(node.attributes.time.value));
@@ -30,7 +30,7 @@ export const parseCustomNode = (node, idx, player) => {
                 }
             }}>
                 {node.textContent}
-            </a>
+            </span>
         default:
             return null;
     }

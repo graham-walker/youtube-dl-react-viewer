@@ -239,6 +239,8 @@ const VideoStatBadge = props => {
                         title: new Date(video.dateDownloaded).toLocaleString(),
                     };
                     break;
+                default:
+                    break;
             }
             if (badgeProps) {
                 return (

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Col, Image, Media } from 'react-bootstrap';
+import { Row, Col, Image } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import VideoList from '../VideoList/VideoList';
 import { UserContext } from '../../contexts/user.context';
