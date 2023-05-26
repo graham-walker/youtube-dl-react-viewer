@@ -150,8 +150,8 @@ export default class AdminPage extends Component {
                                 </Card.Body>
                             </Tab.Container>
                         </Card>
-                        <h5 className="mb-4">Failed downloads</h5>
-                        <Alert variant="info">If you are expecting to see a error here but do not, check the errors.txt or unknown errors.txt file in the output directory.</Alert>
+                        <h5 className="mb-4">Failed to import</h5>
+                        <Alert variant="info"><FontAwesomeIcon icon="info-circle"/> If you are expecting to see a video here but do not, check the errors.txt or unknown errors.txt file in the output directory. Videos that failed to download will not be listed here and can be retried by rerunning the job.</Alert>
                         {this.state.errors.length > 0 ?
                             this.state.errors.map(error =>
                                 <Alert variant="danger" key={error._id}>
