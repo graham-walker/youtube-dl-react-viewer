@@ -468,6 +468,14 @@ export default class VideoPage extends Component {
                             <Button
                                 variant="primary"
                                 className="mb-2 mr-2"
+                                href={`/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`}
+                                target="_blank"
+                            >
+                                <FontAwesomeIcon icon="database" /> Metadata
+                            </Button>
+                            <Button
+                                variant="primary"
+                                className="mb-2 mr-2"
                                 href={'vlc://' + window.location.origin + '/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
