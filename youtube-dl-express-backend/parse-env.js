@@ -19,7 +19,7 @@ const expected = {
     },
     'YOUTUBE_DL_PATH': {
         type: String,
-        default: 'youtube-dl',
+        default: 'yt-dlp',
     },
     'FFMPEG_PATH': {
         type: String,
