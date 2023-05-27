@@ -18,8 +18,7 @@ const applyUpdates = async () => {
 
     let hasUpdates = false;
     if (Math.max(...Object.keys(updateIds).map(x => updateIds[x]), 0) > version.lastUpdateCompleted) {
-        console.log('Applying updates. This may take a considerable amount of time'
-            + ' depending on the size of the amount of videos...');
+        console.log('Upgrading database. This may take a while...');
         console.time('Took');
         hasUpdates = true;
     }
@@ -153,16 +152,9 @@ const applyUpdates = async () => {
 
             await video.save();
 
-            let progress = `Migrating database to version 1.3.0... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`;
+            let progress = `Doing version 1.3.0 migrations... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`;
 
-            // clearLine & cursorTo may not be available in Docker if there is no TTY
-            if (process.stdout.isTTY) {
-                process.stdout.clearLine(1);
-                process.stdout.cursorTo(0);
-                process.stdout.write(progress);
-            } else {
-                console.log(progress);
-            }
+            printProgress(progress);
         }
         if (process.stdout.isTTY) console.log();
 
@@ -171,8 +163,18 @@ const applyUpdates = async () => {
     }
 
     if (hasUpdates) {
-        console.log('Completed Updates.');
+        console.log('Completed database upgrade.');
         console.timeEnd('Took');
+    }
+}
+
+const printProgress = (message) => {
+    if (!process.stdout.isTTY) { // clearLine & cursorTo are not available if there is no TTY (notably in the Docker console)
+        console.log(message);
+    } else {
+        process.stdout.clearLine(1);
+        process.stdout.cursorTo(0);
+        process.stdout.write(message);
     }
 }
 
