@@ -133,7 +133,7 @@ class AppNavbar extends Component {
                                         <NavDropdown
                                             title={
                                                 <>
-                                                    {this.context.user.username}
+                                                    <span>{this.context.user.username}</span>
                                                     <Image
                                                         width={36}
                                                         height={36}

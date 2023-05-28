@@ -1,9 +1,14 @@
 .user-dropdown .dropdown-toggle.nav-link {
     padding-top: 2px;
     padding-bottom: 2px;
+    display: flex;
+    align-items: center;
 
-    &::after {
-        transform: translateY(0.15rem);
+    span {
+        max-width: 156px;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
     }
 }
 
