@@ -62,6 +62,7 @@ export default class LoginForm extends Component {
                                     name="username"
                                     value={this.state.username}
                                     onChange={this.handleInputChange}
+                                    maxLength={50}
                                     required
                                 />
                             </Form.Group>
