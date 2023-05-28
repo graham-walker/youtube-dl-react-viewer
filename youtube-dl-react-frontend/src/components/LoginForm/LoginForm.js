@@ -4,17 +4,25 @@ import { UserContext } from '../../contexts/user.context';
 import AuthService from '../../services/auth.service';
 import { getErrorMessage } from '../../utilities/format.utility';
 import history from '../../utilities/history.utility';
+import queryString from 'query-string';
 
 export default class LoginForm extends Component {
     static contextType = UserContext;
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             username: '',
             password: '',
             error: undefined,
+            newuser: false,
         };
+    }
+
+    componentDidMount() {
+        if (!this.props.location) return; // Will be undefined when the form is used in the dropdown
+        let parsed = queryString.parse(this.props.location.search);
+        if (parsed.newuser) this.setState({ username: parsed.newuser, newuser: parsed.newuser });
     }
 
     handleInputChange = (e) => {
@@ -30,7 +38,7 @@ export default class LoginForm extends Component {
             document.dispatchEvent(new MouseEvent('click'));
             history.push('/');
         }).catch(err => {
-            this.setState({ error: getErrorMessage(err) })
+            this.setState({ error: getErrorMessage(err), newuser: false })
         });
     }
 
@@ -38,6 +46,9 @@ export default class LoginForm extends Component {
         return (
             <>
                 <Card.Title className="mb-2">Login</Card.Title>
+                {!!this.state.newuser &&
+                    <Alert variant="success">User registered, please login</Alert>
+                }
                 {!!this.state.error &&
                     <Alert variant="danger">{this.state.error}</Alert>
                 }

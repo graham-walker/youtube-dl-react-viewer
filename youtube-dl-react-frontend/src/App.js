@@ -92,9 +92,9 @@ function App() {
 						<Route
 							path="/login"
 							exact
-							render={() =>
+							render={(props) =>
 								<Page clamp="350px">
-									<LoginForm />
+									<LoginForm {...props} />
 								</Page>
 							}
 						/>
