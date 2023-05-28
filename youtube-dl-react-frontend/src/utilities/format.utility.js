@@ -3,7 +3,7 @@
  * @param  {Date}   date Date object
  * @return {String}      Time since the date
  */
-export const dateToTimeSinceString = date => {
+export const dateToTimeSinceString = (date) => {
     var seconds = Math.floor((new Date() - date) / 1000);
     var units = ['century', 'decade', 'year', 'month', 'day', 'hour', 'minute', 'second'];
     var intervals = [3154000000, 315400000, 31540000, 2592000, 86400, 3600, 60, 1];
@@ -41,7 +41,7 @@ export const bytesToSizeString = (bytes, iec) => {
  * @param  {Object} video Video object
  * @return {String}       Duration string
  */
-export const videoDurationToOverlay = duration => {
+export const videoDurationToOverlay = (duration) => {
     var hours = Math.floor(duration / 3600);
     var minutes = Math.floor(duration % 3600 / 60);
     var seconds = Math.floor(duration % 3600 % 60);
@@ -80,7 +80,7 @@ export const secondsToDetailedString = (seconds, round = false) => {
     return string ? string : '0 Seconds';
 }
 
-export const abbreviateNumber = value => {
+export const abbreviateNumber = (value) => {
     let newValue = value;
     const suffixes = ['', 'K', 'M', 'B', 'T'];
     let suffixNum = 0;
@@ -95,23 +95,28 @@ export const abbreviateNumber = value => {
 }
 
 export const resolutionToBadge = (width, height, ignoreSmall = true) => {
-    let size = Math.min(width, height);
-    if (size < 1080) {
-        if (ignoreSmall) {
-            return undefined;
+    try {
+        let size = Math.min(width, height);
+        if (size < 1080) {
+            if (ignoreSmall) {
+                return undefined;
+            } else {
+                return size + 'p';
+            }
+        } else if (size < 1440) {
+            return 'HD';
+        } else if (size < 2160) {
+            return 'QHD';
+        } else if (size < 4320) {
+            return '4K';
+        } else if (size === 4320) {
+            return '8K';
         } else {
             return size + 'p';
         }
-    } else if (size < 1440) {
-        return 'HD';
-    } else if (size < 2160) {
-        return 'QHD';
-    } else if (size < 4320) {
-        return '4K';
-    } else if (size === 4320) {
-        return '8K';
-    } else {
-        return size + 'p';
+    } catch (err) {
+        console.error(err);
+        return '0p';
     }
 }
 

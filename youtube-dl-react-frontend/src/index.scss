@@ -1,5 +1,5 @@
-@import '../node_modules/bootstrap/scss/functions';
-@import '../node_modules/bootstrap/scss/variables';
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
 
 $grid-breakpoints: (
     xs: 0,
@@ -12,41 +12,90 @@ $grid-breakpoints: (
 );
 
 $container-max-widths: (
-    // sm: 540px,
-    // md: 720px,
-    // lg: 960px,
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
     xl: 1140px,
     xxl: 1380px,
-    xxxl: 1560px,
+    xxxl: 1560px
 );
 
-@import '../node_modules/bootstrap/scss/bootstrap.scss';
+$dark: #000; // Make dark OLED dark
 
-@each $breakpoint in map-keys($grid-breakpoints) {
-    @include media-breakpoint-up($breakpoint) {
-        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-        @each $prop, $abbrev in (width: w, height: h) {
-            @each $size, $length in $sizes {
-                .#{$abbrev}#{$infix}-#{$size} {
-                    #{$prop}: $length !important;
-                }
-            }
-        }
-    }
-}
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
 
-@import './components/Admin/Admin.scss';
-@import './components/Playlist/Playlist.scss';
-@import './components/Video/Video.scss';
-@import './components/Video/Description/Description.scss';
-@import './components/VideoPreview/VideoPreview.scss';
-@import './components/UploaderList/UploaderList.scss';
-@import './components/Navbar/Navbar.scss';
-@import './components/Activity/Activity.scss';
-@import './components/Video/Comments/Comments.scss';
+@import "./components/Admin/Admin.scss";
+@import "./components/Playlist/Playlist.scss";
+@import "./components/Video/Video.scss";
+@import "./components/Video/Description/Description.scss";
+@import "./components/VideoPreview/VideoPreview.scss";
+@import "./components/UploaderList/UploaderList.scss";
+@import "./components/Navbar/Navbar.scss";
+@import "./components/Activity/Activity.scss";
+@import "./components/Video/Comments/Comments.scss";
+@import "./components/ThemeController/ThemeController.scss";
 
 html {
     width: 100%;
     width: 100vw;
     overflow-x: hidden;
+}
+
+a:not(.nav-link):not(.dropdown-item):not(.btn):not(.navbar-brand) {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+small {
+    font-size: 80%;
+}
+
+// Bootstrap
+.btn-primary {
+    color: #fff !important;
+}
+
+.btn-link {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.badge.bg-light {
+    color: var(--bs-body-color) !important;
+}
+
+// Bootstrap legacy components
+.media-container {
+    display: flex;
+    align-items: flex-start;
+
+    .media-body {
+        flex: 1 1;
+    }
+}
+
+.form-inline {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+// Dark theme overrides
+[data-bs-theme="dark"] {
+    --bs-body-bg: #{$dark} !important;
+    --bs-light-rgb: 10, 10, 10 !important;
+    --bs-dark-rgb: 214, 218, 222 !important;
+}
+
+// Helpers
+@media (min-width: 768px) {
+    .w-md-auto {
+        width: auto !important;
+    }
 }

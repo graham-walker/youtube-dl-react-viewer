@@ -37,12 +37,12 @@ export default class LoginForm extends Component {
     render() {
         return (
             <>
-                <Card.Title>Login</Card.Title>
+                <Card.Title className="mb-2">Login</Card.Title>
                 {!!this.state.error &&
                     <Alert variant="danger">{this.state.error}</Alert>
                 }
                 <Form onSubmit={this.onSubmit}>
-                    <Form.Group controlId="username">
+                    <Form.Group className="mb-3" controlId="username">
                         <Form.Label>Username</Form.Label>
                         <Form.Control
                             type="text"
@@ -53,7 +53,7 @@ export default class LoginForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group controlId="password">
+                    <Form.Group className="mb-3" controlId="password">
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                             type="password"

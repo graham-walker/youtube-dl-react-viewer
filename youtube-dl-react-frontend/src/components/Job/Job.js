@@ -56,26 +56,11 @@ export default class Job extends Component {
                             xs="12"
                             className="playlist-column mb-4"
                         >
-                            <div style={{ position: 'sticky', top: 'calc(56px + 1.5rem)' }}>
+                            <div className="playlist-header">
                                 <div
-                                    className="bg-light mb-2"
-                                    style={{
-                                        width: '100%',
-                                        paddingBottom: '56.25%',
-                                        overflow: 'hidden',
-                                        position: 'relative',
-                                    }}
+                                    className="playlist-image bg-light mb-2"
                                 >
                                     <Image
-                                        style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'contain',
-                                        }}
-                                        className="w-100"
                                         src={getImage(video, 'thumbnail', 'medium')}
                                         onLoad={(e) => e.target.parentElement.style.setProperty('background-color', '#000', 'important')}
                                         onError={(e) => defaultImage(e, 'thumbnail')}

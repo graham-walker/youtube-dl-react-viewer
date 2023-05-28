@@ -1,5 +1,34 @@
+.playlist-header {
+    background: linear-gradient(rgba(var(--bs-light-rgb), 1), transparent);
+    padding: 1rem;
+    border-radius: 1rem;
+
+    position: sticky;
+    top: calc(56px + 1.5rem);
+
+    .playlist-image {
+        width: 100%;
+        padding-bottom: 56.25%;
+        overflow: hidden;
+        position: relative;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+}
+
 @media screen and (min-width: 992px) {
     .playlist-column {
         max-width: 400px;
+
+        .playlist-header {
+            height: 80vh;
+        }
     }
 }

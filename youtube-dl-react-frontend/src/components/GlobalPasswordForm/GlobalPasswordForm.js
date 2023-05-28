@@ -36,7 +36,7 @@ export default class GlobalPasswordForm extends Component {
                     <Alert variant="danger">{this.state.error}</Alert>
                 }
                 <Form onSubmit={this.onSubmit}>
-                    <Form.Group controlId="globalPassword">
+                    <Form.Group className="mb-3" controlId="globalPassword">
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                             type="password"

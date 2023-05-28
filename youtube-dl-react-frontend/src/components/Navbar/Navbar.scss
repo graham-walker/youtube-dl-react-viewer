@@ -1,4 +1,20 @@
 .user-dropdown .dropdown-toggle.nav-link {
     padding-top: 2px;
     padding-bottom: 2px;
+
+    &::after {
+        transform: translateY(0.15rem);
+    }
+}
+
+.navbar-brand {
+    padding-left: calc(36px + 0.5rem);
+    position: relative;
+
+    .brand-image {
+        left: 0;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 }

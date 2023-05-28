@@ -97,30 +97,33 @@ export default class StatisticsPage extends Component {
                                         detailedStatistic={statistic.totalDislikeCount.toLocaleString() + ' dislikes'}
                                     />
                                 </Row>
-                                <h5>
-                                    Top Tags:
-                                <TopTags
+                                <div>
+                                    <h3>Top Tags:</h3>
+                                    <TopTags
                                         title="tags"
                                         tags={statistic.tags}
-                                        variant="secondary"
+                                        bg="secondary"
+                                        as="h5"
                                     />
-                                </h5>
-                                <h5>
-                                    Top Categories:
-                                <TopTags
+                                </div>
+                                <div>
+                                    <h3>Top Categories:</h3>
+                                    <TopTags
                                         title="tags"
                                         tags={statistic.categories}
-                                        variant="secondary"
+                                        bg="secondary"
+                                        as="h5"
                                     />
-                                </h5>
-                                <h5 className="mb-4">
-                                    Top Hashtags:
-                                <TopTags
+                                </div>
+                                <div className="mb-4">
+                                    <h3>Top Hashtags:</h3>
+                                    <TopTags
                                         title="tags"
                                         tags={statistic.hashtags}
-                                        variant="secondary"
+                                        bg="secondary"
+                                        as="h5"
                                     />
-                                </h5>
+                                </div>
                                 <div className="mx-auto">
                                     <Pie
                                         height={300}
@@ -131,7 +134,7 @@ export default class StatisticsPage extends Component {
                                                 '.description',
                                                 '.annotations.xml',
                                                 'Thumbnails',
-                                                'Resized Thumbnail Files',
+                                                'Small Thumbnail Files',
                                                 'Subtitle Files',
                                             ],
                                             datasets: [{

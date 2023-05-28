@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Media, Image, Table, Badge, Tab, Nav, Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Image, Table, Badge, Tab, Nav, Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MiniStatisticColumn from '../MiniStatisticsColumn/MiniStatisticsColumn';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
@@ -38,9 +38,9 @@ export default class VideoPage extends Component {
             localVideoPath: undefined,
             resumeTime: undefined,
             activityDocument: undefined,
-            loop: localStorage.getItem('loop') === 'true' ?? false,
-            autoplay: localStorage.getItem('autoplay') === 'true' ?? false,
-            spoofContentType: localStorage.getItem('spoofContentType') === 'true' ?? true,
+            loop: localStorage.getItem('loop') === 'true' || false,
+            autoplay: localStorage.getItem('autoplay') === 'true' || false,
+            spoofContentType: localStorage.getItem('spoofContentType') === 'true' || true,
         };
         this.videoRef = React.createRef();
     }
@@ -266,10 +266,10 @@ export default class VideoPage extends Component {
                                         xs="auto"
                                         className="mb-2"
                                     >
-                                        <Media>
+                                        <div className="media-container">
                                             <Link
                                                 to={`/uploaders/${video.uploaderDocument.extractor}/${video.uploaderDocument.id}`}
-                                                className="mr-3"
+                                                className="me-3"
                                             >
                                                 <Image
                                                     width={48}
@@ -279,23 +279,23 @@ export default class VideoPage extends Component {
                                                     roundedCircle={this.context.user?.useCircularAvatars ?? true}
                                                 />
                                             </Link>
-                                            <Media.Body>
+                                            <div className="media-body">
                                                 <Link
                                                     to={`/uploaders/${video.uploaderDocument.extractor}/${video.uploaderDocument.id}`}
-                                                    className="text-dark">
+                                                    className="text-dark video-title-link">
                                                     {video.uploaderDocument.name}
                                                 </Link>
                                                 <small className="text-muted d-block">
                                                     {video.uploaderDocument.statistics.totalVideoCount.toLocaleString()} video
                                                     {video.uploaderDocument.statistics.totalVideoCount !== 1 && 's'}
                                                 </small>
-                                            </Media.Body>
-                                        </Media>
+                                            </div>
+                                        </div>
                                     </Col>
                                 }
                                 <Col
                                     md="12"
-                                    className="col-xxl-auto mx-sm-auto mr-xxl-0 mb-2"
+                                    className="col-xxl-auto mx-sm-auto me-xxl-0 mb-2"
                                 >
                                     <Row className="text-center justify-content-md-center">
                                         {!!video.uploadDate &&
@@ -330,7 +330,7 @@ export default class VideoPage extends Component {
                                                 detailedStatistic={video.dislikeCount.toLocaleString() + ' dislikes'}
                                             />
                                         }
-                                        {!!video.resolution &&
+                                        {!!video.resolution && video.resolution !== 'audio only' &&
                                             <MiniStatisticColumn
                                                 title="Resolution"
                                                 icon="camera"
@@ -400,7 +400,7 @@ export default class VideoPage extends Component {
                                                     to={createSearchLink(tag)}
                                                     key={i}
                                                 >
-                                                    <Badge className="mr-1" variant="secondary">
+                                                    <Badge className="me-1" bg="secondary">
                                                         {tag}
                                                     </Badge>
                                                 </Link>
@@ -415,7 +415,7 @@ export default class VideoPage extends Component {
                                                         to={createSearchLink(category)}
                                                         key={i}
                                                     >
-                                                        <Badge className="mr-1" variant="secondary">
+                                                        <Badge className="me-1" bg="secondary">
                                                             {category}
                                                         </Badge>
                                                     </Link>
@@ -459,7 +459,7 @@ export default class VideoPage extends Component {
                             <hr />
                             <Button
                                 variant="primary"
-                                className="mb-2 mr-2"
+                                className="mb-2 me-2"
                                 href={'/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
                                 download={video.videoFile.name}
                             >
@@ -467,7 +467,7 @@ export default class VideoPage extends Component {
                             </Button>
                             <Button
                                 variant="primary"
-                                className="mb-2 mr-2"
+                                className="mb-2 me-2"
                                 href={`/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                                 target="_blank"
                             >
@@ -475,7 +475,7 @@ export default class VideoPage extends Component {
                             </Button>
                             <Button
                                 variant="primary"
-                                className="mb-2 mr-2"
+                                className="mb-2 me-2"
                                 href={'vlc://' + window.location.origin + '/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
@@ -490,9 +490,7 @@ export default class VideoPage extends Component {
                                 </Button>
                             }
                             <hr />
-                            <div className="video-description">
-                                <Comments comments={video?.comments} player={this.player} uploader={video?.uploader} />
-                            </div>
+                            <Comments comments={video?.comments} player={this.player} uploader={video?.uploader} />
                         </Col>
                         <Col
                             xs="12"
@@ -500,7 +498,7 @@ export default class VideoPage extends Component {
                         >
                             {(this.state.uploaderVideos || this.state.playlistVideos || this.state.jobVideos) &&
                                 <>
-                                    <Form inline className="mb-1">
+                                    <Form className="form-inline mb-1">
                                         <Form.Group>
                                             <Form.Check
                                                 checked={this.state.loop}
@@ -509,7 +507,7 @@ export default class VideoPage extends Component {
                                                 label="Loop"
                                                 id="loop"
                                                 onChange={this.handleInputChange}
-                                                className="mr-2"
+                                                className="me-2"
                                             />
                                         </Form.Group>
                                         <Form.Group>
@@ -521,7 +519,7 @@ export default class VideoPage extends Component {
                                                 id="autoplay"
                                                 onChange={this.handleInputChange}
                                                 disabled={this.state.loop}
-                                                className="mr-2"
+                                                className="me-2"
                                             />
                                         </Form.Group>
                                         <Form.Group>
@@ -544,7 +542,7 @@ export default class VideoPage extends Component {
                                                     }
                                                 >
                                                     <FontAwesomeIcon
-                                                        className="ml-1 text-muted"
+                                                        className="ms-1 text-muted"
                                                         icon="info-circle"
                                                     />
                                                 </OverlayTrigger>
@@ -568,7 +566,7 @@ export default class VideoPage extends Component {
                                                         >
                                                             <Nav.Link
                                                                 eventKey="uploader"
-                                                                onSelect={(e) => { this.setState({ activeTab: e }) }}
+                                                                onClick={(e) => { this.setState({ activeTab: 'uploader' }) }}
                                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
                                                                 title={'Videos by ' + video.uploader}
                                                             >
@@ -583,7 +581,7 @@ export default class VideoPage extends Component {
                                                         >
                                                             <Nav.Link
                                                                 eventKey="playlist"
-                                                                onSelect={(e) => { this.setState({ activeTab: e }) }}
+                                                                onClick={(e) => { this.setState({ activeTab: 'playlist' }) }}
                                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
                                                                 title={video.playlist}
                                                             >
@@ -598,7 +596,7 @@ export default class VideoPage extends Component {
                                                         >
                                                             <Nav.Link
                                                                 eventKey="job"
-                                                                onSelect={(e) => { this.setState({ activeTab: e }) }}
+                                                                onClick={(e) => { this.setState({ activeTab: 'job' }) }}
                                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
                                                                 title={'Downloaded by ' + video.jobDocument.name}
                                                             >
@@ -663,7 +661,7 @@ export default class VideoPage extends Component {
                             }
                             {this.state.similarVideos &&
                                 <>
-                                    <p className="font-weight-bold">Similar Videos</p>
+                                    <p className="fw-bold">Similar Videos</p>
                                     {this.state.similarVideos.map(video =>
                                         <VideoPreview
                                             className="mb-2"

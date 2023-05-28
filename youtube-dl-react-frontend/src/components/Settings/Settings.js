@@ -125,7 +125,7 @@ class SettingsForm extends Component {
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 <Form onSubmit={this.onSubmit}>
-                    <Form.Group controlId="avatar">
+                    <Form.Group className="mb-3" controlId="avatar">
                         <Form.Label>Profile Image</Form.Label>
                         <Image
                             width={145}
@@ -141,7 +141,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="username">
+                    <Form.Group className="mb-3" controlId="username">
                         <Form.Label>Username</Form.Label>
                         <Form.Control
                             type="text"
@@ -152,7 +152,7 @@ class SettingsForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group controlId="password">
+                    <Form.Group className="mb-3" controlId="password">
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                             type="password"
@@ -162,7 +162,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="verifyPassword">
+                    <Form.Group className="mb-3" controlId="verifyPassword">
                         <Form.Control
                             type="password"
                             name="verifyPassword"
@@ -173,7 +173,7 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group
                         controlId="enableSponsorblock"
-                        className="d-none"
+                        className="mb-3 d-none"
                     >
                         <Form.Check
                             custom
@@ -185,7 +185,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="useCircularAvatars">
+                    <Form.Group className="mb-3" controlId="useCircularAvatars">
                         <Form.Check
                             custom
                             checked={this.state.useCircularAvatars}
@@ -196,7 +196,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="reportBytesUsingIec">
+                    <Form.Group className="mb-3" controlId="reportBytesUsingIec">
                         <Form.Check
                             custom
                             checked={this.state.reportBytesUsingIec}
@@ -207,24 +207,24 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="recordWatchHistory">
+                    <Form.Group className="mb-3" controlId="recordWatchHistory">
                         <Form.Check
                             custom
                             checked={this.state.recordWatchHistory}
                             type="checkbox"
                             name="recordWatchHistory"
-                            label="Save video watched history"
+                            label="Save watched history"
                             id="recordWatchHistory"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="resumeVideos">
+                    <Form.Group className="mb-3" controlId="resumeVideos">
                         <Form.Check
                             custom
                             checked={this.state.resumeVideos}
                             type="checkbox"
                             name="resumeVideos"
-                            label="Automatically resume videos where you left off"
+                            label="Resume videos where you left off"
                             id="resumeVideos"
                             onChange={this.handleInputChange}
                             disabled={!this.state.recordWatchHistory}

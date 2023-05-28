@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Image, Media } from 'react-bootstrap';
+import { Row, Col, Image } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import Pageinator from '../Pageinator/Pageinator';
 import { UserContext } from '../../contexts/user.context';
@@ -24,6 +24,7 @@ export default class UploaderList extends Component {
     }
 
     componentDidMount() {
+        document.title = `Uploaders - ${window.documentTitle}`;
         this.getUploaders();
     }
 
@@ -61,7 +62,7 @@ export default class UploaderList extends Component {
                 key={uploader.extractor + uploader.name}
             >
 
-                <Media>
+                <div className="media-container">
                     <Link to={`/uploaders/${uploader.extractor}/${uploader.id}`}>
                         <Image
                             width={145}
@@ -69,10 +70,10 @@ export default class UploaderList extends Component {
                             src={getImage(uploader, 'avatar')}
                             onError={(e) => { defaultImage(e, 'avatar') }}
                             roundedCircle={this.context.user?.useCircularAvatars ?? true}
-                            className="mr-3"
+                            className="me-3"
                         />
                     </Link>
-                    <Media.Body className="align-self-center">
+                    <div className="media-body align-self-center">
                         <Link
                             to={`/uploaders/${uploader.extractor}/${uploader.id}`}
                             className="uploader-title-link text-dark"
@@ -99,8 +100,8 @@ export default class UploaderList extends Component {
                                 Uploads to <span style={{ textTransform: 'capitalize' }}>{uploader.extractor}</span>
                             </small>
                         </p>
-                    </Media.Body>
-                </Media>
+                    </div>
+                </div>
             </Col>
         );
 
@@ -118,7 +119,7 @@ export default class UploaderList extends Component {
                         Across {this.state.totalWebsites} different websites
                     </h5>
                     {this.state.uploaders.length === 0
-                        ? <p className="text-center font-weight-bold">No results found</p>
+                        ? <p className="text-center fw-bold">No results found</p>
                         : <>
                             <Pageinator baseUrl="uploaders/page" page={this.props.match.params.page || 1} maxPages={this.state.maxPages} />
                             <Row

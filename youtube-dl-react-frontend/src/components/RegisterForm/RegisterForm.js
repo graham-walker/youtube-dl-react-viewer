@@ -54,7 +54,7 @@ export default class LoginForm extends Component {
                 }
                 <Card.Text>
                     <Form onSubmit={this.onSubmit}>
-                        <Form.Group controlId="username">
+                        <Form.Group className="mb-3" controlId="username">
                             <Form.Label>Username</Form.Label>
                             <Form.Control
                                 type="text"
@@ -65,7 +65,7 @@ export default class LoginForm extends Component {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="password">
+                        <Form.Group className="mb-3" controlId="password">
                             <Form.Label>Password</Form.Label>
                             <Form.Control
                                 type="password"
@@ -76,7 +76,7 @@ export default class LoginForm extends Component {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="verifyPassword">
+                        <Form.Group className="mb-3" controlId="verifyPassword">
                             <Form.Control
                                 type="password"
                                 name="verifyPassword"

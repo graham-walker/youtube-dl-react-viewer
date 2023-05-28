@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Image, Media } from 'react-bootstrap';
+import { Row, Col, Image } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import VideoList from '../VideoList/VideoList';
 import { UserContext } from '../../contexts/user.context';
@@ -56,26 +56,11 @@ export default class Playlist extends Component {
                             xs="12"
                             className="playlist-column mb-4"
                         >
-                            <div style={{ position: 'sticky', top: 'calc(56px + 1.5rem)' }}>
+                            <div className="playlist-header">
                                 <div
-                                    className="bg-light mb-2"
-                                    style={{
-                                        width: '100%',
-                                        paddingBottom: '56.25%',
-                                        overflow: 'hidden',
-                                        position: 'relative',
-                                    }}
+                                    className="playlist-image bg-light mb-2"
                                 >
                                     <Image
-                                        style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'contain',
-                                        }}
-                                        className="w-100"
                                         src={getImage(video, 'thumbnail', 'medium')}
                                         onLoad={(e) => e.target.parentElement.style.setProperty('background-color', '#000', 'important')}
                                         onError={(e) => defaultImage(e, 'thumbnail')}
@@ -97,10 +82,10 @@ export default class Playlist extends Component {
                                 </p>
                                 {!!uploader && <>
                                     <hr />
-                                    <Media>
+                                    <div className="media-container">
                                         <Link
                                             to={`/uploaders/${uploader.extractor}/${uploader.id}`}
-                                            className="mr-3"
+                                            className="me-3"
                                         >
                                             <Image
                                                 width={48}
@@ -110,14 +95,14 @@ export default class Playlist extends Component {
                                                 roundedCircle={this.context.user?.useCircularAvatars ?? true}
                                             />
                                         </Link>
-                                        <Media.Body className="align-self-center">
+                                        <div className="media-body align-self-center">
                                             <Link
                                                 to={`/uploaders/${uploader.extractor}/${uploader.id}`}
-                                                className="text-dark font-weight-bold">
+                                                className="text-dark fw-bold">
                                                 {uploader.name}
                                             </Link>
-                                        </Media.Body>
-                                    </Media>
+                                        </div>
+                                    </div>
                                 </>}
                             </div>
                         </Col>

@@ -6,6 +6,11 @@
     display: -webkit-box;
     overflow: hidden;
     margin-bottom: 0;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 
     h5 {
         margin-bottom: 0.1em;

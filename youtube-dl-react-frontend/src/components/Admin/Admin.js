@@ -5,6 +5,7 @@ import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import { getErrorMessage, getWarningColor } from '../../utilities/format.utility';
 import { UserContext } from '../../contexts/user.context';
 import axios from '../../utilities/axios.utility';
+import AccordionButton from '../AccordionButton/AccordionButton';
 
 export default class AdminPage extends Component {
     static contextType = UserContext;
@@ -177,12 +178,12 @@ export default class AdminPage extends Component {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     variant="danger"
-                                                    className="mr-2"
+                                                    className="me-2"
                                                 >
                                                     Report Error
                                                 </Button>
                                                 <Button
-                                                    className="mr-2"
+                                                    className="me-2"
                                                     variant="danger"
                                                     onClick={(e) => { this.repairError(error._id) }}
                                                 >
@@ -194,7 +195,7 @@ export default class AdminPage extends Component {
                                 </Alert>
                             )
                             :
-                            <p className="text-center font-weight-bold">Nothing here</p>}
+                            <p className="text-center fw-bold">Nothing here</p>}
                     </div>
                 }
             </PageLoadWrapper>
@@ -322,7 +323,7 @@ class JobDownloader extends Component {
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 <Form>
-                    <Form.Group controlId="name">
+                    <Form.Group className="mb-3" controlId="name">
                         <Form.Control
                             as="select"
                             name="selected"
@@ -344,7 +345,7 @@ class JobDownloader extends Component {
                         </Form.Control>
                     </Form.Group>
                     <Button
-                        className="mr-2"
+                        className="me-2"
                         name="download"
                         type="submit"
                         onClick={this.onSubmit}
@@ -445,7 +446,7 @@ class JobForm extends Component {
                     <p className="text-muted">Last completed downloading: {new Date(this.props.job.lastCompleted).toLocaleString()}</p>
                 }
                 <Form onSubmit={this.onSubmit}>
-                    <Form.Group controlId={'name' + (this.props.job?._id || 'new')}>
+                    <Form.Group className="mb-3" controlId={'name' + (this.props.job?._id || 'new')}>
                         <Form.Label>Job name</Form.Label>
                         <Form.Control
                             type="text"
@@ -456,7 +457,7 @@ class JobForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group controlId={'formatCode' + (this.props.job?._id || 'new')}>
+                    <Form.Group className="mb-3" controlId={'formatCode' + (this.props.job?._id || 'new')}>
                         <Form.Label>Format code</Form.Label>
                         <Form.Control
                             type="text"
@@ -467,7 +468,7 @@ class JobForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group controlId={'isAudioOnly' + (this.props.job?._id || 'new')}>
+                    <Form.Group className="mb-3" controlId={'isAudioOnly' + (this.props.job?._id || 'new')}>
                         <Form.Check
                             custom
                             checked={this.state.isAudioOnly}
@@ -477,7 +478,7 @@ class JobForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId={'username' + (this.props.job?._id || 'new')}>
+                    <Form.Group className="mb-3" controlId={'username' + (this.props.job?._id || 'new')}>
                         <Form.Label>URL list</Form.Label>
                         <Form.Control
                             as="textarea"
@@ -490,17 +491,16 @@ class JobForm extends Component {
                         />
                     </Form.Group>
                     <Accordion>
-                        <Accordion.Toggle
-                            as="a"
+                        <AccordionButton
                             variant="link"
                             eventKey="0"
-                            className="mb-3 d-inline-block"
+                            className="mb-3 d-inline-block p-0"
                         >
                             Advanced options
-                        </Accordion.Toggle>
+                        </AccordionButton>
                         <Accordion.Collapse eventKey="0">
                             <>
-                                <Form.Group controlId={'arguments' + (this.props.job?._id || 'new')}>
+                                <Form.Group className="mb-3" controlId={'arguments' + (this.props.job?._id || 'new')}>
                                     <Form.Label>Override config</Form.Label>
                                     <Form.Control
                                         as="textarea"
@@ -514,7 +514,7 @@ class JobForm extends Component {
                                         {defaultArguments}
                                     </Form.Control>
                                 </Form.Group>
-                                <Form.Group controlId={'overrideUploader' + (this.props.job?._id || 'new')}>
+                                <Form.Group className="mb-3" controlId={'overrideUploader' + (this.props.job?._id || 'new')}>
                                     <Form.Label>Override uploader</Form.Label>
                                     <Form.Control
                                         type="text"

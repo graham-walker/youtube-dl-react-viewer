@@ -8,13 +8,14 @@ import { UserContext } from '../../contexts/user.context';
 import history from '../../utilities/history.utility';
 import queryString from 'query-string';
 import { defaultImage } from '../../utilities/image.utility';
+import ThemeController from '../ThemeController/ThemeController';
 
 class AppNavbar extends Component {
     static contextType = UserContext;
 
     constructor(props) {
         super(props);
-        this.state = { search: '' };
+        this.state = { search: '', theme: 'auto' };
     }
 
     handleInputChange = (e) => {
@@ -55,8 +56,8 @@ class AppNavbar extends Component {
                 >
                     <Container>
                         <LinkContainer to="/">
-                            <Navbar.Brand className="d-xl-none mr-auto">
-                                <NavbarBrandContent />
+                            <Navbar.Brand className="d-xl-none me-auto">
+                                <NavbarBrandContent theme={this.state.theme} />
                             </Navbar.Brand>
                         </LinkContainer>
 
@@ -68,7 +69,7 @@ class AppNavbar extends Component {
                             <Nav className="w-100 justify-content-left">
                                 <LinkContainer to="/">
                                     <Navbar.Brand className="d-none d-xl-block">
-                                        <NavbarBrandContent />
+                                        <NavbarBrandContent theme={this.state.theme} />
                                     </Navbar.Brand>
                                 </LinkContainer>
                                 <Nav.Item>
@@ -106,13 +107,13 @@ class AppNavbar extends Component {
                             </Nav>
                             <Nav className="w-100 justify-content-center">
                                 <Form
-                                    inline
+                                    className="form-inline"
                                     onSubmit={this.onSubmit}
                                 >
                                     <FormControl
                                         type="text"
                                         placeholder="Search"
-                                        className="mr-md-2 w-100 w-md-auto mb-2 mb-md-0"
+                                        className="me-md-2 w-100 w-md-auto mb-2 mb-xl-0"
                                         name="search"
                                         value={this.state.search}
                                         onChange={this.handleInputChange}
@@ -120,13 +121,13 @@ class AppNavbar extends Component {
                                     <Button
                                         variant="primary"
                                         type="submit"
-                                        className="w-100 w-md-auto"
+                                        className="w-100 w-md-auto mb-2 mb-xl-0"
                                     >
                                         <FontAwesomeIcon icon="search" />
                                     </Button>
                                 </Form>
                             </Nav>
-                            <Nav className="ml-auto w-100 justify-content-end">
+                            <Nav className="ms-auto w-100 justify-content-end">
                                 {this.context.user ?
                                     <>
                                         <NavDropdown
@@ -144,7 +145,7 @@ class AppNavbar extends Component {
                                                 </>
 
                                             }
-                                            alignRight
+                                            align="end"
                                             className="user-dropdown"
                                         >
                                             <NavDropdown.Item
@@ -177,7 +178,7 @@ class AppNavbar extends Component {
                                     <>
                                         <NavDropdown
                                             title="Login"
-                                            alignRight
+                                            align="end"
                                         >
                                             <NavDropdown.ItemText
                                                 style={{ width: '100vw', maxWidth: '350px' }}
@@ -190,6 +191,8 @@ class AppNavbar extends Component {
                                         </LinkContainer>
                                     </>
                                 }
+                                <ThemeController onThemeChange={(theme) => { this.setState({ theme }) }} />
+                                {process.env.REACT_APP_SHOW_VERSION_TAG !== 'false' && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.scriptVersion}</Badge></small>}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
@@ -207,12 +210,15 @@ const NavbarBrandContent = props => {
             <Image
                 width={36}
                 height={36}
-                src={process.env.REACT_APP_LIGHT_THEME_LOGO || '/logo-navbar-light.png'}
+                className="brand-image"
+                src={
+                    props.theme === 'light'
+                        ? (process.env.REACT_APP_LIGHT_THEME_LOGO || '/logo.svg')
+                        : ((process.env.REACT_APP_DARK_THEME_LOGO || '/logo.svg'))
+                }
                 onError={(e) => { e.target.src = '/logo-navbar-light.png'; }}
-                style={{ marginRight: '0.25em' }}
             />
             {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
-            {process.env.REACT_APP_SHOW_VERSION_TAG !== 'false' && <small style={{ verticalAlign: 'text-top' }}> <Badge variant="primary">v{window.scriptVersion}</Badge></small>}
         </>
     );
 }

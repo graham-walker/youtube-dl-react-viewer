@@ -24,6 +24,7 @@ export default class ActivityPage extends Component {
     }
 
     componentDidMount() {
+        document.title = `History - ${window.documentTitle}`;
         this.getActivity();
     }
 
@@ -112,7 +113,7 @@ export default class ActivityPage extends Component {
                                     </div>
                                 }
                                 endMessage={
-                                    <p className="text-center font-weight-bold">
+                                    <p className="text-center fw-bold">
                                         {this.state.count === 0 ? 'No activity found' : 'End of activity'}
                                     </p>
                                 }
@@ -168,9 +169,9 @@ const ActivityItem = props => {
                     src={avatar}
                     onError={(e) => { defaultImage(e, 'avatar') }}
                     roundedCircle={userContext.user?.useCircularAvatars ?? true}
-                    className="mr-2"
+                    className="me-2"
                 />
-                    <span className="font-weight-bold">{userContext.user.username} {eventType}</span><small className="text-muted ml-3">{new Date(activity.createdAt).toLocaleString()}</small></p>
+                    <span className="fw-bold">{userContext.user.username} {eventType}</span><small className="text-muted ms-3">{new Date(activity.createdAt).toLocaleString()}</small></p>
             </div>
             <div className="activity-body">{activityBody}</div>
         </>

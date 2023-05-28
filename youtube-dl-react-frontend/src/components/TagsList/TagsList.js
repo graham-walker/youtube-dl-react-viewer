@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Badge, Accordion, Row, Col, Card, Spinner } from 'react-bootstrap';
+import { Form, Badge, Accordion, Row, Col, Card, Spinner } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import axios from '../../utilities/axios.utility';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import AccordionButton from '../AccordionButton/AccordionButton';
 
 export default class TagsList extends Component {
     constructor(props) {
@@ -97,19 +98,21 @@ export default class TagsList extends Component {
 
     render() {
         const display = this.state.display.map((tag, i) =>
-            <h5>
-                <Link
-                    to={createSearchLink(tag.name)}
-                    key={i}
-                >
-                    <Badge
-                        variant={'secondary'}
-                        className="ml-1"
+            <div className="w-auto p-0">
+                <h5>
+                    <Link
+                        to={createSearchLink(tag.name)}
+                        key={i}
                     >
-                        {tag.name} ({tag.count.toLocaleString()})
-                    </Badge>
-                </Link>
-            </h5>
+                        <Badge
+                            bg="secondary"
+                            className="ms-1"
+                        >
+                            {tag.name} ({tag.count.toLocaleString()})
+                        </Badge>
+                    </Link>
+                </h5>
+            </div>
         );
 
         return (
@@ -128,9 +131,9 @@ export default class TagsList extends Component {
                         <Accordion className="mb-4">
                             <Row>
                                 <Col className="mb-2 mb-sm-0">
-                                    <Accordion.Toggle as={Button} eventKey="0">
+                                    <AccordionButton eventKey="0">
                                         <><FontAwesomeIcon icon="filter" /> Filter</>
-                                    </Accordion.Toggle>
+                                    </AccordionButton>
                                 </Col>
                             </Row>
                             <Accordion.Collapse eventKey="0">
@@ -138,7 +141,7 @@ export default class TagsList extends Component {
                                     <Card className="mt-4">
                                         <Card.Body>
                                             <Form
-                                                className="mr-2"
+                                                className="me-2"
                                                 onSubmit={this.onSubmit}
                                             ><Row>
                                                     <Col>
@@ -189,7 +192,7 @@ export default class TagsList extends Component {
                                 </div>
                             }
                             endMessage={
-                                <p className="text-center font-weight-bold">
+                                <p className="text-center fw-bold">
                                     {this.state[this.state.show].length === 0 ? 'No results found' : 'No more results'}
                                 </p>
                             }

@@ -21,6 +21,11 @@
     overflow: hidden;
     line-height: 1.15em;
     padding-bottom: 0.1em;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .video-uploader-link {
@@ -31,6 +36,11 @@
     display: -webkit-box;
     overflow: hidden;
     color: $text-muted !important;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .video-badge {
@@ -38,8 +48,8 @@
     top: 0;
     margin: 4px;
 
-    &.badge-dark {
-        background-color: #000;
+    &.bg-dark {
+        background-color: #000 !important;
     }
 }
 

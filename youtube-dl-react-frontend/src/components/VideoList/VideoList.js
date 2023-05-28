@@ -10,6 +10,7 @@ import { bytesToSizeString, secondsToDetailedString } from '../../utilities/form
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import axios from '../../utilities/axios.utility';
+import AccordionButton from '../AccordionButton/AccordionButton';
 
 export default class VideoList extends Component {
     static contextType = UserContext;
@@ -129,9 +130,9 @@ export default class VideoList extends Component {
                     <Accordion className="mb-4">
                         <Row>
                             <Col className="mb-2 mb-sm-0">
-                                <Accordion.Toggle as={Button} eventKey="0">
+                                <AccordionButton eventKey="0">
                                     <><FontAwesomeIcon icon="filter" /> Filter</>
-                                </Accordion.Toggle>
+                                </AccordionButton>
                             </Col>
                             {this.state.randomVideo &&
                                 <Col className="col-12 col-sm-auto">
@@ -148,7 +149,7 @@ export default class VideoList extends Component {
                                 <Card className="mt-4">
                                     <Card.Body>
                                         <Form
-                                            className="mr-2"
+                                            className="me-2"
                                             onSubmit={this.onSubmit}
                                         >
                                             <Form.Group>
@@ -195,7 +196,7 @@ export default class VideoList extends Component {
                             </div>
                         }
                         endMessage={
-                            <p className="text-center font-weight-bold">
+                            <p className="text-center fw-bold">
                                 {this.state.totals.count === 0 ? 'No results found' : 'No more results'}
                             </p>
                         }

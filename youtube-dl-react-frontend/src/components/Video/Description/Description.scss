@@ -6,12 +6,12 @@
 }
 
 .fake-link {
-    color: #007bff;
+    color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
     text-decoration: none;
     background-color: transparent;
 
     &:hover {
-        color: #0056b3;
+        --bs-link-color-rgb: var(--bs-link-hover-color-rgb);
         text-decoration: underline;
         cursor: pointer;
     }

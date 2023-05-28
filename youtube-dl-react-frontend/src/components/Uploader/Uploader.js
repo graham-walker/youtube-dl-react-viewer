@@ -52,10 +52,10 @@ export default class UploaderPage extends Component {
                 error={this.state.error}
             >
                 {!this.state.loading && <>
-                    <Row className="justify-content-center mb-4">
+                    <Row className="justify-content-center mb-4 mx-auto" style={{ maxWidth: '1140px' }}>
                         <Col
                             xs="auto"
-                            className="align-self-center"
+                            className="align-self-start"
                         >
                             <Image
                                 width={145}
@@ -63,16 +63,17 @@ export default class UploaderPage extends Component {
                                 src={getImage(uploader, 'avatar')}
                                 onError={(e) => { defaultImage(e, 'avatar') }}
                                 roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                className="mb-1 mb-lg-0"
                             />
                         </Col>
                         <Col
                             xs="auto"
                             className="align-self-center"
                         >
-                            <h3 className="text-center text-md-left">
+                            <h3 className="text-center text-lg-start">
                                 {uploader.name}
                             </h3>
-                            <Row className="text-center justify-content-md-center">
+                            <Row className="text-center justify-content-lg-center">
                                 {statistics.newestVideoDateUploaded &&
                                     <MiniStatisticColumn
                                         title="Last Upload"
@@ -146,6 +147,7 @@ export default class UploaderPage extends Component {
                                     <TopTags
                                         title="tags"
                                         tags={statistics.tags}
+                                        inline
                                     />
                                 </div>
                             }
@@ -155,6 +157,7 @@ export default class UploaderPage extends Component {
                                     <TopTags
                                         title="categories"
                                         tags={statistics.categories}
+                                        inline
                                     />
                                 </div>
                             }
@@ -164,6 +167,7 @@ export default class UploaderPage extends Component {
                                     <TopTags
                                         title="hashtags"
                                         tags={statistics.hashtags}
+                                        inline
                                     />
                                 </div>
                             }
