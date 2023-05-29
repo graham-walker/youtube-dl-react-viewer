@@ -52,7 +52,7 @@ const Comments = props => {
                     </Form.Select>
                 </Form.Group>
             </Form>
-            <div style={{ maxHeight: '100vh', overflow: 'auto' }}>
+            <div style={{ maxHeight: 'calc(100vh - 56px - 1.5rem)', overflow: 'auto' }}>
                 {!!groupedComments && n2(groupedComments)}
             </div>
         </div>
