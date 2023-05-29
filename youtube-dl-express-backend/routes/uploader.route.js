@@ -60,7 +60,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
     try {
         uploader = uploader.toJSON();
-        uploader = await applyTags(uploader, { count: -1 }, 10);
+        uploader = await applyTags(uploader, { count: -1 }, 5);
     } catch (err) {
         res.sendStatus(500);
     }
