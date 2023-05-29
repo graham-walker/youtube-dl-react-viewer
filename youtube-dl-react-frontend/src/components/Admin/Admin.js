@@ -565,7 +565,7 @@ class ApplicationManager extends Component {
 
     componentDidMount() {
         if (!this.props.youtubeDlPath) {
-            this.setState({ error: 'Enviornment variable YOUTUBE_DL_PATH is not set' });
+            this.setState({ error: 'Environment variable YOUTUBE_DL_PATH is not set' });
         }
     }
 
