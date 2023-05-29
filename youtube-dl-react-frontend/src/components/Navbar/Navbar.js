@@ -183,7 +183,7 @@ class AppNavbar extends Component {
                                             <NavDropdown.ItemText
                                                 style={{ width: '100vw', maxWidth: '350px' }}
                                             >
-                                                <LoginForm />
+                                                <LoginForm inDropdown={true} />
                                             </NavDropdown.ItemText>
                                         </NavDropdown>
                                         <LinkContainer to="/register">

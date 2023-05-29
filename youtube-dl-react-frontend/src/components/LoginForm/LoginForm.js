@@ -26,7 +26,8 @@ export default class LoginForm extends Component {
     }
 
     handleInputChange = (e) => {
-        const { value, name } = e.target;
+        let { value, name } = e.target;
+        if (this.props.inDropdown) name = name.slice(0, -'_dropdown'.length)
         this.setState({ [name]: value });
     }
 
@@ -53,11 +54,11 @@ export default class LoginForm extends Component {
                     <Alert variant="danger">{this.state.error}</Alert>
                 }
                 <Form onSubmit={this.onSubmit}>
-                    <Form.Group className="mb-3" controlId="username">
+                    <Form.Group className="mb-3" controlId={'username' + (this.props.inDropdown ? '_dropdown' : '')}>
                         <Form.Label>Username</Form.Label>
                         <Form.Control
                             type="text"
-                            name="username"
+                            name={'username' + (this.props.inDropdown ? '_dropdown' : '')}
                             placeholder="Enter username"
                             value={this.state.username}
                             onChange={this.handleInputChange}
@@ -65,11 +66,11 @@ export default class LoginForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="password">
+                    <Form.Group className="mb-3" controlId={'password' + (this.props.inDropdown ? '_dropdown' : '')}>
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                             type="password"
-                            name="password"
+                            name={'password' + (this.props.inDropdown ? '_dropdown' : '')}
                             placeholder="Enter password"
                             value={this.state.password}
                             onChange={this.handleInputChange}
