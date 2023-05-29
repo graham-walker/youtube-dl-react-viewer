@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tab, Form, Button, Accordion, Card, Nav, Alert } from 'react-bootstrap';
+import { Tab, Form, Button, Accordion, Card, Nav, Alert, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import { getErrorMessage, getWarningColor } from '../../utilities/format.utility';
@@ -18,6 +18,7 @@ export default class AdminPage extends Component {
             error: undefined,
             jobs: [],
             errors: [],
+            youtubeDlPath: undefined,
             defaultActivejobId: undefined,
         };
     }
@@ -31,6 +32,7 @@ export default class AdminPage extends Component {
                     loading: false,
                     jobs: res.data.jobs,
                     errors: res.data.errors,
+                    youtubeDlPath: res.data.youtubeDlPath,
                     defaultActivejobId: res.data.jobs[0]?._id,
                 });
             }).catch(err => {
@@ -86,18 +88,19 @@ export default class AdminPage extends Component {
                         <h5 className="mb-4">youtube-dl</h5>
                         <Card className="mb-4">
                             <Card.Body>
-                                <ApplicationManager />
+                                <ApplicationManager youtubeDlPath={this.state.youtubeDlPath} />
                             </Card.Body>
                         </Card>
                         <h5 className="mb-4">Download</h5>
                         <Card className="mb-4">
                             <Card.Body>
+                                {this.state.jobs.length === 0 && <Alert variant="danger">You must create a job before you can download</Alert>}
                                 <JobDownloader
                                     jobs={this.state.jobs}
                                 />
                             </Card.Body>
                         </Card>
-                        <h5 className="mb-4">Edit jobs</h5>
+                        <h5 className="mb-4">Jobs</h5>
                         <Card className="mb-4">
                             <Tab.Container defaultActiveKey={this.state.defaultActivejobId || 'new'}>
                                 <Card.Header>
@@ -108,7 +111,7 @@ export default class AdminPage extends Component {
                                         {this.state.jobs.map(job =>
                                             <Nav.Link
                                                 eventKey={job._id}
-                                                className={`tab-constrained${getWarningColor(job, ' ')}`}
+                                                className="tab-constrained"
                                                 title={job.name}
                                                 key={job._id}
                                             >
@@ -132,7 +135,6 @@ export default class AdminPage extends Component {
                                         {this.state.jobs.map(job =>
                                             <Tab.Pane
                                                 eventKey={job._id}
-                                                title={job.name}
                                                 key={job._id}
                                             >
                                                 <JobForm
@@ -152,20 +154,19 @@ export default class AdminPage extends Component {
                             </Tab.Container>
                         </Card>
                         <h5 className="mb-4">Failed to import</h5>
-                        <Alert variant="info"><FontAwesomeIcon icon="info-circle"/> If you are expecting to see a video here but do not, check the errors.txt or unknown errors.txt file in the output directory. Videos that failed to download will not be listed here and can be retried by rerunning the job.</Alert>
+                        <Alert variant="info">If you are expecting to see a video here but do not, check errors.txt or unknown_errors.txt in the output directory. Videos that failed to download will not be listed here and can be retried by rerunning the job.</Alert>
                         {this.state.errors.length > 0 ?
                             this.state.errors.map(error =>
                                 <Alert variant="danger" key={error._id}>
                                     {error.videoPath}
                                     <Accordion>
-                                        <Accordion.Toggle
-                                            as="a"
+                                        <AccordionButton
                                             variant="link"
                                             eventKey="0"
-                                            className="d-inline-block"
+                                            className="d-inline-block p-0"
                                         >
                                             Show Details
-                                        </Accordion.Toggle>
+                                        </AccordionButton>
                                         <Accordion.Collapse eventKey="0">
                                             <>
                                                 <pre className="pre-scrollable">
@@ -194,8 +195,7 @@ export default class AdminPage extends Component {
                                     </Accordion>
                                 </Alert>
                             )
-                            :
-                            <p className="text-center fw-bold">Nothing here</p>}
+                            : <p className="text-center fw-bold">Nothing here</p>}
                     </div>
                 }
             </PageLoadWrapper>
@@ -222,21 +222,21 @@ class UpdateChecker extends Component {
                 if (res?.data?.tag_name) {
                     if (this.getVersionScore(res.data.tag_name) > this.getVersionScore(window.scriptVersion)) {
                         this.setState({
-                            message: <>A new release of youtube-dl-react-viewer is available ({res.data.tag_name.slice(1)} &gt; {window.scriptVersion}). <a
+                            message: <>A <a
                                 href={window.gitHubLatestReleaseLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Download it here.
-                            </a></>,
+                                new release is available
+                            </a> ({res.data.tag_name.slice(1)} &gt; {window.scriptVersion})</>,
                             variant: 'info',
                         });
                     } else if (this.getVersionScore(res.data.tag_name) === this.getVersionScore(window.scriptVersion)) {
-                        this.setState({ message: `You are using the latest version of youtube-dl-react-viewer (${window.scriptVersion}).`, variant: 'success' });
+                        this.setState({ message: `You are using the latest version (${window.scriptVersion})`, variant: 'success' });
                     } else {
                         this.setState({
-                            message: `You are using a development version of youtube-dl-react-viewer (${window.scriptVersion}).
-                        Functionality may be missing or broken. Using development versions could cause irreversible damage to the database.`, variant: 'warning'
+                            message: `You are using a development version (${window.scriptVersion}).
+                        Features may not be complete or may cause irreversible damage to the database`, variant: 'warning'
                         });
                     }
                 } else {
@@ -378,6 +378,7 @@ class JobForm extends Component {
             name: '',
             formatCode: defaultFormatCode,
             isAudioOnly: false,
+            downloadComments: false,
             urls: '',
             arguments: defaultArguments,
             overrideUploader: '',
@@ -443,7 +444,7 @@ class JobForm extends Component {
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 {this.props.job?.lastCompleted &&
-                    <p className="text-muted">Last completed downloading: {new Date(this.props.job.lastCompleted).toLocaleString()}</p>
+                    <p className={getWarningColor(this.props.job)}>Last downloaded: {new Date(this.props.job.lastCompleted).toLocaleString()}</p>
                 }
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group className="mb-3" controlId={'name' + (this.props.job?._id || 'new')}>
@@ -458,7 +459,10 @@ class JobForm extends Component {
                         />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId={'formatCode' + (this.props.job?._id || 'new')}>
-                        <Form.Label>Format code</Form.Label>
+
+                        <OverlayTrigger overlay={<Tooltip>Same as --format</Tooltip>}>
+                            <Form.Label>Format code</Form.Label>
+                        </OverlayTrigger>
                         <Form.Control
                             type="text"
                             placeholder="Format code"
@@ -478,8 +482,18 @@ class JobForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <Form.Group className="mb-3" controlId={'downloadComments' + (this.props.job?._id || 'new')}>
+                        <Form.Check
+                            custom
+                            checked={this.state.downloadComments}
+                            type="checkbox"
+                            name="downloadComments"
+                            label="Download comments (yt-dlp only)"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId={'username' + (this.props.job?._id || 'new')}>
-                        <Form.Label>URL list</Form.Label>
+                        <Form.Label>URLs</Form.Label>
                         <Form.Control
                             as="textarea"
                             rows="5"
@@ -501,7 +515,9 @@ class JobForm extends Component {
                         <Accordion.Collapse eventKey="0">
                             <>
                                 <Form.Group className="mb-3" controlId={'arguments' + (this.props.job?._id || 'new')}>
-                                    <Form.Label>Override config</Form.Label>
+                                    <OverlayTrigger overlay={<Tooltip>Set the arguments used when executing youtube-dl</Tooltip>}>
+                                        <Form.Label>Override config</Form.Label>
+                                    </OverlayTrigger>
                                     <Form.Control
                                         as="textarea"
                                         rows="10"
@@ -515,7 +531,9 @@ class JobForm extends Component {
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId={'overrideUploader' + (this.props.job?._id || 'new')}>
-                                    <Form.Label>Override uploader</Form.Label>
+                                    <OverlayTrigger overlay={<Tooltip>Set the uploader. Useful when downloading from websites that do not return uploader in their metadata</Tooltip>}>
+                                        <Form.Label>Override uploader</Form.Label>
+                                    </OverlayTrigger>
                                     <Form.Control
                                         type="text"
                                         placeholder="Uploader name"
@@ -545,6 +563,12 @@ class ApplicationManager extends Component {
         };
     }
 
+    componentDidMount() {
+        if (!this.props.youtubeDlPath) {
+            this.setState({ error: 'Enviornment variable YOUTUBE_DL_PATH is not set' });
+        }
+    }
+
     post() {
         this.setState({ success: undefined, error: undefined }, () => {
             axios
@@ -566,10 +590,12 @@ class ApplicationManager extends Component {
             <>
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                <p>Using <code><span style={{ color: '#569CD6' }}>YOUTUBE_DL_PATH</span>=<span style={{ color: '#CE9178' }}>{this.props.youtubeDlPath}</span></code></p>
                 <Button
                     name="update"
                     type="submit"
                     onClick={this.post.bind(this)}
+                    disabled={!this.props.youtubeDlPath}
                 >
                     Check for updates
                 </Button>
@@ -578,31 +604,32 @@ class ApplicationManager extends Component {
     }
 }
 
-const defaultArguments = `# Some options are not included here are are set when executing youtube-dl. If you attempt to set those options here they will be overwritten.
-# Some options here should not be modified or if modified should only contain certain values.
-# You should be able set most other youtube-dl options without preventing the script from working properly.
+const defaultArguments = `# Sign in to websites:
+#--cookies "/Path/To/cookies.txt"
 
 # These options will BREAK the script, do not set them:
-# --batch-file
-# --keep-fragments
+#--batch-file
+#--keep-fragments
 
-# These options are set by the script when a job is run. Do not set them here, they will be overridden:
-# --exec
-# --write-info-json
-# --prefer-ffmpeg
-# --ffmpeg-location 
-# --output
-# --format
-# --extract-audio
-# --download-archive
-# --cache-dir
+# These options are set by the script, they will be overridden:
+#--exec
+#--write-info-json
+#--prefer-ffmpeg
+#--ffmpeg-location 
+#--output
+#--format
+#--extract-audio
+#--download-archive
+#--cache-dir
+#--write-comments
 
-# These options are set by the script if using the yt-dlp fork of youtube-dl. Do not include them here, they will be overridden:
-# --compat-options youtube-dl
+# These options are set by the script if using the yt-dlp, they will be overridden:
+#--compat-options youtube-dl
 
-# These options are not required, but are preferred and are used by default:
-# --write-all-thumbnails can be replaced with --write-thumbnail and --all-subs can be replaced with --write-sub or --write-auto-sub
-# Changing --merge-output-format mkv might cause some merges to fail depending on the format code used
+# These options are not required, but are used by default:
+#--write-all-thumbnails can be replaced with --write-thumbnail
+#--all-subs can be replaced with --write-sub or --write-auto-sub
+#--merge-output-format can cause downloads to fail depending on the format code used
 --write-description
 --write-annotations
 --write-all-thumbnails
@@ -615,19 +642,17 @@ const defaultArguments = `# Some options are not included here are are set when 
 --no-continue
 --ignore-errors
 
-# These options may help the script but are not necessary. They can be freely modified:
+# These options may help the script, but are not necessary:
 #--geo-bypass
 #--force-ipv4
 #--match-filter "!is_live & !live"
 
-# To prevent 429 errors on YouTube you might want to consider including these options, or sign in using cookies:
+# Prevent 429 errors:
 #--sleep-interval 5
 #--max-sleep-interval 30
-#--cookies "/Path/To/cookies.txt"
 
-# These options are recommended, but are only available if using the yt-dlp fork of youtube-dl:
+# These options are recommended if using yt-dlp:
 #--sleep-requests 1
-#--write-comments
 #--datebefore "$(date --date="30 days ago" +%Y%m%d)"
 `;
 const defaultFormatCode = '(bestvideo[vcodec^=av01][height>=4320][fps>30]/bestvideo[vcodec^=vp9.2][height>=4320][fps>30]/bestvideo[vcodec^=vp9][height>=4320][fps>30]/bestvideo[vcodec^=avc1][height>=4320][fps>30]/bestvideo[height>=4320][fps>30]/bestvideo[vcodec^=av01][height>=4320]/bestvideo[vcodec^=vp9.2][height>=4320]/bestvideo[vcodec^=vp9][height>=4320]/bestvideo[vcodec^=avc1][height>=4320]/bestvideo[height>=4320]/bestvideo[vcodec^=av01][height>=2880][fps>30]/bestvideo[vcodec^=vp9.2][height>=2880][fps>30]/bestvideo[vcodec^=vp9][height>=2880][fps>30]/bestvideo[vcodec^=avc1][height>=2880][fps>30]/bestvideo[height>=2880][fps>30]/bestvideo[vcodec^=av01][height>=2880]/bestvideo[vcodec^=vp9.2][height>=2880]/bestvideo[vcodec^=vp9][height>=2880]/bestvideo[vcodec^=avc1][height>=2880]/bestvideo[height>=2880]/bestvideo[vcodec^=av01][height>=2160][fps>30]/bestvideo[vcodec^=vp9.2][height>=2160][fps>30]/bestvideo[vcodec^=vp9][height>=2160][fps>30]/bestvideo[vcodec^=avc1][height>=2160][fps>30]/bestvideo[height>=2160][fps>30]/bestvideo[vcodec^=av01][height>=2160]/bestvideo[vcodec^=vp9.2][height>=2160]/bestvideo[vcodec^=vp9][height>=2160]/bestvideo[vcodec^=avc1][height>=2160]/bestvideo[height>=2160]/bestvideo[vcodec^=av01][height>=1440][fps>30]/bestvideo[vcodec^=vp9.2][height>=1440][fps>30]/bestvideo[vcodec^=vp9][height>=1440][fps>30]/bestvideo[vcodec^=avc1][height>=1440][fps>30]/bestvideo[height>=1440][fps>30]/bestvideo[vcodec^=av01][height>=1440]/bestvideo[vcodec^=vp9.2][height>=1440]/bestvideo[vcodec^=vp9][height>=1440]/bestvideo[vcodec^=avc1][height>=1440]/bestvideo[height>=1440]/bestvideo[vcodec^=av01][height>=1080][fps>30]/bestvideo[vcodec^=vp9.2][height>=1080][fps>30]/bestvideo[vcodec^=vp9][height>=1080][fps>30]/bestvideo[vcodec^=avc1][height>=1080][fps>30]/bestvideo[height>=1080][fps>30]/bestvideo[vcodec^=av01][height>=1080]/bestvideo[vcodec^=vp9.2][height>=1080]/bestvideo[vcodec^=vp9][height>=1080]/bestvideo[vcodec^=avc1][height>=1080]/bestvideo[height>=1080]/bestvideo[vcodec^=av01][height>=720][fps>30]/bestvideo[vcodec^=vp9.2][height>=720][fps>30]/bestvideo[vcodec^=vp9][height>=720][fps>30]/bestvideo[vcodec^=avc1][height>=720][fps>30]/bestvideo[height>=720][fps>30]/bestvideo[vcodec^=av01][height>=720]/bestvideo[vcodec^=vp9.2][height>=720]/bestvideo[vcodec^=vp9][height>=720]/bestvideo[vcodec^=avc1][height>=720]/bestvideo[height>=720]/bestvideo[vcodec^=av01][height>=480][fps>30]/bestvideo[vcodec^=vp9.2][height>=480][fps>30]/bestvideo[vcodec^=vp9][height>=480][fps>30]/bestvideo[vcodec^=avc1][height>=480][fps>30]/bestvideo[height>=480][fps>30]/bestvideo[vcodec^=av01][height>=480]/bestvideo[vcodec^=vp9.2][height>=480]/bestvideo[vcodec^=vp9][height>=480]/bestvideo[vcodec^=avc1][height>=480]/bestvideo[height>=480]/bestvideo[vcodec^=av01][height>=360][fps>30]/bestvideo[vcodec^=vp9.2][height>=360][fps>30]/bestvideo[vcodec^=vp9][height>=360][fps>30]/bestvideo[vcodec^=avc1][height>=360][fps>30]/bestvideo[height>=360][fps>30]/bestvideo[vcodec^=av01][height>=360]/bestvideo[vcodec^=vp9.2][height>=360]/bestvideo[vcodec^=vp9][height>=360]/bestvideo[vcodec^=avc1][height>=360]/bestvideo[height>=360]/bestvideo[vcodec^=av01][height>=240][fps>30]/bestvideo[vcodec^=vp9.2][height>=240][fps>30]/bestvideo[vcodec^=vp9][height>=240][fps>30]/bestvideo[vcodec^=avc1][height>=240][fps>30]/bestvideo[height>=240][fps>30]/bestvideo[vcodec^=av01][height>=240]/bestvideo[vcodec^=vp9.2][height>=240]/bestvideo[vcodec^=vp9][height>=240]/bestvideo[vcodec^=avc1][height>=240]/bestvideo[height>=240]/bestvideo[vcodec^=av01][height>=144][fps>30]/bestvideo[vcodec^=vp9.2][height>=144][fps>30]/bestvideo[vcodec^=vp9][height>=144][fps>30]/bestvideo[vcodec^=avc1][height>=144][fps>30]/bestvideo[height>=144][fps>30]/bestvideo[vcodec^=av01][height>=144]/bestvideo[vcodec^=vp9.2][height>=144]/bestvideo[vcodec^=vp9][height>=144]/bestvideo[vcodec^=avc1][height>=144]/bestvideo[height>=144]/bestvideo)+(bestaudio[acodec^=opus]/bestaudio)/best';

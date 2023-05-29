@@ -17,7 +17,7 @@ $container-max-widths: (
     lg: 960px,
     xl: 1140px,
     xxl: 1380px,
-    xxxl: 1560px
+    xxxl: 1560px,
 );
 
 $dark: #000; // Make dark OLED dark
@@ -51,6 +51,13 @@ a:not(.nav-link):not(.dropdown-item):not(.btn):not(.navbar-brand) {
 
 small {
     font-size: 80%;
+}
+
+code {
+    background: #1F1F1F !important;
+    color: #CCCCCC !important;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.25rem;
 }
 
 // Bootstrap

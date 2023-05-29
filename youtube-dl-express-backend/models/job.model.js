@@ -11,6 +11,7 @@ const jobSchema = new mongoose.Schema({
     overrideUploader: { type: String, default: null },
     lastCompleted: { type: Date, default: null },
     statistics: { type: statisticSchema, default: () => ({}) },
+    downloadComments: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

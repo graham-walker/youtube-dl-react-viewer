@@ -72,6 +72,7 @@ export default class Downloader {
             if (parsedEnv.VERBOSE) jobArguments.push('--verbose');
             if (process.platform === 'win32') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);
             if (job.isAudioOnly) jobArguments.push('--extract-audio');
+            if (job.downloadComments) jobArguments.push('--write-comments');
             jobArguments = parsedArguments.concat(jobArguments);
             jobArguments = jobArguments.concat(parsedUrls);
 
@@ -196,7 +197,7 @@ const getYoutubeDlVersion = async () => {
     if (versionProcess.status === 0) {
         return versionProcess.stdout.toString().trim();
     } else {
-        throw new Error('Failed to get youtube-dl version');
+        throw new Error('Failed to get version');
     }
 }
 

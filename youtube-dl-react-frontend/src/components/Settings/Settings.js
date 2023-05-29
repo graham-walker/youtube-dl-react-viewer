@@ -192,7 +192,7 @@ class SettingsForm extends Component {
                             checked={this.state.useCircularAvatars}
                             type="checkbox"
                             name="useCircularAvatars"
-                            label="Use circular avatar images"
+                            label="Circular avatar images"
                             id="useCircularAvatars"
                             onChange={this.handleInputChange}
                         />
@@ -203,7 +203,7 @@ class SettingsForm extends Component {
                             checked={this.state.reportBytesUsingIec}
                             type="checkbox"
                             name="reportBytesUsingIec"
-                            label="Calculate filesizes using a divisor of 1024 bytes instead of 1000 bytes (On Windows, MiB is equivalent to MB)"
+                            label="Use base 1024 when calculating filesize instead of base 1000"
                             id="reportBytesUsingIec"
                             onChange={this.handleInputChange}
                         />

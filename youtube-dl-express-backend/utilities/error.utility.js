@@ -15,11 +15,11 @@ export default class ErrorManager {
             error = await DownloadError.findOne({ _id: errorId });
         } catch (err) {
             this.busy = false;
-            return { error: 'Could not find error document' };
+            return { error: 'Error not found' };
         }
         if (!error) {
             this.busy = false;
-            return { error: 'Could not find error document' };
+            return { error: 'Error not found' };
         }
 
         // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
@@ -46,8 +46,7 @@ export default class ErrorManager {
         if (execProcess.status !== 0) {
             this.busy = false;
             return {
-                error: `Exec failed to repair the download with status`
-                    + ` code: ${execProcess.status}. Refresh the page to see the updated error.`
+                error: `Failed to repair error. Refresh the page to see the updated error`,
             };
         }
 
@@ -59,7 +58,7 @@ export default class ErrorManager {
         }
 
         this.busy = false;
-        return { success: 'Video repaired' };
+        return { success: 'Video imported' };
     }
 
     isBusy() {

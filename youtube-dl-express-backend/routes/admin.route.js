@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'path';
 import os from 'os';
 import { spawnSync } from 'child_process';
 
@@ -26,7 +25,7 @@ router.get('/', async (req, res) => {
         res.sendStatus(500);
     }
 
-    res.json({ jobs, errors });
+    res.json({ jobs, errors, youtubeDlPath: process.env.YOUTUBE_DL_PATH });
 });
 
 router.post('/jobs/save/new', async (req, res) => {
@@ -36,6 +35,7 @@ router.post('/jobs/save/new', async (req, res) => {
             name: req.body.name,
             formatCode: req.body.formatCode,
             isAudioOnly: req.body.isAudioOnly,
+            downloadComments: req.body.downloadComments,
             urls: req.body.urls,
             arguments: req.body.arguments,
             overrideUploader: req.body.overrideUploader,
@@ -49,7 +49,7 @@ router.post('/jobs/save/new', async (req, res) => {
 
 router.post('/jobs/save/:jobId', async (req, res) => {
     if (downloader.isBusy(req.params.jobId)) {
-        return res.status(500).json({ error: 'Cannot save job while downloading' });
+        return res.status(500).json({ error: 'Cannot save while downloading' });
     }
 
     let job;
@@ -58,6 +58,7 @@ router.post('/jobs/save/:jobId', async (req, res) => {
         job.name = req.body.name;
         job.formatCode = req.body.formatCode;
         job.isAudioOnly = req.body.isAudioOnly;
+        job.downloadComments = req.body.downloadComments;
         job.urls = req.body.urls;
         job.arguments = req.body.arguments;
         job.overrideUploader = req.body.overrideUploader;
@@ -70,10 +71,10 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 
 router.post('/jobs/download/', async (req, res) => {
     if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Cannot start download while repairing an error' }
+        { error: 'Cannot download while repairing an error' }
     );
     if (updating) return res.status(500).json(
-        { error: 'Cannot start download while a checking youtube-dl for updates' }
+        { error: 'Cannot download while checking for updates' }
     );
 
     if (!Array.isArray(req.body)
@@ -86,14 +87,14 @@ router.post('/jobs/download/', async (req, res) => {
     switch (await downloader.download()) {
         case 'not-started':
             if (jobsAdded > 0) {
-                return res.json({ success: `Queued ${jobsAdded} jobs` });
+                return res.json({ success: 'Job(s) started, check the console for progress' });
             } else {
-                return res.json({ error: 'All jobs already downloading or queued' });
+                return res.json({ error: 'Job(s) already running' });
             }
         case 'started':
-            return res.json({ success: `Job started${jobsAdded > 1 ? `. Queued ${jobsAdded - 1} jobs` : ''}` });
+            return res.json({ success: 'Job(s) started, check the console for progress' });
         case 'failed':
-            return res.status(500).json({ error: 'Failed to start job' });
+            return res.status(500).json({ error: 'Failed to start' });
         default:
             return res.sendStatus(500);
     }
@@ -102,11 +103,11 @@ router.post('/jobs/download/', async (req, res) => {
 router.post('/jobs/stop', async (req, res) => {
     switch (await downloader.stop()) {
         case 'stopped':
-            return res.json({ success: 'All jobs stopped' });
+            return res.json({ success: 'Stopped' });
         case 'failed':
-            return res.json({ error: 'Failed to stop jobs' });
+            return res.json({ error: 'Failed to stop' });
         case 'none':
-            return res.json({ error: 'No jobs are running to stop' });
+            return res.json({ error: 'None running' });
         default:
             return res.sendStatus(500);
     }
@@ -114,13 +115,13 @@ router.post('/jobs/stop', async (req, res) => {
 
 router.post('/errors/repair/:errorId', async (req, res) => {
     if (downloader.isBusy()) return res.status(500).json(
-        { error: 'Cannot attempt to repair error while a job is downloading' }
+        { error: 'Cannot repair error while downloading' }
     );
     if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Already attempting to repair an error' }
+        { error: 'Currently repairing another error' }
     );
     if (updating) return res.status(500).json(
-        { error: 'Cannot attempt to repair error while a checking youtube-dl for updates' }
+        { error: 'Cannot repair error while checking for updates' }
     );
 
     try {
@@ -134,13 +135,13 @@ router.post('/errors/repair/:errorId', async (req, res) => {
 
 router.post('/youtube-dl/update', async (req, res) => {
     if (downloader.isBusy()) return res.status(500).json(
-        { error: 'Cannot check for updates to youtube-dl while a job is downloading' }
+        { error: 'Cannot check for updates while downloading' }
     );
     if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Cannot check for updates to youtube-dl while repairing an error' }
+        { error: 'Cannot check for updates while repairing errors' }
     );
     if (updating) return res.status(500).json(
-        { error: 'Already checking youtube-dl for updates' }
+        { error: 'Already checking for updates' }
     );
 
     updating = true;
