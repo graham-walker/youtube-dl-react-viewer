@@ -4,7 +4,6 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import ffmpeg from 'fluent-ffmpeg';
 
 import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
@@ -68,27 +67,8 @@ import applyUpdates from './utilities/update.utility.js';
         app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
     }
 
-    // Transcode videos
-    app.use('/transcoded/videos', globalPasswordMiddleware, (req, res) => {
-        try {
-            res.contentType('webm');
-            const videoPath = path.join(outputDirectory, 'videos', decodeURIComponent(req.path));
-            // ffmpeg(videoPath)
-            //     .format('webm')
-            //     // .videoBitrate(3500)
-            //     // .audioBitrate(128)
-            //     .on('error', function (err) {
-            //         if (parsedEnv.VERBOSE) console.error(err)
-            //     })
-            //     .pipe(res, { end: true });
-            res.status(206);
-            let stream = fs.createReadStream(videoPath)
-            stream.pipe(res);
-        } catch (err) {
-            if (parsedEnv.VERBOSE) console.error(err);
-            res.sendStatus(500);
-        }
-    });
+    // Spoof type
+    app.use('/transcoded/videos', globalPasswordMiddleware, (req, res, next) => { res.contentType('webm'); next(); }, express.static(path.join(outputDirectory, 'videos')));
 
     // Serve the react app build in production
     if (parsedEnv.NODE_ENV === 'production') {
