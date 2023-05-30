@@ -38,9 +38,9 @@ export default class VideoPage extends Component {
             localVideoPath: undefined,
             resumeTime: undefined,
             activityDocument: undefined,
-            loop: localStorage.getItem('loop') === 'true' || false,
-            autoplay: localStorage.getItem('autoplay') === 'true' || false,
-            spoofContentType: localStorage.getItem('spoofContentType') === 'true' || true,
+            loop: localStorage.getItem('loop') === null ? false : localStorage.getItem('loop') === 'true',
+            autoplay: localStorage.getItem('autoplay') === null ? false : localStorage.getItem('autoplay') === 'true',
+            spoofContentType: localStorage.getItem('spoofContentType') === null ? true : localStorage.getItem('spoofContentType') === 'true',
             keepControlsOpen: localStorage.getItem('keepControlsOpen') || 'never', // never, windowed, fullscreen, always
         };
         this.videoRef = React.createRef();
@@ -196,7 +196,7 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('error', function (e) {
-                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The default format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try another browser or change the format code and redownload. Firefox generally works.'
+                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The default format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload. Firefox generally works.'
                                 });
 
                                 this.forceUpdate();
