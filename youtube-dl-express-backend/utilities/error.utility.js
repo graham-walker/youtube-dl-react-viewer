@@ -58,7 +58,7 @@ export default class ErrorManager {
         }
 
         this.busy = false;
-        return { success: 'Video imported' };
+        return { success: 'Video imported successfully' };
     }
 
     isBusy() {
