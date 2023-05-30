@@ -51,7 +51,7 @@ export default class ActivityPage extends Component {
         axios.post(`/api/activity/clear`)
             .then(res => {
                 if (res.status === 200) {
-                    this.setState({ activities: [], count: 0 });
+                    this.setState({ activities: [], count: 0, page: 0, hasMore: false });
                 }
             }).catch(err => {
             });
