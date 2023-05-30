@@ -116,7 +116,7 @@ export default class UploaderList extends Component {
                         {this.state.totalUploaders !== 1 && 's'}
                     </h1>
                     <h5 className="mb-4">
-                        Across {this.state.totalWebsites} different websites
+                        From {this.state.totalWebsites} different websites
                     </h5>
                     {this.state.uploaders.length === 0
                         ? <p className="text-center fw-bold">No results found</p>
