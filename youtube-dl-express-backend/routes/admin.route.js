@@ -1,9 +1,13 @@
 import express from 'express';
 import os from 'os';
 import { spawnSync } from 'child_process';
+import axios from 'axios';
+import path from 'path';
+import fs from 'fs-extra';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
+import Uploader from '../models/uploader.model.js';
 
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
@@ -163,5 +167,61 @@ router.post('/youtube-dl/update', async (req, res) => {
         return res.sendStatus(500);
     }
 });
+
+router.post('/download_uploader_icons', async (req, res) => {
+    let sentResponse = false;
+    try {
+        if (!parsedEnv.YOUTUBE_V3_API_KEY) return res.status(500).json({ error: 'Environment variable YOUTUBE_V3_API_KEY is not set' });
+
+        const uploaders = await Uploader
+            .find({ extractor: 'youtube' }, '-_id id name')
+            .collation({ locale: 'en' })
+            .sort({ name: 1 })
+            .lean()
+            .exec();
+
+        if (uploaders.length === 0) return res.status(500).json({ error: 'No valid uploaders' });
+
+        for (let uploader of uploaders) {
+            const channelIconFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars/youtube', uploader.name.replace(/[|:&;$%@"<>()+,/\\*?]/g, '_') + '.jpg');
+            if (req.query?.force !== 'true' && (await fs.exists(channelIconFile))) continue;
+
+            let channelRes;
+            try {
+                channelRes = await axios.get(`https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${uploader.id}&fields=items%2Fsnippet%2Fthumbnails&key=${parsedEnv.YOUTUBE_V3_API_KEY}`);
+            } catch (err) {
+                if (err?.response?.data?.error?.message === 'API key not valid. Please pass a valid API key.') {
+                    return res.status(500).json({ error: 'Invalid API key' });
+                }
+                console.error('Failed to lookup icon for ' + uploader.name);
+                if (parsedEnv.VERBOSE) console.error(err);
+                continue;
+            }
+
+            if (!sentResponse) {
+                res.json({ success: 'Downloading uploader icons, check the console for progress' });
+                sentResponse = true;
+            }
+
+            try {
+                const channelIconUrl = channelRes.data.items[0].snippet.thumbnails.high.url;
+                let channelIconRes = await axios.request({ url: channelIconUrl, method: 'GET', responseType: 'arraybuffer' });
+                await fs.writeFile(channelIconFile, channelIconRes.data);
+                console.log('Downloaded icon for ' + uploader.name);
+            } catch (err) {
+                console.error('Failed to download icon for ' + uploader.name);
+                if (parsedEnv.VERBOSE) console.error(err);
+            }
+        }
+        if (!sentResponse) {
+            return res.json({ success: 'All uploader icons downloaded' });
+        } else {
+            console.log('Finished downloading uploader icons');
+        }
+    } catch (err) {
+        if (parsedEnv.VERBOSE) console.error(err);
+        if (!sentResponse) return res.sendStatus(500);
+    }
+})
 
 export default router;

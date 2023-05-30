@@ -48,5 +48,5 @@ export const defaultImage = (e, type) => {
 }
 
 const makeSafe = (text, replaceWith) => {
-    return encodeURIComponent(text.replace(/[|:&;$%@"<>()+,/\\]/g, replaceWith));
+    return encodeURIComponent(text.replace(/[|:&;$%@"<>()+,/\\*?]/g, replaceWith));
 }

@@ -84,6 +84,10 @@ const expected = {
         type: String,
         default: 'https://sponsor.ajay.app/',
     },
+    'YOUTUBE_V3_API_KEY': {
+        type: String,
+        default: '',
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',

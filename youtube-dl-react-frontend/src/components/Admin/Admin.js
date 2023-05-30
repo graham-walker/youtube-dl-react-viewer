@@ -85,12 +85,7 @@ export default class AdminPage extends Component {
                             && process.env.REACT_APP_CHECK_FOR_UPDATES.toLowerCase() === 'true'
                             && <UpdateChecker />
                         }
-                        <h5 className="mb-4">youtube-dl</h5>
-                        <Card className="mb-4">
-                            <Card.Body>
-                                <ApplicationManager youtubeDlPath={this.state.youtubeDlPath} />
-                            </Card.Body>
-                        </Card>
+                        <ApplicationManager youtubeDlPath={this.state.youtubeDlPath} />
                         <h5 className="mb-4">Download</h5>
                         <Card className="mb-4">
                             <Card.Body>
@@ -153,6 +148,7 @@ export default class AdminPage extends Component {
                                 </Card.Body>
                             </Tab.Container>
                         </Card>
+                        <ChannelIconDownloader />
                         <h5 className="mb-4">Failed to import</h5>
                         <Alert variant="info">If you are expecting to see a video here but do not, check errors.txt or unknown_errors.txt in the output directory. Videos that failed to download will not be listed here and can be retried by rerunning the job.</Alert>
                         {this.state.errors.length > 0 ?
@@ -588,17 +584,80 @@ class ApplicationManager extends Component {
     render() {
         return (
             <>
-                {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
-                {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
-                <p>Using <code><span style={{ color: '#569CD6' }}>YOUTUBE_DL_PATH</span>=<span style={{ color: '#CE9178' }}>{this.props.youtubeDlPath}</span></code></p>
-                <Button
-                    name="update"
-                    type="submit"
-                    onClick={this.post.bind(this)}
-                    disabled={!this.props.youtubeDlPath}
-                >
-                    Check for updates
-                </Button>
+                <h5 className="mb-4">youtube-dl</h5>
+                <Card className="mb-4">
+                    <Card.Body>
+                        {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
+                        {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                        <p>Using <code><span style={{ color: '#569CD6' }}>YOUTUBE_DL_PATH</span>=<span style={{ color: '#CE9178' }}>{this.props.youtubeDlPath}</span></code></p>
+                        <Button
+                            name="update"
+                            type="submit"
+                            onClick={this.post.bind(this)}
+                            disabled={!this.props.youtubeDlPath}
+                        >
+                            Check for updates
+                        </Button>
+                    </Card.Body>
+                </Card>
+            </>
+        );
+    }
+}
+
+class ChannelIconDownloader extends Component {
+    static contextType = UserContext;
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            success: undefined,
+            error: undefined,
+        };
+        this.post = this.post.bind(this);
+    }
+
+    post(force = false) {
+        this.setState({ success: undefined, error: undefined }, () => {
+            axios
+                .post(
+                    '/api/admin/download_uploader_icons?force=' + force
+                ).then(res => {
+                    if (res.status === 200) this.setState({
+                        success: res.data.success,
+                        error: res.data.error
+                    });
+                }).catch(err => {
+                    this.setState({ error: getErrorMessage(err) });
+                });
+        });
+    }
+
+    render() {
+        return (
+            <>
+                <h5 className="mb-4">Uploader icons</h5>
+                <Card className="mb-4">
+                    <Card.Body>
+                        {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
+                        {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                        <Button
+                            name="update"
+                            type="submit"
+                            onClick={() => this.post()}
+                            className="me-2"
+                        >
+                            Download
+                        </Button>
+                        <Button
+                            name="update"
+                            type="submit"
+                            onClick={() => this.post(true)}
+                        >
+                            Download (overwrite)
+                        </Button>
+                    </Card.Body>
+                </Card>
             </>
         );
     }
