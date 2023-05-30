@@ -8,6 +8,14 @@
     background-size: cover !important;
 }
 
+.keep-controls-open-windowed .video-js:not(.vjs-fullscreen) .vjs-control-bar,
+.keep-controls-open-fullscreen .video-js.vjs-fullscreen .vjs-control-bar,
+.keep-controls-open-always .video-js .vjs-control-bar {
+	visibility: visible !important;
+	opacity: 1 !important;
+	transition-duration: 0s !important;
+}
+
 .sponsor-segment {
     position: absolute;
     bottom: 0;

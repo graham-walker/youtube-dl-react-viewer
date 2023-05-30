@@ -41,6 +41,7 @@ export default class VideoPage extends Component {
             loop: localStorage.getItem('loop') === 'true' || false,
             autoplay: localStorage.getItem('autoplay') === 'true' || false,
             spoofContentType: localStorage.getItem('spoofContentType') === 'true' || true,
+            keepControlsOpen: localStorage.getItem('keepControlsOpen') || 'never', // never, windowed, fullscreen, always
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -193,7 +194,7 @@ export default class VideoPage extends Component {
                                 this.player.on('ended', () => {
                                     this.onVideoEnd();
                                 });
-                                
+
                                 this.player.on('error', function (e) {
                                     document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The default format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try another browser or change the format code and redownload. Firefox generally works.'
                                 });
@@ -292,8 +293,8 @@ export default class VideoPage extends Component {
             >
                 {!this.state.loading && <>
                     <Row>
-                        <Col>
-                            <div data-vjs-player>
+                        <Col className={`keep-controls-open-${this.state.keepControlsOpen}`}>
+                            <div data-vjs-player> 
                                 <video
                                     controls
                                     className="video-js vjs-big-play-centered mb-3"
