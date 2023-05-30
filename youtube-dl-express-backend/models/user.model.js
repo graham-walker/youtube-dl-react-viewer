@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema({
     useCircularAvatars: { type: Boolean, default: true },
     avatar: { type: String, default: null },
     recordWatchHistory: { type: Boolean, default: true },
+    onlySkipLocked: { type: Boolean, default: true },
+    skipSponsor: { type: Boolean, default: true },
+    skipSelfpromo: { type: Boolean, default: true },
+    skipInteraction: { type: Boolean, default: true },
+    skipIntro: { type: Boolean, default: true },
+    skipOutro: { type: Boolean, default: true },
+    skipPreview: { type: Boolean, default: true },
+    skipFiller: { type: Boolean, default: false },
+    skipMusicOfftopic: { type: Boolean, default: true },
 }, {
     timestamps: true,
 });

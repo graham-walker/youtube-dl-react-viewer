@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import slash from 'slash';
+import axios from 'axios';
 
 import Video from '../models/video.model.js';
 import Activity from '../models/activity.model.js';
@@ -138,6 +139,17 @@ router.get('/:extractor/:id', async (req, res) => {
 
     delete video._id;
 
+    let sponsorSegments = null;
+    if (req.user?.enableSponsorblock && video.extractor === 'youtube') {
+        try {
+            const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/?videoID=${video.id}&categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
+            sponsorSegments = sponsorRes.data;
+        } catch (err) {
+            console.error('Failed to get sponsor segments');
+            if (parsedEnv.VERBOSE) console.error(err);
+        }
+    }
+
     res.json({
         video,
         uploaderVideos,
@@ -150,6 +162,7 @@ router.get('/:extractor/:id', async (req, res) => {
         localVideoPath: slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
         resumeTime,
         activityDocument: activity?._id,
+        sponsorSegments,
     });
 });
 

@@ -16,7 +16,7 @@ router.get('/settings', async (req, res) => {
     try {
         user = await User.findOne(
             { _id: req.userId },
-            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory'
+            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic'
         );
     } catch (err) {
         return res.sendStatus(500);
@@ -30,7 +30,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     let user;
     try {
         user = await User.findOne({ _id: req.userId },
-            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory');
+            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic');
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -63,6 +63,15 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.useCircularAvatars = req.body.useCircularAvatars;
     user.recordWatchHistory = req.body.recordWatchHistory;
+    user.onlySkipLocked = req.body.onlySkipLocked;
+    user.skipSponsor = req.body.skipSponsor;
+    user.skipSelfpromo = req.body.skipSelfpromo;
+    user.skipInteraction = req.body.skipInteraction;
+    user.skipIntro = req.body.skipIntro;
+    user.skipOutro = req.body.skipOutro;
+    user.skipPreview = req.body.skipPreview;
+    user.skipFiller = req.body.skipFiller;
+    user.skipMusicOfftopic = req.body.skipMusicOfftopic;
 
     if (!user.recordWatchHistory) {
         try {

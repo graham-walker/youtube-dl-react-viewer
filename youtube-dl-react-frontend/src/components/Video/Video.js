@@ -43,6 +43,7 @@ export default class VideoPage extends Component {
             spoofContentType: localStorage.getItem('spoofContentType') === 'true' || true,
         };
         this.videoRef = React.createRef();
+        this.sponsorRef = React.createRef();
     }
 
     componentDidMount() {
@@ -68,11 +69,19 @@ export default class VideoPage extends Component {
     }
 
     getVideo() {
+        this.sponsorRef.current = null;
+        document.querySelectorAll('.sponsor-segment').forEach(e => e.remove());
+
         axios
             .get(`/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`)
             .then(res => {
                 if (res.status === 200) {
                     window.scrollTo(0, 0);
+
+                    if (this.context.user?.enableSponsorblock
+                        && res.data.video.extractor === 'youtube'
+                        && res.data.sponsorSegments
+                    ) this.sponsorRef.current = res.data.sponsorSegments;
 
                     this.setState({
                         loading: false,
@@ -125,9 +134,59 @@ export default class VideoPage extends Component {
                                 this.videoReady();
 
                                 this.player.on('loadedmetadata', () => {
+                                    // Resume playback
                                     if (this.state.resumeTime) {
                                         let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
                                         this.player.currentTime(resumeTime);
+                                    }
+
+                                    // Mark sponsor segments
+                                    if (this.sponsorRef.current) {
+                                        for (let sponsor of this.sponsorRef.current) {
+                                            if (this.context.user.onlySkipLocked && sponsor.locked == 0) continue;
+
+                                            if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
+                                            if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
+                                            if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
+                                            if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
+                                            if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
+                                            if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
+                                            if (!this.context.user.skipFiller && sponsor.category === 'music_offtopic') continue;
+                                            if (!this.context.user.skipMusicOfftopic && sponsor.category === 'filler') continue;
+
+                                            let segmentElement = document.createElement('div');
+                                            const left = (sponsor.segment[0] / sponsor.videoDuration) * 100;
+                                            const width = ((sponsor.segment[1] - sponsor.segment[0]) / sponsor.videoDuration) * 100;
+                                            segmentElement.innerHTML = `<div class="sponsor-segment sponsor-type-${sponsor.category}" style="left: ${left}%; width: ${width}%;"></div>`;
+                                            document.getElementsByClassName('vjs-progress-holder')[0].appendChild(segmentElement.childNodes[0]);
+                                        }
+                                    }
+                                });
+
+                                this.player.on('timeupdate', () => {
+                                    // Skip sponsors
+                                    if (this.sponsorRef.current) {
+                                        let currentTime = this.player.currentTime();
+                                        let skip = false;
+                                        for (let sponsor of this.sponsorRef.current) {
+                                            if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
+                                            if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
+                                            if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
+                                            if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
+                                            if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
+                                            if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
+                                            if (!this.context.user.skipFiller && sponsor.category === 'music_offtopic') continue;
+                                            if (!this.context.user.skipMusicOfftopic && sponsor.category === 'filler') continue;
+
+                                            if (currentTime >= sponsor.segment[0] && currentTime < sponsor.segment[1]) {
+                                                currentTime = sponsor.segment[1];
+                                                skip = true;
+                                            }
+                                        }
+                                        if (skip) {
+                                            this.player.currentTime(currentTime);
+                                            console.log('Skipped sponsor');
+                                        }
                                     }
                                 });
 

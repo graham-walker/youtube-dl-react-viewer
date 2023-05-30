@@ -111,9 +111,11 @@ class SettingsForm extends Component {
                         }
                         this.context.updateUser(user);
                         localStorage.setItem('user', JSON.stringify(user));
+                        window.scrollTo(0, 0);
                     }
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                    window.scrollTo(0, 0);
                 });
         });
     }
@@ -172,20 +174,6 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Form.Group
-                        controlId="enableSponsorblock"
-                        className="mb-3 d-none"
-                    >
-                        <Form.Check
-                            custom
-                            checked={this.state.enableSponsorblock}
-                            type="checkbox"
-                            name="enableSponsorblock"
-                            label="Skip sponsored segments in videos using the SponsorBlock database"
-                            id="enableSponsorblock"
-                            onChange={this.handleInputChange}
-                        />
-                    </Form.Group>
                     <Form.Group className="mb-3" controlId="useCircularAvatars">
                         <Form.Check
                             custom
@@ -229,6 +217,156 @@ class SettingsForm extends Component {
                             id="resumeVideos"
                             onChange={this.handleInputChange}
                             disabled={!this.state.recordWatchHistory}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="enableSponsorblock"
+                        className="mb-3"
+                    >
+                        <Form.Label>SponsorBlock</Form.Label>
+                        <Form.Check
+                            custom
+                            checked={this.state.enableSponsorblock}
+                            type="checkbox"
+                            name="enableSponsorblock"
+                            label="Skip sponsored segments"
+                            id="enableSponsorblock"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="onlySkipLocked"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.onlySkipLocked}
+                            type="checkbox"
+                            name="onlySkipLocked"
+                            label="Only skip approved segments"
+                            id="onlySkipLocked"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipSponsor"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipSponsor}
+                            type="checkbox"
+                            name="skipSponsor"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-sponsor"></span>Sponsors</span>}
+                            id="skipSponsor"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipSelfpromo"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipSelfpromo}
+                            type="checkbox"
+                            name="skipSelfpromo"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-selfpromo"></span>Unpaid/Self Promotion</span>}
+                            id="skipSelfpromo"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipInteraction"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipInteraction}
+                            type="checkbox"
+                            name="skipInteraction"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-interaction"></span>Interaction Reminder (Subscribe)</span>}
+                            id="skipInteraction"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipIntro"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipIntro}
+                            type="checkbox"
+                            name="skipIntro"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-intro"></span>Intermission/Intro Animation</span>}
+                            id="skipIntro"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipOutro"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipOutro}
+                            type="checkbox"
+                            name="skipOutro"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-outro"></span>Endcards/Credits</span>}
+                            id="skipOutro"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipPreview"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipPreview}
+                            type="checkbox"
+                            name="skipPreview"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-preview"></span>Preview/Recap</span>}
+                            id="skipPreview"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipFiller"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipFiller}
+                            type="checkbox"
+                            name="skipFiller"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-filler"></span>Filler Tangent/Jokes</span>}
+                            id="skipFiller"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="skipMusicOfftopic"
+                        className="mb-3"
+                    >
+                        <Form.Check
+                            custom
+                            checked={this.state.skipMusicOfftopic}
+                            type="checkbox"
+                            name="skipMusicOfftopic"
+                            label={<span className="d-flex align-items-center"><span className="pip sponsor-type-music_offtopic"></span>Music: Non-Music Section</span>}
+                            id="skipMusicOfftopic"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.enableSponsorblock}
                         />
                     </Form.Group>
                     <Button type="submit">Save</Button>

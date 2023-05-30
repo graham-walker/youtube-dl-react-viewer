@@ -80,6 +80,10 @@ const expected = {
         allowed: ['complex', 'simple', 'disabled'],
         default: 'complex',
     },
+    'SPONSORBLOCK_API_URL': {
+        type: String,
+        default: 'https://sponsor.ajay.app/',
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',
