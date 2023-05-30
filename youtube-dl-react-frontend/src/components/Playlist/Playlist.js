@@ -10,6 +10,7 @@ import {
 } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
+import Description from '../Video/Description/Description';
 
 export default class Playlist extends Component {
     static contextType = UserContext;
@@ -80,9 +81,9 @@ export default class Playlist extends Component {
                                         Updated {dateToTimeSinceString(new Date(statistics.newestVideoDateUploaded))}
                                     </span>
                                 </p>
-                                {!!uploader && <>
-                                    <hr />
-                                    <div className="media-container">
+                                {(!!uploader || playlist.description) && <hr />}
+                                {!!uploader &&
+                                    <div className="media-container mb-2">
                                         <Link
                                             to={`/uploaders/${uploader.extractor}/${uploader.id}`}
                                             className="me-3"
@@ -103,7 +104,8 @@ export default class Playlist extends Component {
                                             </Link>
                                         </div>
                                     </div>
-                                </>}
+                                }
+                                {playlist.description && <Description text={playlist.description} />}
                             </div>
                         </Col>
                         <Col>

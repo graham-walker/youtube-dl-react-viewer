@@ -13,7 +13,7 @@ router.get('/:extractor/:id', async (req, res) => {
         playlist = await Playlist.findOne({
             extractor: req.params.extractor,
             id: req.params.id,
-        }, 'name uploaderDocument statistics').populate('uploaderDocument statistics.newestVideo');
+        }, 'name uploaderDocument statistics description').populate('uploaderDocument statistics.newestVideo');
     }
     catch (err) {
         return res.sendStatus(500);

@@ -477,6 +477,21 @@ let debug;
         }
     }
 
+    let ytdlpPlaylistDescription;
+    if (infojsonData.extractor === 'youtube' && infojsonData.playlist_id) {
+        try {
+            const ytdlpPlaylistDir = path.join(parsed.env.OUTPUT_DIRECTORY, 'videos/youtube：tab', infojsonData.playlist_id);
+            if (fs.existsSync(ytdlpPlaylistDir)) {
+                const ytdlpPlaylistMetadataFile = path.join(ytdlpPlaylistDir, (await fs.readdir(ytdlpPlaylistDir)).filter(file => path.extname(file) === '.json')[0]);
+                const ytdlpPlaylistJson = JSON.parse(await fs.readFile(ytdlpPlaylistMetadataFile));
+                ytdlpPlaylistDescription = ytdlpPlaylistJson.description;
+            }
+        } catch (err) {
+            console.error('Failed to read yt-dlp playlist file (it probably does not exist or not using yt-dlp)');
+            if (debug) console.error(err);
+        }
+    }
+
     let playlist;
     if (infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id) {
         try {
@@ -489,7 +504,7 @@ let debug;
                     extractor: infojsonData.extractor,
                     id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
                     name: infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id,
-                    description: infojsonData.playlist_description,
+                    description: infojsonData.playlist_description || ytdlpPlaylistDescription,
                     uploaderDocument: playlistUploader,
                 }).save();
 
@@ -716,7 +731,7 @@ let debug;
 
         if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
             playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
-            playlist.description = video.playlistDescription || playlist.description;
+            playlist.description = video.playlistDescription || ytdlpPlaylistDescription || playlist.description;
         }
 
         await playlist.save();
@@ -777,7 +792,7 @@ let debug;
         if (debug) oldError(err);
         try {
             fs.ensureDirSync(parsed.env.OUTPUT_DIRECTORY);
-            fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'unknown errors.txt'), videoPath + '\r\n');
+            fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'unknown_errors.txt'), videoPath + '\r\n');
             console.error('Failed to capture error. Saved video file name');
         } catch (err) {
             if (debug) oldError(err);

@@ -134,7 +134,7 @@ export default class UploaderPage extends Component {
                                 }
                                 {!!uploader.playlistCreatedCount &&
                                     <MiniStatisticColumn
-                                        title="Created Playlists"
+                                        title="Playlists"
                                         icon="list"
                                         statistic={abbreviateNumber(uploader.playlistCreatedCount)}
                                         detailedStatistic={uploader.playlistCreatedCount.toLocaleString() + ' playlists'}
