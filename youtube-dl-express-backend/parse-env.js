@@ -88,6 +88,10 @@ const expected = {
         type: String,
         default: '',
     },
+    'EXPOSE_LOCAL_VIDEO_PATH': {
+        type: Boolean,
+        default: false,
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',

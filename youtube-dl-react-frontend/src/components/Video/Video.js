@@ -544,7 +544,7 @@ export default class VideoPage extends Component {
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
                             </Button>
-                            {window.location.hostname === 'localhost' &&
+                            {this.state.localVideoPath && window.location.hostname === 'localhost' &&
                                 <Button
                                     variant="primary"
                                     className="mb-2"

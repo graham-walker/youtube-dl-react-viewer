@@ -150,6 +150,8 @@ router.get('/:extractor/:id', async (req, res) => {
         }
     }
 
+    if (!parsedEnv.EXPOSE_LOCAL_VIDEO_PATH && video?.jobDocument?.arguments) video.jobDocument.arguments = null; // Local path may also be exposed in job arguments
+
     res.json({
         video,
         uploaderVideos,
@@ -159,7 +161,7 @@ router.get('/:extractor/:id', async (req, res) => {
         playlistVideosOffset,
         jobVideosOffset,
         similarVideos,
-        localVideoPath: slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)),
+        localVideoPath: parsedEnv.EXPOSE_LOCAL_VIDEO_PATH ? slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)) : null,
         resumeTime,
         activityDocument: activity?._id,
         sponsorSegments,
