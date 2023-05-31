@@ -33,7 +33,7 @@ export default function ThemeController(props) {
     }, [theme]);
 
     return (
-        <Dropdown className="ms-xl-3 d-flex" align="end">
+        <Dropdown className="ms-xl-3 d-xl-flex" align="end">
             <Dropdown.Toggle id="theme-controller">
                 <FontAwesomeIcon icon={icon} />
             </Dropdown.Toggle>
