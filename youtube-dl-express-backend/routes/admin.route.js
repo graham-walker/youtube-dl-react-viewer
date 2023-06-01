@@ -4,10 +4,12 @@ import { spawnSync } from 'child_process';
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
+import crypto from 'crypto';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
 import Uploader from '../models/uploader.model.js';
+import Video from '../models/video.model.js';
 
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
@@ -222,6 +224,100 @@ router.post('/download_uploader_icons', async (req, res) => {
         if (parsedEnv.VERBOSE) console.error(err);
         if (!sentResponse) return res.sendStatus(500);
     }
-})
+});
+
+let verifyingHashes = false;
+router.post('/verify_hashes', async (req, res) => {
+    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'checked_hashes.txt');
+
+    if (verifyingHashes) return res.status(500).json({ error: 'Currently verifying hashes' });
+    verifyingHashes = true;
+    res.json({ success: 'Started verifying hashes, results will be saved to checked_hashes.txt' });
+
+    try {
+        let videos = await Video.find({},
+            '-_id extractor id directory videoFile mediumResizedThumbnailFile smallResizedThumbnailFile infoFile descriptionFile annotationsFile thumbnailFiles subtitleFiles')
+            .lean()
+            .exec();
+
+        await fs.writeFile(verifiedHashesFile, 'STARTING HASH VERIFICATION ' + new Date().toISOString() + '\r\n');
+
+        let mismatches = 0;
+        for (let video of videos) {
+            const directory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory);
+            const thumbnailDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'thumbnails', video.directory);
+
+            mismatches += await verifyFileHash(video.videoFile, directory);
+            mismatches += await verifyFileHash(video.mediumResizedThumbnailFile, thumbnailDirectory);
+            mismatches += await verifyFileHash(video.smallResizedThumbnailFile, thumbnailDirectory);
+            mismatches += await verifyFileHash(video.infoFile, directory);
+            mismatches += await verifyFileHash(video.descriptionFile, directory);
+            mismatches += await verifyFileHash(video.annotationsFile, directory);
+            for (let thumbnailFile of video.thumbnailFiles) mismatches += await verifyFileHash(thumbnailFile, directory);
+            for (let subtitleFile of video.subtitleFiles) mismatches += await verifyFileHash(subtitleFile, directory);
+        }
+
+        await fs.appendFile(verifiedHashesFile, 'FINISHED HASH VERIFICATION ' + new Date().toISOString() + '\r\n');
+        await fs.appendFile(verifiedHashesFile, mismatches + ' MISMATCHES');
+        console.log(`Finished verifying hashes, ${mismatches} mismatches`);
+    } catch (err) {
+        if (parsedEnv.VERBOSE) console.error(err);
+    }
+    verifyingHashes = false;
+});
+
+const verifyFileHash = async (file, directory) => {
+    if (file === null) return 0;
+
+    const md5 = file.md5;
+    const filename = path.join(directory, file.name);
+
+    try {
+        // If SKIP_HASHING=true md5 will be undefined 
+        if (md5 === undefined) {
+            await logHashResult('SKIPPED', filename);
+            return 0;
+        }
+
+        let currentMd5 = await generateFileHash(filename);
+
+        if (md5 === currentMd5) {
+            await logHashResult('OK', filename);
+        } else {
+            await logHashResult('MISMATCH', filename);
+            return 1;
+        }
+    } catch (err) {
+        if (err?.code === 'ENOENT') {
+            await logHashResult('FILE NOT FOUND', filename);
+        } else {
+            await logHashResult('FAILED TO TEST', filename);
+        }
+        if (parsedEnv.VERBOSE) console.error(err);
+    }
+
+    return 0;
+}
+
+const logHashResult = async (result, filename) => {
+    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'checked_hashes.txt');
+    const message = `${result}\t\t${filename}`;
+    console.log(message);
+    await fs.appendFile(verifiedHashesFile, message + '\r\n');
+}
+
+const generateFileHash = async (filename) => {
+    return new Promise((resolve, reject) => {
+        let shasum = crypto.createHash('md5');
+        let readStream = fs.createReadStream(filename);
+        readStream.on('data', (data) => {
+            shasum.update(data);
+        }).on('end', () => {
+            resolve(shasum.digest('hex'));
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}
 
 export default router;

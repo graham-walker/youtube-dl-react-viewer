@@ -149,6 +149,7 @@ export default class AdminPage extends Component {
                             </Tab.Container>
                         </Card>
                         <ChannelIconDownloader />
+                        <HashVerifier />
                         <h5 className="mb-4">Failed to import</h5>
                         <Alert variant="info">If you are expecting to see a video here but do not, check errors.txt or unknown_errors.txt in the output directory. Videos that failed to download will not be listed here and can be retried by rerunning the job.</Alert>
                         {this.state.errors.length > 0 ?
@@ -655,6 +656,56 @@ class ChannelIconDownloader extends Component {
                             onClick={() => this.post(true)}
                         >
                             Download (overwrite)
+                        </Button>
+                    </Card.Body>
+                </Card>
+            </>
+        );
+    }
+}
+
+class HashVerifier extends Component {
+    static contextType = UserContext;
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            success: undefined,
+            error: undefined,
+        };
+    }
+
+    post() {
+        this.setState({ success: undefined, error: undefined }, () => {
+            axios
+                .post(
+                    '/api/admin/verify_hashes'
+                ).then(res => {
+                    if (res.status === 200) this.setState({
+                        success: res.data.success,
+                        error: res.data.error
+                    });
+                }).catch(err => {
+                    this.setState({ error: getErrorMessage(err) });
+                });
+        });
+    }
+
+    render() {
+        return (
+            <>
+                <h5 className="mb-4">File integrity</h5>
+                <Card className="mb-4">
+                    <Card.Body>
+                        {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
+                        {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                        <Button
+                            name="update"
+                            type="submit"
+                            onClick={this.post.bind(this)}
+                            className="me-2"
+                        >
+                            Verify file hashes
                         </Button>
                     </Card.Body>
                 </Card>
