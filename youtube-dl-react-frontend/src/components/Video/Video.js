@@ -71,7 +71,8 @@ export default class VideoPage extends Component {
 
     getVideo() {
         this.sponsorRef.current = null;
-        document.querySelectorAll('.sponsor-segment').forEach(e => e.remove());
+        for (let className of ['.sponsor-segment', '.chapter-section', '.chapter-marker']) document.querySelectorAll(className).forEach(e => e.remove());
+        document.documentElement.style.setProperty('--chapter-title', '');
 
         axios
             .get(`/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`)
@@ -160,6 +161,36 @@ export default class VideoPage extends Component {
                                             const width = ((sponsor.segment[1] - sponsor.segment[0]) / sponsor.videoDuration) * 100;
                                             segmentElement.innerHTML = `<div class="sponsor-segment sponsor-type-${sponsor.category}" style="left: ${left}%; width: ${width}%;"></div>`;
                                             document.getElementsByClassName('vjs-progress-holder')[0].appendChild(segmentElement.childNodes[0]);
+                                        }
+                                    }
+
+                                    // Add chapters
+                                    if (this.state.video.chapters && this.state.video.chapters.length > 0) {
+                                        const duration = this.player.duration();
+                                        for (let [i, chapter] of this.state.video.chapters.entries()) {
+                                            let chapterSectionElement = document.createElement('div');
+
+                                            const left = (chapter.start_time / duration) * 100;
+                                            const width = ((chapter.end_time - chapter.start_time) / duration) * 100;
+
+                                            let sectionLeft = `left: ${left}%;`;
+                                            let sectionWidth = `width: ${width}%;`;
+
+                                            if (i === 0) sectionLeft = `left: calc(${left}% - 10px);`;
+                                            if (i === 0 || i === this.state.video.chapters.length - 1) sectionWidth = `width: calc(${width}% + 10px);`;
+
+                                            chapterSectionElement.innerHTML = `<div class="chapter-section" style="${sectionLeft} ${sectionWidth}"></div>`;
+                                            chapterSectionElement.childNodes[0].addEventListener('mouseenter', () => {
+                                                document.documentElement.style.setProperty('--chapter-title', '"' + CSS.escape(chapter.title) + '"');
+                                            });
+
+                                            document.getElementsByClassName('vjs-progress-holder')[0].appendChild(chapterSectionElement.childNodes[0]);
+
+                                            if (i > 0) {
+                                                let chapterMarkerElement = document.createElement('div');
+                                                chapterMarkerElement.innerHTML = `<div class="chapter-marker" style="left: ${left}%;"></div>`;
+                                                document.getElementsByClassName('vjs-progress-holder')[0].appendChild(chapterMarkerElement.childNodes[0]);
+                                            }
                                         }
                                     }
                                 });
@@ -294,7 +325,7 @@ export default class VideoPage extends Component {
                 {!this.state.loading && <>
                     <Row>
                         <Col className={`keep-controls-open-${this.state.keepControlsOpen}`}>
-                            <div data-vjs-player> 
+                            <div data-vjs-player>
                                 <video
                                     controls
                                     className="video-js vjs-big-play-centered mb-3"

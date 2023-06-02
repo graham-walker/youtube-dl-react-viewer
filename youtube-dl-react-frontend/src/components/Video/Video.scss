@@ -11,9 +11,9 @@
 .keep-controls-open-windowed .video-js:not(.vjs-fullscreen) .vjs-control-bar,
 .keep-controls-open-fullscreen .video-js.vjs-fullscreen .vjs-control-bar,
 .keep-controls-open-always .video-js .vjs-control-bar {
-	visibility: visible !important;
-	opacity: 1 !important;
-	transition-duration: 0s !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transition-duration: 0s !important;
 }
 
 .sponsor-segment {
@@ -54,4 +54,28 @@
 
 .sponsor-type-filler {
     background: rgb(115, 0, 255);
+}
+
+.chapter-section {
+    position: absolute;
+    bottom: -14px;
+    top: -14px;
+}
+
+.chapter-marker {
+    background: #2b333f;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    width: 2px;
+    pointer-events: none;
+}
+
+.vjs-mouse-display .vjs-time-tooltip {
+    width: max-content;
+}
+
+.vjs-mouse-display .vjs-time-tooltip::after {
+    content: var(--chapter-title);
+    display: block;
 }

@@ -155,7 +155,7 @@ const weightedFields = {
     hashtags: { weight: 5, type: 'dot' },
 }
 
-export const fields = Object.keys(weightedFields).join(' ');
+export const fields = Object.keys(weightedFields).join(' ').replace('chapters.title', 'chapters');
 
 export const getSimilarVideos = async (video) => {
     let aggregatedFields = {};
