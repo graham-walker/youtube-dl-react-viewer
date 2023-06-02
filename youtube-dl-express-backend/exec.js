@@ -230,7 +230,8 @@ let debug;
         potentialThumbnailFiles.push(
             path.join(videoDirectory, basename + '.' + extensionFromUrl(infojsonData.thumbnail))
         );
-        // For compatibility with youtube-dl version 2020.12.12+
+
+        // Compatibility with youtube-dl version 2020.12.12+
         potentialThumbnailFiles.push(
             path.join(videoDirectory, basename + '.' + ext + '.' + extensionFromUrl(infojsonData.thumbnail))
         );
@@ -240,32 +241,50 @@ let debug;
             if (infojsonData.thumbnails[i].hasOwnProperty('id')
                 && infojsonData.thumbnails[i].hasOwnProperty('url')
             ) {
+                const thumbnailExt = extensionFromUrl(infojsonData.thumbnails[i].url);
+
                 potentialThumbnailFiles.push(
                     path.join(
                         videoDirectory,
                         basename + '_' + infojsonData.thumbnails[i].id + '.'
-                        + extensionFromUrl(infojsonData.thumbnails[i].url)
+                        + thumbnailExt
                     )
                 );
-                // For compatibility with youtube-dl version 2020.12.12+
+
+                // Compatibility with youtube-dl version 2020.12.12+
                 potentialThumbnailFiles.push(
                     path.join(
                         videoDirectory,
                         basename + '.' + ext + '_' + infojsonData.thumbnails[i].id + '.'
-                        + extensionFromUrl(infojsonData.thumbnails[i].url)
+                        + thumbnailExt
                     )
                 );
-                // For compatibility with yt-dlp version 2021.02.04+
+
+                // Compatibility with yt-dlp version 2021.02.04+
                 potentialThumbnailFiles.push(
                     path.join(
                         videoDirectory,
                         basename + '.' + infojsonData.thumbnails[i].id + '.'
-                        + extensionFromUrl(infojsonData.thumbnails[i].url)
+                        + thumbnailExt
+                    )
+                );
+
+                // Compatibility with yt-dlp individual thumbnails
+                potentialThumbnailFiles.push(
+                    path.join(
+                        videoDirectory,
+                        basename + '.' + thumbnailExt
                     )
                 );
             }
         }
     }
+
+    // Remove duplicates
+    potentialThumbnailFiles = potentialThumbnailFiles.filter((value, index, self) => {
+        return self.indexOf(value) === index;
+    });
+
     let thumbnailFiles = [];
     let totalThumbnailFilesize = 0;
     let largestThumbnailData;
