@@ -32,7 +32,7 @@ const program = commander.program;
     if (program.overrideExt && program.overrideExt.startsWith('.')) program.overrideExt = program.overrideExt.slice(1);
 
     // Delete the error file from the last run
-    const importErrorFile = path.join(parsed.env.OUTPUT_DIRECTORY, 'import errors.json');
+    const importErrorFile = path.join(parsed.env.OUTPUT_DIRECTORY, 'import_errors.json');
     try {
         fs.unlinkSync(importErrorFile);
     } catch (err) {
@@ -54,7 +54,6 @@ const program = commander.program;
         console.error('Failed to connect to the database');
         throw err;
     }
-
     console.log('Connected');
 
     // Get the job from the job name
@@ -79,13 +78,9 @@ const program = commander.program;
     let alreadyAddedVideoCount = 0;
     let errors = {};
 
-    let t = 0;
-
     filesLoop:
     for (let i = 0; i < files.length; i++) {
         if (files[i].isFile() && files[i].name.endsWith('.info.json')) {
-            t++;
-            if (t > 4100) break; // TEMP
 
             // Parse the video metadata file
             const infojsonFile = path.join(files[i].path, files[i].name);
