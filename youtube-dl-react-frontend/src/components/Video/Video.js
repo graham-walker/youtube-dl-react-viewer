@@ -236,6 +236,20 @@ export default class VideoPage extends Component {
                                     document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The default format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload. Firefox generally works.'
                                 });
 
+                                this.player.on('userinactive', function () {
+                                    document.querySelectorAll('.skip-button').forEach(e => {
+                                        e.classList.remove('skip-visible');
+                                        e.classList.add('skip-hidden');
+                                    });
+                                });
+
+                                this.player.on('useractive', function () {
+                                    document.querySelectorAll('.skip-button').forEach(e => {
+                                        e.classList.add('skip-visible');
+                                        e.classList.remove('skip-hidden');
+                                    });
+                                });
+
                                 this.forceUpdate();
                             });
                         } else {
@@ -342,6 +356,24 @@ export default class VideoPage extends Component {
                     <Row>
                         <Col className={`keep-controls-open-${this.state.keepControlsOpen}`}>
                             <div data-vjs-player>
+                                <div
+                                    className="skip-button skip-back"
+                                    onClick={() => {
+                                        this.player.currentTime(Math.max(this.player.currentTime() - 10, 0));
+                                        this.player.play();
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon="rotate-left" />10
+                                </div>
+                                <div
+                                    className="skip-button skip-forwards"
+                                    onClick={() => {
+                                        this.player.currentTime(Math.min(this.player.currentTime() + 10, this.player.duration()));
+                                        this.player.play();
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon="rotate-right" />10
+                                </div>
                                 <video
                                     controls
                                     className="video-js vjs-big-play-centered mb-3"

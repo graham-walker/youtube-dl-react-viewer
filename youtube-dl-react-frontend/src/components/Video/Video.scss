@@ -79,3 +79,60 @@
     content: var(--chapter-title);
     display: block;
 }
+
+.skip-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    filter: drop-shadow(0 0 2px #2b333f);
+    user-select: none;
+
+    &.skip-visible {
+        opacity: 1;
+        pointer-events: all;
+        transition: 0.1s ease opacity;
+    }
+
+    &.skip-hidden {
+        opacity: 0;
+        pointer-events: none;
+        transition: 1s ease opacity;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    svg {
+        font-size: 2rem;
+        position: absolute;
+        top: -120%;
+        left: -95%;
+    }
+}
+
+.skip-back {
+    left: 15%;
+
+    svg {
+        transform: rotateZ(45deg);
+    }
+}
+
+.skip-forwards {
+    right: 15%;
+
+    svg {
+        transform: rotateZ(-45deg);
+    }
+}
+
+.video-js:not(.vjs-has-started) .skip-button {
+    display: none;
+}
+
+.video-js.vjs-paused .skip-button {
+    opacity: 1 !important;
+    pointer-events: all !important;
+}
