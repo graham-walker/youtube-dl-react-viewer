@@ -121,13 +121,13 @@ router.post('/jobs/stop', async (req, res) => {
 
 router.post('/errors/repair/:errorId', async (req, res) => {
     if (downloader.isBusy()) return res.status(500).json(
-        { error: 'Cannot repair error while downloading' }
+        { error: 'Cannot retry import while downloading' }
     );
     if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Currently repairing another error' }
+        { error: 'Already retrying import' }
     );
     if (updating) return res.status(500).json(
-        { error: 'Cannot repair error while checking for updates' }
+        { error: 'Cannot retry import while checking for updates' }
     );
 
     try {
@@ -144,7 +144,7 @@ router.post('/youtube-dl/update', async (req, res) => {
         { error: 'Cannot check for updates while downloading' }
     );
     if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Cannot check for updates while repairing errors' }
+        { error: 'Cannot check for updates while retrying import' }
     );
     if (updating) return res.status(500).json(
         { error: 'Already checking for updates' }

@@ -1,4 +1,4 @@
-import { spawnSync } from 'child_process';
+import { spawn } from 'child_process';
 import path from 'path';
 
 import DownloadError from '../models/error.model.js';
@@ -22,7 +22,7 @@ export default class ErrorManager {
             return { error: 'Error not found' };
         }
 
-        // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename, so node is used here instead
+        // On non-Windows platforms npm does not escape the $ character which can sometimes be in the filename so node is used instead
         let execArguments = [
             '--job-id',
             error.jobDocument,
@@ -41,12 +41,16 @@ export default class ErrorManager {
             execArguments.unshift('dotenv/config');
             execArguments.unshift('--require');
         }
-        const execProcess = await spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
 
-        if (execProcess.status !== 0) {
+        const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
+        execProcess.stdout.on('data', (data) => console.log(data.toString()));
+        execProcess.stderr.on('data', (data) => console.log(data.toString()));
+        const exitCode = await new Promise((resolve, reject) => execProcess.on('close', resolve));
+
+        if (exitCode !== 0) {
             this.busy = false;
             return {
-                error: `Failed to repair error. Refresh the page to see the updated error`,
+                error: `Video import failed. Refresh the page to see the updated error`,
             };
         }
 

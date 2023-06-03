@@ -61,10 +61,10 @@ export default class AdminPage extends Component {
             .then(res => {
                 if (res.status === 200) {
                     if (res.data.success) alert(res.data.success)
-                    if (res.data.error) alert('Error: ' + res.data.error)
+                    if (res.data.error) alert(res.data.error)
                 }
             }).catch(err => {
-                alert('Error: ' + getErrorMessage(err));
+                alert(getErrorMessage(err));
             });
     }
 
@@ -185,7 +185,7 @@ export default class AdminPage extends Component {
                                                     variant="danger"
                                                     onClick={(e) => { this.repairError(error._id) }}
                                                 >
-                                                    Attempt Repair
+                                                    Retry Import
                                                 </Button>
                                             </>
                                         </Accordion.Collapse>
