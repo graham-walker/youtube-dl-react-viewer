@@ -180,7 +180,7 @@ class SettingsForm extends Component {
                             checked={this.state.useCircularAvatars}
                             type="checkbox"
                             name="useCircularAvatars"
-                            label="Circular avatar images"
+                            label="Rounded corners"
                             id="useCircularAvatars"
                             onChange={this.handleInputChange}
                         />

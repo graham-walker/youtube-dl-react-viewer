@@ -90,50 +90,40 @@ const VideoPreview = props => {
         </div>
     </>;
 
-    const videoImage = <div
-        className="bg-light"
-        style={{
-            width: props.width,
-            paddingBottom: '56.25%',
-            overflow: 'hidden',
-            position: 'relative',
-        }}
-    >
-        <Image
-            style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                filter: props.watched ? 'brightness(75%)' : 'none'
-            }}
-            src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
-            onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
-            onError={(e) => defaultImage(e, 'thumbnail')}
-        />
-        {!!video.duration &&
-            <span className="video-duration-overlay">
-                {videoDurationToOverlay(video.duration)}
-            </span>
-        }
-        {!!props.watched &&
-            <Badge
-                bg="dark"
-                className="video-badge badge-left"
+    const videoImage =
+        <>
+            <div
+                className="video-thumbnail bg-light"
+                style={{ width: props.width }}
             >
-                <FontAwesomeIcon icon="history" />
-                <> Watched</>
-            </Badge>
-        }
-        <VideoStatBadge video={video} type={props.badge} />
-        {!!props.stopTime &&
-            <div className="video-watchtime">
-                <div className="video-watchtimebar" style={{width: ((props.stopTime / video.duration) * 100) + '%'}}></div>
+                <Image
+                    style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: userContext.user?.useCircularAvatars ? '0.5rem' : 0 }}
+                    src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
+                    onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
+                    onError={(e) => defaultImage(e, 'thumbnail')}
+                />
+                {!!video.duration &&
+                    <span className="video-duration-overlay">
+                        {videoDurationToOverlay(video.duration)}
+                    </span>
+                }
+                {!!props.watched &&
+                    <Badge
+                        bg="dark"
+                        className="video-badge badge-left"
+                    >
+                        <FontAwesomeIcon icon="history" />
+                        <> Watched</>
+                    </Badge>
+                }
+                <VideoStatBadge video={video} type={props.badge} />
             </div>
-        }
-    </div>;
+            {!!props.stopTime &&
+                <div className="video-watchtime">
+                    <div className="video-watchtimebar" style={{ width: ((props.stopTime / video.duration) * 100) + '%' }}></div>
+                </div>
+            }
+        </>;
 
     if (!!props.horizontal) {
         return (
