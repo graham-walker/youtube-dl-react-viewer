@@ -35,6 +35,7 @@ export default class VideoPage extends Component {
             similarVideos: undefined,
             activeTab: undefined,
             nextVideos: undefined,
+            firstVideos: undefined,
             localVideoPath: undefined,
             resumeTime: undefined,
             activityDocument: undefined,
@@ -99,6 +100,11 @@ export default class VideoPage extends Component {
                             uploader: this.getNextVideo(res.data.video, res.data.uploaderVideos),
                             playlist: this.getNextVideo(res.data.video, res.data.playlistVideos),
                             job: this.getNextVideo(res.data.video, res.data.jobVideos),
+                        },
+                        firstVideos: {
+                            uploader: res.data.firstUploaderVideo,
+                            playlist: res.data.firstPlaylistVideo,
+                            job: res.data.firstJobVideo,
                         },
                         activeTab: (
                             !this.state.activeTab
@@ -280,7 +286,17 @@ export default class VideoPage extends Component {
         this.saveActivity();
         if (!this.state.loop && this.state.autoplay) {
             const nextVideo = this.state.nextVideos[this.state.activeTab];
-            if (nextVideo) history.push(`/videos/${nextVideo.extractor}/${nextVideo.id}`);
+            const firstVideo = this.state.firstVideos[this.state.activeTab];
+            if (nextVideo) {
+                history.push(`/videos/${nextVideo.extractor}/${nextVideo.id}`);
+            } else if (firstVideo) {
+                if (firstVideo.extractor === this.state.video.extractor && firstVideo.id === this.state.video.id) {
+                    this.player.currentTime(0);
+                    this.player.play();
+                } else {
+                    history.push(`/videos/${firstVideo.extractor}/${firstVideo.id}`);
+                }
+            }
         }
     }
 

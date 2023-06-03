@@ -61,6 +61,9 @@ router.get('/:extractor/:id', async (req, res) => {
     let uploaderVideosOffset;
     let playlistVideosOffset;
     let jobVideosOffset;
+    let firstUploaderVideo;
+    let firstPlaylistVideo;
+    let firstJobVideo;
     try {
         video = (await Video.findOne({
             extractor: req.params.extractor,
@@ -100,6 +103,10 @@ router.get('/:extractor/:id', async (req, res) => {
             .sort({ dateDownloaded: -1 })
             .lean()
             .exec();
+
+        if (uploaderVideos) firstUploaderVideo = uploaderVideos[0];
+        if (playlistVideos) firstPlaylistVideo = playlistVideos[0];
+        if (jobVideos) firstJobVideo = jobVideos[0];
 
         if (uploaderVideos) [uploaderVideos, uploaderVideosOffset] = limitVideoList(uploaderVideos, video);
         if (playlistVideos) [playlistVideos, playlistVideosOffset] = limitVideoList(playlistVideos, video);
@@ -160,6 +167,9 @@ router.get('/:extractor/:id', async (req, res) => {
         uploaderVideosOffset,
         playlistVideosOffset,
         jobVideosOffset,
+        firstUploaderVideo,
+        firstPlaylistVideo,
+        firstJobVideo,
         similarVideos,
         localVideoPath: parsedEnv.EXPOSE_LOCAL_VIDEO_PATH ? slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)) : null,
         resumeTime,
