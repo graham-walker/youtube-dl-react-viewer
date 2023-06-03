@@ -97,7 +97,7 @@ const VideoPreview = props => {
                 style={{ width: props.width }}
             >
                 <Image
-                    style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: userContext.user?.useCircularAvatars ? '0.5rem' : 0 }}
+                    style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
                     src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
                     onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
                     onError={(e) => defaultImage(e, 'thumbnail')}
