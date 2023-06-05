@@ -152,8 +152,10 @@ router.get('/:extractor/:id', async (req, res) => {
             const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/?videoID=${video.id}&categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
             sponsorSegments = sponsorRes.data;
         } catch (err) {
-            console.error('Failed to get sponsor segments');
-            if (parsedEnv.VERBOSE) console.error(err);
+            if (err?.response?.status !== 404) {
+                console.error('Failed to get sponsor segments');
+                if (parsedEnv.VERBOSE) console.error(err);
+            }
         }
     }
 
