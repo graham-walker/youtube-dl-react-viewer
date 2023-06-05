@@ -120,14 +120,14 @@ export const resolutionToBadge = (width, height, ignoreSmall = true) => {
     }
 }
 
-export const getErrorMessage = (err) => {
+export const getErrorMessage = (err, defaultMessage = 'Unknown error') => {
     if (err.response && err.response.data.hasOwnProperty('error')) {
         return err.response.data.error;
     } else {
         if (err.message) {
             return err.message;
         }
-        return 'Unknown error';
+        return defaultMessage;
     }
 }
 
