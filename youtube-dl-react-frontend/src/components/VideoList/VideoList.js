@@ -104,6 +104,7 @@ export default class VideoList extends Component {
                     small={this.props?.layout === 'playlist' ? true : false}
                     horizontal={this.props?.layout === 'playlist' ? true : false}
                     badge={this.state['sort']}
+                    icon={this.props.icon}
                 />
             </Col>
         );
