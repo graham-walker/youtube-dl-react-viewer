@@ -1,7 +1,7 @@
 export const getImage = (video, type, size = 'small') => {
     switch (type) {
         case 'thumbnail':
-            if (!video.hasOwnProperty('directory')) {
+            if (!video || !video.hasOwnProperty('directory')) {
                 return 'default-thumbnail.jpg';
             }
             switch (size) {
@@ -21,6 +21,7 @@ export const getImage = (video, type, size = 'small') => {
                     throw new Error('Invalid size');
             }
         case 'avatar':
+            if (!video) return 'default-avatar.jpg';
             if (video.hasOwnProperty('name')) video = { uploaderDocument: video }; // An uploader is being passed instead of a video
             if (
                 !video.hasOwnProperty('uploaderDocument')
