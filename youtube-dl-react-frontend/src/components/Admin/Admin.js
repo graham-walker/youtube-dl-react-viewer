@@ -19,6 +19,7 @@ export default class AdminPage extends Component {
             jobs: [],
             errors: [],
             extractors: [],
+            adminFiles: [],
             youtubeDlPath: undefined,
             defaultActivejobId: undefined,
         };
@@ -34,6 +35,7 @@ export default class AdminPage extends Component {
                     jobs: res.data.jobs,
                     errors: res.data.errors,
                     extractors: res.data.extractors,
+                    adminFiles: res.data.adminFiles,
                     youtubeDlPath: res.data.youtubeDlPath,
                     defaultActivejobId: res.data.jobs[0]?._id,
                 });
@@ -86,6 +88,16 @@ export default class AdminPage extends Component {
                             !!process.env?.REACT_APP_CHECK_FOR_UPDATES
                             && process.env.REACT_APP_CHECK_FOR_UPDATES.toLowerCase() === 'true'
                             && <UpdateChecker />
+                        }
+                        {this.state.adminFiles.length > 0 &&
+                            <>
+                                <h5 className="mb-4">Logs</h5>
+                                <div className="mb-3">
+                                    {this.state.adminFiles.map(file => {
+                                        return <Button href={'/static/admin/' + file} target="_blank" variant="outline-secondary" className="me-2 mb-2"><FontAwesomeIcon className="text-primary" icon="file" /> {file}</Button>
+                                    })}
+                                </div>
+                            </>
                         }
                         <ApplicationManager youtubeDlPath={this.state.youtubeDlPath} />
                         <h5 className="mb-4">Download</h5>

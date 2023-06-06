@@ -27,23 +27,22 @@ let verifying = false;
 let deleting = false;
 
 router.get('/', async (req, res) => {
-    let jobs;
-    let errors;
-    let extractors;
     try {
-        jobs = await Job.find({}).sort({ name: 1 }).lean().exec();
-        errors = await DownloadError.find({}).sort({ errorOccurred: -1 }).lean().exec();
-        extractors = await Video.distinct('extractor');
+        let jobs = await Job.find({}).sort({ name: 1 }).lean().exec();
+        let errors = await DownloadError.find({}).sort({ errorOccurred: -1 }).lean().exec();
+        let extractors = await Video.distinct('extractor');
+        let adminFiles = (await fs.readdir(parsedEnv.OUTPUT_DIRECTORY, { withFileTypes: true })).filter(file => file.isFile()).map(file => file.name);
+
+        res.json({
+            jobs,
+            errors,
+            extractors,
+            adminFiles,
+            youtubeDlPath: process.env.YOUTUBE_DL_PATH
+        });
     } catch (err) {
         res.sendStatus(500);
     }
-
-    res.json({
-        jobs,
-        errors,
-        extractors,
-        youtubeDlPath: process.env.YOUTUBE_DL_PATH
-    });
 });
 
 router.post('/jobs/save/new', async (req, res) => {

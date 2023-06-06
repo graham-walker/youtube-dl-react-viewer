@@ -67,6 +67,12 @@ import applyUpdates from './utilities/update.utility.js';
         app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
     }
 
+    // Admin files
+    app.use('/static/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware, (req, res, next) => {
+        if (req.url.split('/').length - 1 > 1) return res.sendStatus(404); // Only serve the top level output directory
+        next();
+    }], express.static(outputDirectory));
+
     // Clean up deleted files
     const deleteQueueFile = path.join(outputDirectory, 'delete_queue.txt');
     try {
