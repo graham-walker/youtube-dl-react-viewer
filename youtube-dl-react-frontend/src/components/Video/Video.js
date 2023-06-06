@@ -60,6 +60,7 @@ export default class VideoPage extends Component {
         this.saveActivity();
         if (this.player) this.player.dispose();
         clearInterval(this.interval);
+        if ('mediaSession' in navigator && 'MediaMetadata' in window) navigator.mediaSession.metadata = null;
     }
 
     componentDidUpdate(prevProps) {
@@ -126,6 +127,15 @@ export default class VideoPage extends Component {
                         activityDocument: res.data.activityDocument,
                     }, () => {
                         document.title = `${res.data.video.title} - ${window.documentTitle}`;
+
+                        if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+                            navigator.mediaSession.metadata = new window.MediaMetadata({
+                                title: res.data.video.title,
+                                artist: res.data.video.uploader,
+                                album: res.data.video.album,
+                                artwork: [{ src: getImage(res.data.video, 'thumbnail', 'medium') }]
+                            });
+                        }
 
                         if (!this.player) {
                             this.player = videojs(this.videoRef.current, {
