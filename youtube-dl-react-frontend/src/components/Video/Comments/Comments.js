@@ -27,7 +27,7 @@ const Comments = props => {
 
     function n2(comments) {
         return comments.map((comment, i) => {
-            return <Comment key={i} comment={comment} player={props.player}>{comment.replies.length > 0 ? <div className="comment-replies">{n2(comment.replies)}</div> : <></>}</Comment>
+            return <Comment key={i} comment={comment} player={props.player} uploader={props.uploader}>{comment.replies.length > 0 ? <div className="comment-replies">{n2(comment.replies)}</div> : <></>}</Comment>
         });
     }
 
