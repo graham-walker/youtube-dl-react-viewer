@@ -143,7 +143,7 @@ const program = commander.program;
              */
 
             // Create the path in the output directory to move files to
-            let outputPath = path.join(process.env.OUTPUT_DIRECTORY, 'videos', infojsonData.extractor, infojsonData.id);
+            let outputPath = path.join(process.env.OUTPUT_DIRECTORY, 'videos', infojsonData.extractor, infojsonData.id, Math.floor(new Date().getTime() / 1000).toString());
             try {
                 fs.ensureDirSync(outputPath);
             } catch (err) {

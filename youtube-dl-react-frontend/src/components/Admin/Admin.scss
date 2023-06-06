@@ -4,3 +4,21 @@
     white-space: nowrap;
     overflow: hidden;
 }
+
+#delete-form {
+    > div {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+
+        &:not(:last-child) {
+            margin-right: 0.5rem;
+        }
+
+        label {
+            margin-bottom: 0;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+    }
+}

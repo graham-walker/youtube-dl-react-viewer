@@ -5,33 +5,45 @@ import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
 import Uploader from '../models/uploader.model.js';
 import Video from '../models/video.model.js';
+import Playlist from '../models/playlist.model.js';
+import Statistic from '../models/statistic.model.js';
 
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
+import { decrementStatistics } from '../utilities/statistic.utility.js';
 
 const router = express.Router();
 
 const downloader = new Downloader();
 const errorManager = new ErrorManager();
-
 let updating = false;
+let verifying = false;
+let deleting = false;
 
 router.get('/', async (req, res) => {
     let jobs;
     let errors;
+    let extractors;
     try {
         jobs = await Job.find({}).sort({ name: 1 }).lean().exec();
         errors = await DownloadError.find({}).sort({ errorOccurred: -1 }).lean().exec();
+        extractors = await Video.distinct('extractor');
     } catch (err) {
         res.sendStatus(500);
     }
 
-    res.json({ jobs, errors, youtubeDlPath: process.env.YOUTUBE_DL_PATH });
+    res.json({
+        jobs,
+        errors,
+        extractors,
+        youtubeDlPath: process.env.YOUTUBE_DL_PATH
+    });
 });
 
 router.post('/jobs/save/new', async (req, res) => {
@@ -54,9 +66,8 @@ router.post('/jobs/save/new', async (req, res) => {
 });
 
 router.post('/jobs/save/:jobId', async (req, res) => {
-    if (downloader.isBusy(req.params.jobId)) {
-        return res.status(500).json({ error: 'Cannot save while downloading' });
-    }
+    const [busy, reason] = isBusy(['deleting', 'downloading'], req.params.jobId);
+    if (busy) return res.status(500).json({ error: 'Cannot save job while' + reason });
 
     let job;
     try {
@@ -76,12 +87,8 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 });
 
 router.post('/jobs/download/', async (req, res) => {
-    if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Cannot download while repairing an error' }
-    );
-    if (updating) return res.status(500).json(
-        { error: 'Cannot download while checking for updates' }
-    );
+    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting'], req.params.jobId);
+    if (busy) return res.status(500).json({ error: 'Cannot start download while' + reason });
 
     if (!Array.isArray(req.body)
         || req.body.length === 0
@@ -93,12 +100,12 @@ router.post('/jobs/download/', async (req, res) => {
     switch (await downloader.download()) {
         case 'not-started':
             if (jobsAdded > 0) {
-                return res.json({ success: 'Job(s) started, check the console for progress' });
+                return res.json({ success: 'Job started, check the console for progress' });
             } else {
-                return res.json({ error: 'Job(s) already running' });
+                return res.json({ error: 'Job already started' });
             }
         case 'started':
-            return res.json({ success: 'Job(s) started, check the console for progress' });
+            return res.json({ success: 'Job started, check the console for progress' });
         case 'failed':
             return res.status(500).json({ error: 'Failed to start' });
         default:
@@ -113,22 +120,15 @@ router.post('/jobs/stop', async (req, res) => {
         case 'failed':
             return res.json({ error: 'Failed to stop' });
         case 'none':
-            return res.json({ error: 'None running' });
+            return res.json({ error: 'No jobs are running' });
         default:
             return res.sendStatus(500);
     }
 });
 
 router.post('/errors/repair/:errorId', async (req, res) => {
-    if (downloader.isBusy()) return res.status(500).json(
-        { error: 'Cannot retry import while downloading' }
-    );
-    if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Already retrying import' }
-    );
-    if (updating) return res.status(500).json(
-        { error: 'Cannot retry import while checking for updates' }
-    );
+    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'downloading']);
+    if (busy) return res.status(500).json({ error: (reason === 'retrying import' ? 'Already ' : 'Cannot retry import while ') + reason });
 
     try {
         let result = await errorManager.repair(req.params.errorId);
@@ -140,15 +140,8 @@ router.post('/errors/repair/:errorId', async (req, res) => {
 });
 
 router.post('/youtube-dl/update', async (req, res) => {
-    if (downloader.isBusy()) return res.status(500).json(
-        { error: 'Cannot check for updates while downloading' }
-    );
-    if (errorManager.isBusy()) return res.status(500).json(
-        { error: 'Cannot check for updates while retrying import' }
-    );
-    if (updating) return res.status(500).json(
-        { error: 'Already checking for updates' }
-    );
+    const [busy, reason] = isBusy(['updating', 'retrying', 'downloading']);
+    if (busy) return res.status(500).json({ error: (reason === 'updating youtube-dl' ? 'Already ' : 'Cannot update youtube-dl while ') + reason });
 
     updating = true;
     try {
@@ -226,13 +219,14 @@ router.post('/download_uploader_icons', async (req, res) => {
     }
 });
 
-let verifyingHashes = false;
 router.post('/verify_hashes', async (req, res) => {
-    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'checked_hashes.txt');
+    const [busy, reason] = isBusy(['deleting', 'verifying']);
+    if (busy) return res.status(500).json({ error: (reason === 'verifying hashes' ? 'Already ' : 'Cannot verify hashes while ') + reason });
 
-    if (verifyingHashes) return res.status(500).json({ error: 'Currently verifying hashes' });
-    verifyingHashes = true;
-    res.json({ success: 'Started verifying hashes, results will be saved to checked_hashes.txt' });
+    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
+
+    verifying = true;
+    res.json({ success: 'Started verifying hashes, results will be saved to verified_hashes.txt' });
 
     try {
         let videos = await Video.find({},
@@ -263,8 +257,153 @@ router.post('/verify_hashes', async (req, res) => {
     } catch (err) {
         if (parsedEnv.VERBOSE) console.error(err);
     }
-    verifyingHashes = false;
+    verifying = false;
 });
+
+router.post('/delete', async (req, res) => {
+    try {
+        const preventRedownload = !!req.body.preventRedownload;
+
+        let pipeline = [];
+        let match = {};
+
+        if (req.body.uploader) match.uploader = req.body.uploader;
+        if (req.body.extractor) match.extractor = req.body.extractor;
+        if (req.body.id) match.id = req.body.id;
+
+        if (req.body.uploadStart || req.body.uploadEnd) match.uploadDate = {};
+        if (req.body.uploadStart) match.uploadDate.$gte = new Date(req.body.uploadStart);
+        if (req.body.uploadEnd) match.uploadDate.$lte = new Date(req.body.uploadEnd);
+
+        if (req.body.playlist) {
+            pipeline.push({
+                $lookup: {
+                    from: Playlist.collection.name,
+                    localField: 'playlistDocument',
+                    foreignField: '_id',
+                    as: 'lookupPlaylist'
+                }
+            });
+            match['lookupPlaylist.id'] = req.body.playlist;
+        }
+
+        if (req.body.job) {
+            pipeline.push({
+                $lookup: {
+                    from: Job.collection.name,
+                    localField: 'jobDocument',
+                    foreignField: '_id',
+                    as: 'lookupJob'
+                }
+            });
+            match['lookupJob.name'] = req.body.job;
+        }
+
+        pipeline.push({ $match: match }, { $project: { _id: 0, extractor: 1, id: 1, directory: 1 } });
+
+        const videos = await Video.aggregate(pipeline).exec();
+
+        if (videos.length === 0) return res.status(500).json({ error: 'No videos match the query' });
+        if (req.query.preview === 'true') return res.json({ success: `${videos.length} video${videos.length !== 1 ? 's' : ''} will be deleted` });
+
+        // Delete videos
+        const [busy, reason] = isBusy(['retrying', 'deleting', 'downloading', 'verifying']);
+        if (busy) return res.status(500).json({ error: (reason === 'deleting videos' ? 'Already ' : 'Cannot delete videos while ') + reason });
+
+        res.json({ success: `Deleting ${videos.length} video${videos.length !== 1 ? 's' : ''}, check the console for progress` });
+        deleting = true;
+
+        try {
+            for (let { extractor, id, directory } of videos) {
+                const videoName = `${extractor}/${id}`;
+                const videoDir = path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', directory);
+                const thumbnailsDir = path.join(parsedEnv.OUTPUT_DIRECTORY, 'thumbnails', directory);
+
+                const session = null; // Replica sets are required to use transactions
+                // const session = await mongoose.startSession();
+                // session.startTransaction();
+
+                try {
+                    // Delete video
+                    const video = await Video.findOne({ extractor, id }, null, { session });
+                    await video.deleteOne();
+
+                    // Express locks static files while streaming (someone watching the video being deleted) so files can not be deleted immediately
+                    // Since the epoch is added to the filename when downloading/importing, files can be safely redownloaded even if they are not deleted right away
+                    // Files will be deleted on server restart when they are guaranteed to not be locked
+                    await fs.appendFile(path.join(parsedEnv.OUTPUT_DIRECTORY, 'delete_queue.txt'), videoDir + '\r\n' + thumbnailsDir + '\r\n');
+
+                    if (!preventRedownload) {
+                        const archiveFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'archive.txt');
+                        let archived = (await fs.readFile(archiveFile)).toString().replaceAll('\r\n', '\n').split('\n');
+                        archived = archived.filter(video => video !== `${extractor} ${id}`);
+                        await fs.writeFile(archiveFile, archived.join('\r\n'));
+                    }
+
+                    // Update statistics
+                    const statistic = await Statistic.findOne({ accessKey: 'videos' }, null, { session });
+                    statistic.statistics = await decrementStatistics(video, statistic, session);
+                    await statistic.save();
+
+                    const job = await Job.findById(video.jobDocument, null, { session });
+                    job.statistics = await decrementStatistics(video, job, session);
+                    await job.save();
+
+                    if (video.playlistDocument) {
+                        const playlist = await Playlist.findById(video.playlistDocument, null, { session });
+                        if (playlist) {
+                            playlist.statistics = await decrementStatistics(video, playlist, session);
+                            if (playlist.statistics.totalVideoCount <= 0) {
+                                await playlist.deleteOne();
+                            } else {
+                                await playlist.save();
+                            }
+                        }
+                    }
+
+                    if (video.uploaderDocument) {
+                        const uploader = await Uploader.findById(video.uploaderDocument, null, { session });
+                        if (uploader) {
+                            uploader.statistics = await decrementStatistics(video, uploader, session);
+                            console.log(uploader.statistics.totalVideoCount);
+                            if (uploader.statistics.totalVideoCount <= 0) {
+                                await uploader.deleteOne();
+                            } else {
+                                await uploader.save();
+                            }
+                        }
+                    }
+
+                    // session.commitTransaction();
+                    // session.endSession();
+                    console.log(`Deleted video ${videoName}`);
+                } catch (err) {
+                    // session.abortTransaction();
+                    // session.endSession();
+                    console.log(`Failed to delete video ${videoName}`)
+                    if (parsedEnv.VERBOSE) console.error(err);
+                }
+            }
+            deleting = false;
+            console.log('Finished deleting videos');
+        } catch (err) {
+            deleting = false;
+            throw err;
+        }
+    } catch (err) {
+        if (parsedEnv.VERBOSE) console.error(err);
+    }
+});
+
+const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'verifying'], jobId = null) => {
+    // Ordered by shortest expected operation
+    if (updating && check.includes('updating')) return [true, 'updating youtube-dl'];
+    if (errorManager.isBusy() && check.includes('retrying')) return [true, 'retrying import'];
+    if (deleting && check.includes('deleting')) return [true, 'deleting videos'];
+    if (downloader.isBusy(jobId) && check.includes('downloading')) return [true, 'downloading videos'];
+    if (verifying && check.includes('verifying')) return [true, 'verifying hashes'];
+    return [false, null];
+}
 
 const verifyFileHash = async (file, directory) => {
     if (file === null) return 0;
@@ -281,7 +420,7 @@ const verifyFileHash = async (file, directory) => {
 
         let currentMd5 = await generateFileHash(filename);
 
-        if (md5 === currentMd5) {
+        if (md5 === currentMd5 || file.filesize === 0) {
             await logHashResult('OK', filename);
         } else {
             await logHashResult('MISMATCH', filename);
@@ -300,7 +439,7 @@ const verifyFileHash = async (file, directory) => {
 }
 
 const logHashResult = async (result, filename) => {
-    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'checked_hashes.txt');
+    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
     const message = `${result}\t\t${filename}`;
     console.log(message);
     await fs.appendFile(verifiedHashesFile, message + '\r\n');

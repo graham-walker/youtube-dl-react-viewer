@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Row, Col, Image, Table, Badge, Tab, Nav, Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MiniStatisticColumn from '../MiniStatisticsColumn/MiniStatisticsColumn';
@@ -7,7 +7,7 @@ import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import VideoPreview from '../VideoPreview/VideoPreview';
 import Description from './Description/Description';
 import { UserContext } from '../../contexts/user.context';
-import { bytesToSizeString, abbreviateNumber, resolutionToBadge } from '../../utilities/format.utility';
+import { bytesToSizeString, abbreviateNumber, resolutionToBadge, getErrorMessage } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import history from '../../utilities/history.utility';
 import { createSearchLink } from '../../utilities/search.utility';
@@ -43,6 +43,7 @@ export default class VideoPage extends Component {
             autoplay: localStorage.getItem('autoplay') === null ? false : localStorage.getItem('autoplay') === 'true',
             spoofContentType: localStorage.getItem('spoofContentType') === null ? true : localStorage.getItem('spoofContentType') === 'true',
             keepControlsOpen: localStorage.getItem('keepControlsOpen') || 'never', // never, windowed, fullscreen, always
+            redirect: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -335,6 +336,8 @@ export default class VideoPage extends Component {
     }
 
     render() {
+        if (this.state.redirect) return <Redirect to="/" />
+
         let video = this.state.video;
         let seriesData;
         if (video) {
@@ -626,12 +629,37 @@ export default class VideoPage extends Component {
                             {this.state.localVideoPath && window.location.hostname === 'localhost' &&
                                 <Button
                                     variant="primary"
-                                    className="mb-2"
+                                    className="mb-2 me-2"
                                     href={'vlc://file:///' + encodeURI(this.state.localVideoPath).replace(/!/g, '%21')}
                                 >
                                     <FontAwesomeIcon icon="play" /> Open in VLC (local)
                                 </Button>
                             }
+                            {this.context?.user?.isSuperuser && <Button
+                                onClick={() => {
+                                    let ok = window.confirm('Delete video?');
+                                    if (ok) {
+                                        const preventRedownload = !window.confirm('Allow the video to be redownloaded?');
+                                        axios
+                                            .post(
+                                                '/api/admin/delete/', {
+                                                extractor: this.state.video.extractor,
+                                                id: this.state.video.id,
+                                                preventRedownload,
+                                            }
+                                            ).then(res => {
+                                                alert('Video deleted');
+                                                this.setState({ redirect: true });
+                                            }).catch(err => {
+                                                alert(getErrorMessage(err, 'Failed to delete video'));
+                                            });
+                                    }
+                                }}
+                                variant="danger"
+                                className="mb-2 me-2"
+                            >
+                                <FontAwesomeIcon icon="trash" /> Delete
+                            </Button>}
                             <hr />
                             <Comments comments={video?.comments} player={this.player} uploader={video?.uploader} />
                         </Col>

@@ -67,6 +67,28 @@ import applyUpdates from './utilities/update.utility.js';
         app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
     }
 
+    // Clean up deleted files
+    const deleteQueueFile = path.join(outputDirectory, 'delete_queue.txt');
+    try {
+        if (fs.existsSync(deleteQueueFile)) {
+            console.log('Removing files for previously deleted videos...');
+            let folders = fs.readFileSync(deleteQueueFile).toString().replace('\r\n', '\n').split('\n').filter(video => video !== '');
+            for (let folder of folders) {
+                if (fs.existsSync(folder)) {
+                    let files = fs.readdirSync(folder, { withFileTypes: true });
+                    for (let file of files) {
+                        if (file.isFile()) fs.unlinkSync(path.join(folder, file.name));
+                    }
+                }
+            }
+            fs.unlinkSync(deleteQueueFile);
+            console.log('Done');
+        }
+    } catch (err) {
+        console.log('Failed to remove files');
+        if (parsedEnv.VERBOSE) console.error(err);
+    }
+
     // Spoof type
     app.use('/transcoded/videos', globalPasswordMiddleware, (req, res, next) => { res.contentType('webm'); next(); }, express.static(path.join(outputDirectory, 'videos')));
 

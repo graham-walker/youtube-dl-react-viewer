@@ -61,7 +61,7 @@ export default class Downloader {
                 '--write-info-json',
                 '--prefer-ffmpeg',
                 '--output',
-                `${parsedEnv.OUTPUT_DIRECTORY}/videos/%(extractor)s/%(id)s/%(title)s - %(uploader)s - %(upload_date)s.%(ext)s`,
+                `${parsedEnv.OUTPUT_DIRECTORY}/videos/%(extractor)s/%(id)s/${Math.floor(new Date().getTime() / 1000)}/%(title)s - %(uploader)s - %(upload_date)s.%(ext)s`, // %(epoch)s
                 '--format',
                 job.formatCode,
                 '--download-archive',
