@@ -600,7 +600,7 @@ class ApplicationManager extends Component {
                             onClick={this.post.bind(this)}
                             disabled={!this.props.youtubeDlPath}
                         >
-                            Check for updates
+                            Update
                         </Button>
                     </Card.Body>
                 </Card>
