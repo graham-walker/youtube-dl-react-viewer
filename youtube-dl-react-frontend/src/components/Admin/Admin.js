@@ -265,7 +265,7 @@ class UpdateChecker extends Component {
 
     render() {
         return (
-            <Alert variant={this.state.variant}>{this.state.message}</Alert>
+            this.state.message ? <Alert variant={this.state.variant}>{this.state.message}</Alert> : <></>
         );
     }
 }
