@@ -616,7 +616,7 @@ export default class VideoPage extends Component {
                             <Button
                                 variant="primary"
                                 className="mb-2 me-2"
-                                href={'/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
+                                href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/static/videos/` + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
                                 download={video.videoFile.name}
                             >
                                 <FontAwesomeIcon icon="download" /> Download
@@ -624,7 +624,7 @@ export default class VideoPage extends Component {
                             <Button
                                 variant="primary"
                                 className="mb-2 me-2"
-                                href={`/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`}
+                                href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                                 target="_blank"
                             >
                                 <FontAwesomeIcon icon="database" /> Metadata

@@ -94,7 +94,7 @@ export default class AdminPage extends Component {
                                 <h5 className="mb-4">Logs</h5>
                                 <div className="mb-3">
                                     {this.state.adminFiles.map(file => {
-                                        return <Button href={'/static/admin/' + file} target="_blank" variant="outline-secondary" className="me-2 mb-2"><FontAwesomeIcon className="text-primary" icon="file" /> {file}</Button>
+                                        return <Button href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/static/admin/${file}`} target="_blank" variant="outline-secondary" className="me-2 mb-2"><FontAwesomeIcon className="text-primary" icon="file" /> {file}</Button>
                                     })}
                                 </div>
                             </>
