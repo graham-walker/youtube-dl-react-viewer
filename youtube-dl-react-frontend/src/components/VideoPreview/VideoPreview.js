@@ -24,7 +24,7 @@ const VideoPreview = props => {
                     <Image
                         width={36}
                         height={36}
-                        src="/default-avatar.jpg"
+                        src="/default-avatar.svg"
                         roundedCircle={userContext.user?.useCircularAvatars ?? true}
                         className="mt-1"
                     />
@@ -46,7 +46,7 @@ const VideoPreview = props => {
             >
                 <Image
                     style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
-                    src="/default-thumbnail.jpg"
+                    src="/default-thumbnail.svg"
                     onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
                 />
                 {!!props.watched &&

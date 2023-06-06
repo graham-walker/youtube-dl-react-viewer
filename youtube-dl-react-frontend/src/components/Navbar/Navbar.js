@@ -46,7 +46,7 @@ class AppNavbar extends Component {
     render() {
         if (history.location.pathname !== '/global'
             && history.location.pathname !== '/global/') {
-            const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.jpg';
+            const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
             return (
                 <Navbar
                     sticky="top"

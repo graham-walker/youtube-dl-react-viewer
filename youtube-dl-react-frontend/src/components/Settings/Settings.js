@@ -121,7 +121,7 @@ class SettingsForm extends Component {
     }
 
     render() {
-        const avatar = this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.jpg';
+        const avatar = this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
         return (
             <>
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}

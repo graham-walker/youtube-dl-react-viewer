@@ -59,7 +59,7 @@ export default class ActivityPage extends Component {
 
     render() {
         const user = this.state.user;
-        const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.jpg';
+        const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
 
         const activities = this.state.activities.map((activity, i) =>
             <Col
@@ -137,7 +137,7 @@ export default class ActivityPage extends Component {
 
 const ActivityItem = props => {
     const userContext = useContext(UserContext);
-    const avatar = userContext.user && userContext.user.avatar ? '/static/users/avatars/' + userContext.user.avatar : '/default-avatar.jpg';
+    const avatar = userContext.user && userContext.user.avatar ? '/static/users/avatars/' + userContext.user.avatar : '/default-avatar.svg';
 
     const activity = props.activity;
 
