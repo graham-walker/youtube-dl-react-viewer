@@ -1,6 +1,6 @@
 import express from 'express';
 import os from 'os';
-import { spawnSync } from 'child_process';
+import { spawnSync, execSync } from 'child_process';
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
@@ -144,17 +144,29 @@ router.post('/youtube-dl/update', async (req, res) => {
 
     updating = true;
     try {
-        let updateProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
-        if (updateProcess.status === 0) {
-            let message = updateProcess.stdout.split(os.EOL);
-            if (message[message.length - 1] === '') message.pop();
-            message = message.pop();
-            updating = false;
-            if (message.startsWith('ERROR')) return res.status(500).json({ error: message });
-            return res.json({ success: message });
+        if (parsedEnv.YOUTUBE_DL_UPDATE_COMMAND) {
+            try {
+                let output = execSync(parsedEnv.YOUTUBE_DL_UPDATE_COMMAND);
+                updating = false;
+                return res.json({ success: output.toString() });
+            } catch (err) {
+                if (parsedEnv.VERBOSE) console.error(err.toString());
+                updating = false;
+                return res.status(500).json({ error: `Command failed YOUTUBE_DL_UPDATE_COMMAND=${parsedEnv.YOUTUBE_DL_UPDATE_COMMAND}` });
+            }
         } else {
-            updating = false;
-            return res.status(500).json({ error: 'Failed to check for updates' });
+            let updateProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
+            if (updateProcess.status === 0) {
+                let message = updateProcess.stdout.split(os.EOL);
+                if (message[message.length - 1] === '') message.pop();
+                message = message.pop();
+                updating = false;
+                if (message.startsWith('ERROR')) return res.status(500).json({ error: message });
+                return res.json({ success: message });
+            } else {
+                updating = false;
+                return res.status(500).json({ error: 'Failed to check for updates' });
+            }
         }
     } catch (err) {
         updating = false;

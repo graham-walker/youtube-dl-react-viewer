@@ -92,6 +92,10 @@ const expected = {
         type: Boolean,
         default: false,
     },
+    'YOUTUBE_DL_UPDATE_COMMAND': {
+        type: String,
+        default: '',
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',
