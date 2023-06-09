@@ -84,10 +84,6 @@ const expected = {
         type: String,
         default: 'https://sponsor.ajay.app/',
     },
-    'YOUTUBE_V3_API_KEY': {
-        type: String,
-        default: '',
-    },
     'EXPOSE_LOCAL_VIDEO_PATH': {
         type: Boolean,
         default: false,

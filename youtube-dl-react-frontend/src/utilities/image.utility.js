@@ -26,9 +26,9 @@ export const getImage = (video, type, size = 'small') => {
             if (
                 !video.hasOwnProperty('uploaderDocument')
                 || !video.uploaderDocument.hasOwnProperty('extractor')
-                || !video.uploaderDocument.hasOwnProperty('name')
+                || !video.uploaderDocument.hasOwnProperty('id')
             ) return 'default-avatar.svg';
-            return `/static/avatars/${makeSafe(video.uploaderDocument.extractor, ' -')}/${makeSafe(video.uploaderDocument.name, '_')}.jpg`;
+            return `/static/avatars/${makeSafe(video.uploaderDocument.extractor, ' -')}/${makeSafe(video.uploaderDocument.id, '_')}.jpg`;
         default:
             throw new Error('Invalid type');
     }

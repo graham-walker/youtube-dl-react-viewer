@@ -467,10 +467,16 @@ let debug;
                 extractor: infojsonData.extractor,
                 id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
             });
+            if (uploader) {
+                uploader.name = infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id;
+                uploader.url = infojsonData.uploader_url;
+                await uploader.save();
+            }
             if (!uploader) uploader = await new Uploader({
                 extractor: infojsonData.extractor,
                 id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
                 name: infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id,
+                url: infojsonData.uploader_url,
             }).save();
         } catch (err) {
             console.error('Failed to retrieve uploader document');
@@ -489,6 +495,7 @@ let debug;
                 extractor: infojsonData.extractor,
                 id: infojsonData.playlist_uploader_id || infojsonData.playlist_uploader,
                 name: infojsonData.playlist_uploader || infojsonData.playlist_uploader_id,
+                // Uploader URL is not available for playlist uploaders
             }).save();
         } catch (err) {
             console.error('Failed to retrieve playlist uploader document');

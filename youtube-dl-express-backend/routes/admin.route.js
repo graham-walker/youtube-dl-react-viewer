@@ -177,10 +177,8 @@ router.post('/youtube-dl/update', async (req, res) => {
 router.post('/download_uploader_icons', async (req, res) => {
     let sentResponse = false;
     try {
-        if (!parsedEnv.YOUTUBE_V3_API_KEY) return res.status(500).json({ error: 'Environment variable YOUTUBE_V3_API_KEY is not set' });
-
         const uploaders = await Uploader
-            .find({ extractor: 'youtube' }, '-_id id name')
+            .find({ $or: [{ extractor: 'youtube' }, { extractor: 'soundcloud' }] }, '-_id id name extractor url')
             .collation({ locale: 'en' })
             .sort({ name: 1 })
             .lean()
@@ -189,33 +187,35 @@ router.post('/download_uploader_icons', async (req, res) => {
         if (uploaders.length === 0) return res.status(500).json({ error: 'No valid uploaders' });
 
         for (let uploader of uploaders) {
-            const channelIconFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars/youtube', uploader.name.replace(/[|:&;$%@"<>()+,/\\*?]/g, '_') + '.jpg');
+            const channelIconFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars/' + uploader.extractor, uploader.id.replace(/[|:&;$%@"<>()+,/\\*?]/g, '_') + '.jpg');
             if (req.query?.force !== 'true' && (await fs.exists(channelIconFile))) continue;
-
-            let channelRes;
-            try {
-                channelRes = await axios.get(`https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${uploader.id}&fields=items%2Fsnippet%2Fthumbnails&key=${parsedEnv.YOUTUBE_V3_API_KEY}`);
-            } catch (err) {
-                if (err?.response?.data?.error?.message === 'API key not valid. Please pass a valid API key.') {
-                    return res.status(500).json({ error: 'Invalid API key' });
-                }
-                console.error('Failed to lookup icon for ' + uploader.name);
-                if (parsedEnv.VERBOSE) console.error(err);
-                continue;
-            }
 
             if (!sentResponse) {
                 res.json({ success: 'Downloading uploader icons, check the console for progress' });
                 sentResponse = true;
             }
 
+            let uploaderName;
             try {
-                const channelIconUrl = channelRes.data.items[0].snippet.thumbnails.high.url;
-                let channelIconRes = await axios.request({ url: channelIconUrl, method: 'GET', responseType: 'arraybuffer' });
-                await fs.writeFile(channelIconFile, channelIconRes.data);
-                console.log('Downloaded icon for ' + uploader.name);
+                uploaderName = uploader.url.split('/').pop();
+                if (uploader.extractor === 'youtube' && uploaderName.startsWith('@')) uploaderName = uploaderName.substring(1);
+
+                let iconRes = await axios.request({
+                    url: `https://unavatar.io/${encodeURIComponent(uploader.extractor)}/${encodeURIComponent(uploaderName)}?fallback=false`,
+                    method: 'GET',
+                    responseType: 'arraybuffer'
+                });
+                await fs.ensureDir(path.dirname(channelIconFile));
+                await fs.writeFile(channelIconFile, iconRes.data);
+                console.log(`Downloaded icon for ${uploader.extractor}/${uploaderName}`);
             } catch (err) {
-                console.error('Failed to download icon for ' + uploader.name);
+                if (err?.response?.status === 404) {
+                    console.error(`Icon does not exist for ${uploader.extractor}/${uploaderName || uploader.name}`);
+                } else if (err?.response?.status === 429) {
+                    console.error(`Rate limit hit`);
+                } else {
+                    console.error(`Failed to download icon for ${uploader.extractor}/${uploaderName || uploader.name}`);
+                }
                 if (parsedEnv.VERBOSE) console.error(err);
             }
         }

@@ -67,6 +67,7 @@ const applyUpdates = async () => {
                         extractor: video.extractor,
                         id: video.channelId || video.uploaderId || video.uploader,
                         name: video.uploader || video.uploaderId || video.channelId,
+                        url: video.uploaderUrl,
                     }).save();
                 }
 
