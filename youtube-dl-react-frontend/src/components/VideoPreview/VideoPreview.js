@@ -118,7 +118,7 @@ const VideoPreview = props => {
                     >
                         {video.title}
                     </Link>
-                    {video.uploaderDocument &&
+                    {video.uploaderDocument && !props.hideUploader &&
                         <Link
                             className="video-uploader-link"
                             to={uploaderLink}

@@ -176,6 +176,7 @@ export default class UploaderPage extends Component {
                     <VideoList
                         location={this.props.location}
                         url={`uploaders/${this.props.match.params.extractor}/${this.props.match.params.id}`}
+                        hideUploader={true}
                     />
                 </>}
             </PageLoadWrapper>

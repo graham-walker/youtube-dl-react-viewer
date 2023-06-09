@@ -174,6 +174,17 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <Form.Group className="mb-3" controlId="useLargeLayout">
+                        <Form.Check
+                            custom
+                            checked={this.state.useLargeLayout}
+                            type="checkbox"
+                            name="useLargeLayout"
+                            label="Use large layout"
+                            id="useLargeLayout"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="useCircularAvatars">
                         <Form.Check
                             custom

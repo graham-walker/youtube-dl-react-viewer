@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema({
     skipPreview: { type: Boolean, default: true },
     skipFiller: { type: Boolean, default: false },
     skipMusicOfftopic: { type: Boolean, default: true },
+    useLargeLayout: { type: Boolean, default: true },
 }, {
     timestamps: true,
 });

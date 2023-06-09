@@ -92,10 +92,7 @@ export default class VideoList extends Component {
         const videos = this.state.videos.map(video =>
             <Col
                 style={this.props?.layout === 'playlist' ? { flex: '0 0 100%', maxWidth: '100%' } : {}}
-                className="mb-3 px-1 col-xxl-2"
-                lg="3"
-                sm="6"
-                xs="12"
+                className="mb-3 px-1"
                 key={video.extractor + video.id}
             >
                 <VideoPreview
@@ -104,7 +101,8 @@ export default class VideoList extends Component {
                     small={this.props?.layout === 'playlist' ? true : false}
                     horizontal={this.props?.layout === 'playlist' ? true : false}
                     badge={this.state['sort']}
-                    icon={this.props.icon}
+                    icon={this.props.url === 'videos/search' ? (this.context.user?.useLargeLayout === undefined || this.context.user?.useLargeLayout) : this.props.icon}
+                    hideUploader={this.props.hideUploader}
                 />
             </Col>
         );
@@ -203,6 +201,11 @@ export default class VideoList extends Component {
                         }
                         style={{ overflow: 'hidden' }}>
                         <Row
+                            className={
+                                (this.context.user?.useLargeLayout === undefined || this.context.user?.useLargeLayout)
+                                ? 'row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1'
+                                : 'row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1'
+                            }
                             style={{
                                 marginLeft: '-0.25rem',
                                 marginRight: '-0.25rem'
