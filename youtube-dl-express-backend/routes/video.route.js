@@ -65,6 +65,8 @@ router.get('/:extractor/:id', async (req, res) => {
     let firstUploaderVideo;
     let firstPlaylistVideo;
     let firstJobVideo;
+    const metadataFields = req.query?.metadata === 'true' ? ' comments' : '';
+
     try {
         video = (await Video.findOne({
             extractor: req.params.extractor,
@@ -74,9 +76,9 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
         + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId'
-        + ' playlistDocument' + fields
+        + ' playlistDocument ' + fields + metadataFields
         )
-            .populate('uploaderDocument playlistDocument jobDocument')
+            .populate('uploaderDocument playlistDocument jobDocument' + metadataFields)
             .exec()
         )?.toJSON();
         if (!video) return res.sendStatus(404);
@@ -148,7 +150,7 @@ router.get('/:extractor/:id', async (req, res) => {
     delete video._id;
 
     let sponsorSegments = null;
-    if (req.user?.enableSponsorblock && video.extractor === 'youtube') {
+    if (parsedEnv.SPONSORBLOCK_API_URL && video.extractor === 'youtube' && (req.user?.enableSponsorblock || req.query?.metadata === 'true')) {
         try {
             const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/?videoID=${video.id}&categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
             sponsorSegments = sponsorRes.data;

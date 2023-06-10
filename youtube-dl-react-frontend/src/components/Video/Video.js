@@ -624,7 +624,7 @@ export default class VideoPage extends Component {
                             <Button
                                 variant="primary"
                                 className="mb-2 me-2"
-                                href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`}
+                                href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}/?metadata=true`}
                                 target="_blank"
                             >
                                 <FontAwesomeIcon icon="database" /> Metadata
