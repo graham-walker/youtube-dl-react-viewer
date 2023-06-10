@@ -12,18 +12,22 @@ router.get('/', async (req, res) => {
         statistic = await Statistic.findOne({ accessKey: 'videos' })
             .populate({
                 path: 'statistics.recordViewCountVideo',
+                select: '-_id extractor id title uploader duration directory mediumResizedThumbnailFile viewCount width height uploaderDocument',
                 populate: { path: 'uploaderDocument', select: 'extractor id name' },
             })
             .populate({
                 path: 'statistics.recordLikeCountVideo',
+                select: '-_id extractor id title uploader duration directory mediumResizedThumbnailFile viewCount width height uploaderDocument',
                 populate: { path: 'uploaderDocument', select: 'extractor id name' },
             })
             .populate({
                 path: 'statistics.recordDislikeCountVideo',
+                select: '-_id extractor id title uploader duration directory mediumResizedThumbnailFile viewCount width height uploaderDocument',
                 populate: { path: 'uploaderDocument', select: 'extractor id name' },
             })
             .populate({
                 path: 'statistics.oldestVideo',
+                select: '-_id extractor id title uploader duration directory mediumResizedThumbnailFile viewCount width height uploaderDocument',
                 populate: { path: 'uploaderDocument', select: 'extractor id name' },
             });
     }
