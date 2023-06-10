@@ -1,6 +1,5 @@
 <p align="center">
-<img src="./youtube-dl-react-frontend/public/logo.svg" alt="icon" width="100px" height="100px">
-</> 
+<img src="./youtube-dl-react-frontend/public/logo.svg" alt="icon" width="100px" height="100px" />
 <h1 align="center">youtube-dl-react-viewer</h1>
 
 **youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp)/[youtube-dl](https://github.com/ytdl-org/youtube-dl) created using the MERN stack. Supports viewing and downloading videos. The web app is not platform specific and should work on any Windows, Linux, or macOS machine.
