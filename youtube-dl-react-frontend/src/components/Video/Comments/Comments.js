@@ -1,13 +1,45 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef, memo } from 'react';
 import { Image, Form, Badge } from 'react-bootstrap';
 import { defaultImage } from '../../../utilities/image.utility';
 import { dateToTimeSinceString, abbreviateNumber } from '../../../utilities/format.utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Description from '../Description/Description';
 import { UserContext } from '../../../contexts/user.context';
+import axios from '../../../utilities/axios.utility';
+import { Spinner } from 'react-bootstrap';
+
+const CommentsLoader = memo(function CommentsLoader(props) {
+    const [loading, setLoading] = useState(true);
+    const [comments, setComments] = useState(null);
+
+    useEffect(() => {
+        axios
+            .get(`/api/videos/${props.extractor}/${props.id}/comments`)
+            .then(res => {
+                setLoading(false);
+                setComments(res.data.comments);
+            })
+            .catch(err => {
+                setLoading(false);
+            });
+    }, []);
+
+    return (loading
+        ? <Spinner animation="border" />
+        : (!!comments
+            ? <Comments comments={comments} player={props.player} uploader={props.uploader} />
+            : <strong>Failed to load comments</strong>
+        )
+    );
+});
 
 const Comments = props => {
     const [sort, setSort] = useState('like_count');
+    const scrollRef = useRef();
+
+    useEffect(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    }, [sort]);
 
     function group(comments, parent = 'root') {
         let newComments = [];
@@ -37,7 +69,7 @@ const Comments = props => {
     }
 
     return (
-        <div className="video-comments">
+        <div className="video-comments mb-3">
             <p className="fw-bold">{props.comments.length.toLocaleString()} Comment{props.comments.length !== 1 ? 's' : ''}</p>
             <Form className="form-inline mb-4">
                 <Form.Group>
@@ -52,7 +84,7 @@ const Comments = props => {
                     </Form.Select>
                 </Form.Group>
             </Form>
-            <div style={{ maxHeight: 'calc(100vh - 56px - 1.5rem)', overflow: 'auto' }}>
+            <div style={{ maxHeight: 'calc(100vh - 56px - 1.5rem)', overflow: 'auto' }} ref={scrollRef}>
                 {!!groupedComments && n2(groupedComments)}
             </div>
         </div>
@@ -86,4 +118,4 @@ const Comment = props => {
     );
 }
 
-export default Comments;
+export { CommentsLoader, Comments };

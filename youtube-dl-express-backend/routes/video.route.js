@@ -74,9 +74,9 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
         + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId'
-        + ' playlistDocument comments' + fields
+        + ' playlistDocument' + fields
         )
-            .populate('uploaderDocument playlistDocument jobDocument comments')
+            .populate('uploaderDocument playlistDocument jobDocument')
             .exec()
         )?.toJSON();
         if (!video) return res.sendStatus(404);
@@ -114,7 +114,7 @@ router.get('/:extractor/:id', async (req, res) => {
         if (jobVideos) [jobVideos, jobVideosOffset] = limitVideoList(jobVideos, video);
 
     } catch (err) {
-        console.error(err)
+        if (parsedEnv.VERBOSE) console.error(err)
         return res.sendStatus(500);
     }
 
@@ -179,6 +179,20 @@ router.get('/:extractor/:id', async (req, res) => {
         activityDocument: activity?._id,
         sponsorSegments,
     });
+});
+
+router.get('/:extractor/:id/comments', async (req, res) => {
+    try {
+        let video = (await Video.findOne({ extractor: req.params.extractor, id: req.params.id }, '-_id comments')
+            .populate('comments')
+            .exec()
+        )?.toJSON();
+
+        res.json({ comments: video.comments });
+    } catch (err) {
+        if (parsedEnv.VERBOSE) console.error(err);
+        return res.sendStatus(500);
+    }
 });
 
 export default router;

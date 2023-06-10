@@ -15,7 +15,7 @@ import ISO6391 from 'iso-639-1';
 import videojs from 'video.js';
 import 'videojs-flash';
 import axios from '../../utilities/axios.utility';
-import Comments from './Comments/Comments';
+import { CommentsLoader } from './Comments/Comments';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -671,7 +671,13 @@ export default class VideoPage extends Component {
                                 <FontAwesomeIcon icon="trash" /> Delete
                             </Button>}
                             <hr />
-                            <Comments comments={video?.comments} player={this.player} uploader={video?.uploader} />
+                            <CommentsLoader
+                                key={video.id + video.extractor}
+                                id={video.id}
+                                extractor={video.extractor}
+                                player={this.player}
+                                uploader={video?.uploader}
+                            />
                         </Col>
                         <Col
                             xs="12"
