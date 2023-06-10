@@ -14,7 +14,7 @@ import Uploader from './models/uploader.model.js';
 import Playlist from './models/playlist.model.js';
 import DownloadError from './models/error.model.js';
 
-import parsed from './parse-env.js';
+import { parsedEnv, parsedErr } from './parse-env.js';
 import { incrementStatistics } from './utilities/statistic.utility.js';
 
 const program = commander.program;
@@ -22,9 +22,9 @@ const program = commander.program;
 let debug;
 
 (async () => {
-    if (parsed.err) throw parsed.err;
+    if (parsedErr) throw parsedErr;
 
-    debug = parsed.env.VERBOSE;
+    debug = parsedEnv.VERBOSE;
 
     program.name('youtube-dl-exec-script')
         .version('1.3.0') // Version is hardcoded here because on non-Windows systems this script has to be called by node instead of npm
@@ -49,9 +49,9 @@ let debug;
         console.dir(program.opts(), { maxArrayLength: null });
     }
 
-    console.log(`Connecting to database with URL: ${parsed.env.MONGOOSE_URL}...`);
+    console.log(`Connecting to database with URL: ${parsedEnv.MONGOOSE_URL}...`);
     try {
-        await mongoose.connect(parsed.env.MONGOOSE_URL, {
+        await mongoose.connect(parsedEnv.MONGOOSE_URL, {
             useNewUrlParser: true,
             useCreateIndex: true,
             useUnifiedTopology: true,
@@ -309,10 +309,10 @@ let debug;
 
     // Create the resized thumbnail files
     let resizedThumbnailsDirectory = path.join(
-        parsed.env.OUTPUT_DIRECTORY,
+        parsedEnv.OUTPUT_DIRECTORY,
         'thumbnails',
         path.relative(
-            path.join(parsed.env.OUTPUT_DIRECTORY, 'videos'), videoDirectory
+            path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos'), videoDirectory
         )
     );
 
@@ -430,7 +430,7 @@ let debug;
 
     // Create the folder with the extractor name for the avatars
     fs.ensureDirSync(path.join(
-        parsed.env.OUTPUT_DIRECTORY,
+        parsedEnv.OUTPUT_DIRECTORY,
         'avatars',
         infojsonData.extractor.replace(/[|:&;$%@"<>()+,/\\]/g, ' -')
     ));
@@ -506,7 +506,7 @@ let debug;
     let ytdlpPlaylistDescription;
     if (infojsonData.extractor === 'youtube' && infojsonData.playlist_id) {
         try {
-            const ytdlpPlaylistDir = path.join(parsed.env.OUTPUT_DIRECTORY, 'videos/youtube：tab', infojsonData.playlist_id);
+            const ytdlpPlaylistDir = path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos/youtube：tab', infojsonData.playlist_id);
             if (fs.existsSync(ytdlpPlaylistDir)) {
                 const ytdlpPlaylistMetadataFile = path.join(ytdlpPlaylistDir, (await fs.readdir(ytdlpPlaylistDir)).filter(file => path.extname(file) === '.json')[0]);
                 const ytdlpPlaylistJson = JSON.parse(await fs.readFile(ytdlpPlaylistMetadataFile));
@@ -667,7 +667,7 @@ let debug;
         playlistDescription: infojsonData.playlist_description,
         hashtags: hashtags,
         likeDislikeRatio: likeDislikeRatio,
-        directory: slash(path.relative(path.join(parsed.env.OUTPUT_DIRECTORY, 'videos'), videoDirectory)),
+        directory: slash(path.relative(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos'), videoDirectory)),
         totalFilesize: videoFilesize + infoFilesize + (descriptionFilesize || 0) + (annotationsFilesize || 0) + totalThumbnailFilesize + (mediumResizedThumbnailFilesize || 0) + (smallResizedThumbnailFilesize || 0) + totalSubtitleFilesize,
         totalOriginalFilesize: videoFilesize + infoFilesize + (descriptionFilesize || 0) + (annotationsFilesize || 0) + totalThumbnailFilesize + totalSubtitleFilesize,
         videoFile: {
@@ -718,7 +718,7 @@ let debug;
         playlistDocument: playlist?._id,
         jobDocument: job._id,
         youtubeDlVersion: program.isImport ? null : program.isRepair ? error.youtubeDlVersion : program.youtubeDlVersion,
-        youtubeDlPath: program.isImport ? null : program.isRepair ? error.youtubeDlPath : parsed.env.YOUTUBE_DL_PATH,
+        youtubeDlPath: program.isImport ? null : program.isRepair ? error.youtubeDlPath : parsedEnv.YOUTUBE_DL_PATH,
         imported: program.isRepair ? error.imported : program.isImport,
         scriptVersion: program.version(),
     });
@@ -777,7 +777,7 @@ let debug;
     let videoPath;
     try {
         // Record the error
-        videoPath = slash(path.relative(path.join(parsed.env.OUTPUT_DIRECTORY, 'videos'), program.video));
+        videoPath = slash(path.relative(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos'), program.video));
         const job = await Job.findOne({ _id: program.jobId });
         let previousError;
         if (program.isRepair) previousError = await DownloadError.findOne({ _id: program.errorId });
@@ -789,7 +789,7 @@ let debug;
             dateDownloaded: program.downloaded ? new Date(+program.downloaded) : program.isRepair ? previousError.dateDownloaded : new Date(),
             errorOccurred: new Date(),
             youtubeDlVersion: program.isImport ? null : program.isRepair ? previousError.youtubeDlVersion : program.youtubeDlVersion,
-            youtubeDlPath: program.isImport ? null : program.isRepair ? previousError.youtubeDlPath : parsed.env.YOUTUBE_DL_PATH,
+            youtubeDlPath: program.isImport ? null : program.isRepair ? previousError.youtubeDlPath : parsedEnv.YOUTUBE_DL_PATH,
             jobDocument: job._id,
             formatCode: program.isImport ? null : program.isRepair ? previousError.formatCode : job.formatCode,
             isAudioOnly: program.isImport ? null : program.isRepair ? previousError.isAudioOnly : job.isAudioOnly,
@@ -810,15 +810,15 @@ let debug;
             await error.save();
             console.log('Recorded error successfully');
         } else {
-            fs.ensureDirSync(parsed.env.OUTPUT_DIRECTORY);
-            fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'errors.txt'), JSON.stringify(errorDocument) + '\r\n');
+            fs.ensureDirSync(parsedEnv.OUTPUT_DIRECTORY);
+            fs.appendFileSync(path.join(parsedEnv.OUTPUT_DIRECTORY, 'errors.txt'), JSON.stringify(errorDocument) + '\r\n');
             console.error('Failed save error to the database. Saved error object to file');
         }
     } catch (err) {
         if (debug) oldError(err);
         try {
-            fs.ensureDirSync(parsed.env.OUTPUT_DIRECTORY);
-            fs.appendFileSync(path.join(parsed.env.OUTPUT_DIRECTORY, 'unknown_errors.txt'), videoPath + '\r\n');
+            fs.ensureDirSync(parsedEnv.OUTPUT_DIRECTORY);
+            fs.appendFileSync(path.join(parsedEnv.OUTPUT_DIRECTORY, 'unknown_errors.txt'), videoPath + '\r\n');
             console.error('Failed to capture error. Saved video file name');
         } catch (err) {
             if (debug) oldError(err);
@@ -850,7 +850,7 @@ console.error = message => {
 
 const generateFileHash = async (filename) => {
     return new Promise((resolve, reject) => {
-        if (parsed.env.SKIP_HASHING) return resolve(undefined);
+        if (parsedEnv.SKIP_HASHING) return resolve(undefined);
         let shasum = crypto.createHash('md5');
         let readStream = fs.createReadStream(filename);
         readStream.on('data', (data) => {
@@ -864,7 +864,7 @@ const generateFileHash = async (filename) => {
 }
 
 const generateDataHash = (buffer) => {
-    if (parsed.env.SKIP_HASHING) return undefined;
+    if (parsedEnv.SKIP_HASHING) return undefined;
     return crypto.createHash('md5').update(buffer).digest('hex');
 }
 
@@ -896,7 +896,7 @@ const generateThumbnailFile = async (sourceData, width, height, filepath) => {
     try {
         const data = await sharp(sourceData)
             .resize({ width: width, height: height, fit: sharp.fit.inside })
-            .jpeg({ quality: parsed.env.THUMBNAIL_QUALITY, chromaSubsampling: parsed.env.THUMBNAIL_CHROMA_SUBSAMPLING })
+            .jpeg({ quality: parsedEnv.THUMBNAIL_QUALITY, chromaSubsampling: parsedEnv.THUMBNAIL_CHROMA_SUBSAMPLING })
             .toBuffer();
         const filesize = data.length;
         const md5 = generateDataHash(data);
@@ -911,7 +911,7 @@ const generateThumbnailFile = async (sourceData, width, height, filepath) => {
 
 const doProbeSync = (file) => {
     let proc = spawnSync(
-        parsed.env.FFPROBE_PATH || 'ffprobe',
+        parsedEnv.FFPROBE_PATH || 'ffprobe',
         [
             '-hide_banner',
             '-loglevel',
