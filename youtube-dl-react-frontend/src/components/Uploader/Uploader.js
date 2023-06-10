@@ -140,6 +140,24 @@ export default class UploaderPage extends Component {
                                         detailedStatistic={uploader.playlistCreatedCount.toLocaleString() + ' playlists'}
                                     />
                                 }
+                                {!!uploader.url &&
+                                    <MiniStatisticColumn
+                                        title="Channel URL"
+                                        icon="external-link-alt"
+                                        statistic={<a
+                                            href={uploader.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {uploader.url.replace('https://', '')
+                                                .replace('http://', '')
+                                                .replace('www.', '')
+                                                .split('/')
+                                                .shift()
+                                            }
+                                        </a>}
+                                    />
+                                }
                             </Row>
                             {statistics.tags.length > 0 &&
                                 <div>
