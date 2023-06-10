@@ -98,66 +98,66 @@ const expected = {
     }
 }
 
-const parse = () => {
-    let env = {};
-    try {
-        for (let key in expected) {
-            if (!process.env.hasOwnProperty(key)) {
-                if (expected[key].required) {
-                    throw new Error(`Required environment variable "${key}" not specified.`);
-                } else {
-                    env[key] = expected[key].default;
-                }
+let env = {};
+let err = null;
+try {
+    for (let key in expected) {
+        if (!process.env.hasOwnProperty(key)) {
+            if (expected[key].required) {
+                throw new Error(`Required environment variable "${key}" not specified.`);
             } else {
-                // Parse environment variable values
-                switch (expected[key].type) {
-                    case String:
-                        if (expected[key].denied) {
-                            for (let i = 0; i < expected[key].denied.length; i++) {
-                                if (process.env[key] === expected[key].denied[i])
-                                    throw new Error(`String environment variable "${key}" cannot be "${expected[key].denied[i]}".`)
-                            }
+                env[key] = expected[key].default;
+            }
+        } else {
+            // Parse environment variable values
+            switch (expected[key].type) {
+                case String:
+                    if (expected[key].denied) {
+                        for (let i = 0; i < expected[key].denied.length; i++) {
+                            if (process.env[key] === expected[key].denied[i])
+                                throw new Error(`String environment variable "${key}" cannot be "${expected[key].denied[i]}".`)
                         }
-                        if (expected[key].allowed && !expected[key].allowed.includes(process.env[key]))
-                            throw new Error(`String environment variable "${key}" must be one of ${expected[key].allowed.map(a => `"${a}"`).join(', ')}.`);
-                        env[key] = process.env[key];
-                        break;
-                    case Number:
-                        if (isNaN(process.env[key])) {
-                            throw new Error(`Non Number value "${process.env[key]}" provided for Number environment variable "${key}".`);
-                        }
+                    }
+                    if (expected[key].allowed && !expected[key].allowed.includes(process.env[key]))
+                        throw new Error(`String environment variable "${key}" must be one of ${expected[key].allowed.map(a => `"${a}"`).join(', ')}.`);
+                    env[key] = process.env[key];
+                    break;
+                case Number:
+                    if (isNaN(process.env[key])) {
+                        throw new Error(`Non Number value "${process.env[key]}" provided for Number environment variable "${key}".`);
+                    }
 
-                        env[key] = parseInt(process.env[key]);
+                    env[key] = parseInt(process.env[key]);
 
-                        if (expected[key].rangeMin && env[key] < expected[key].rangeMin)
-                            throw new Error(`Number environment variable "${key}" out of range (min: ${expected[key].rangeMin}).`);
-                        if (expected[key].rangeMax && env[key] > expected[key].rangeMax)
-                            throw new Error(`Number environment variable "${key}" out of range (max: ${expected[key].rangeMax}).`);
-                        break;
-                    case Boolean:
-                        if (process.env[key].toLowerCase() === 'true') {
-                            env[key] = true;
-                        } else if (process.env[key].toLowerCase() === 'false') {
-                            env[key] = false;
-                        } else {
-                            throw new Error(`Non Boolean value provided for Boolean environment variable "${key}".`);
-                        }
-                        break;
-                }
+                    if (expected[key].rangeMin && env[key] < expected[key].rangeMin)
+                        throw new Error(`Number environment variable "${key}" out of range (min: ${expected[key].rangeMin}).`);
+                    if (expected[key].rangeMax && env[key] > expected[key].rangeMax)
+                        throw new Error(`Number environment variable "${key}" out of range (max: ${expected[key].rangeMax}).`);
+                    break;
+                case Boolean:
+                    if (process.env[key].toLowerCase() === 'true') {
+                        env[key] = true;
+                    } else if (process.env[key].toLowerCase() === 'false') {
+                        env[key] = false;
+                    } else {
+                        throw new Error(`Non Boolean value provided for Boolean environment variable "${key}".`);
+                    }
+                    break;
             }
         }
-
-        // Additional validation
-        if (env.OUTPUT_DIRECTORY.endsWith('/')
-            || env.OUTPUT_DIRECTORY.endsWith('\\')
-        ) {
-            env.OUTPUT_DIRECTORY = env.OUTPUT_DIRECTORY.slice(0, -1);
-        }
-
-        return { env };
-    } catch (err) {
-        return { err };
     }
+
+    // Additional validation
+    if (env.OUTPUT_DIRECTORY.endsWith('/')
+        || env.OUTPUT_DIRECTORY.endsWith('\\')
+    ) {
+        env.OUTPUT_DIRECTORY = env.OUTPUT_DIRECTORY.slice(0, -1);
+    }
+} catch (e) {
+    err = e;
 }
 
-export default parse();
+const parsedEnv = env;
+const parsedErr = err;
+
+export { parsedEnv, parsedErr };

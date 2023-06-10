@@ -14,6 +14,7 @@ import {
     getSimilarVideos,
     limitVideoList,
 } from '../utilities/video.utility.js';
+import { parsedEnv } from '../parse-env.js';
 
 const router = express.Router();
 

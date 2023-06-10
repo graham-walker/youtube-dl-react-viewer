@@ -22,13 +22,12 @@ import userMiddleware from './middleware/user.middleware.js';
 
 import User from './models/user.model.js';
 
-import parsed from './parse-env.js';
+import { parsedEnv, parsedErr } from './parse-env.js';
 import applyUpdates from './utilities/update.utility.js';
 
 (async () => {
     // Parse environment variables
-    if (parsed.err) throw parsed.err;
-    global.parsedEnv = parsed.env;
+    if (parsedErr) throw parsedErr;
 
     // Connect to the database
     await mongoose.connect(parsedEnv.MONGOOSE_URL, {

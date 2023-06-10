@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { parsedEnv } from '../parse-env.js';
 
 export default async (req, res, next) => {
     const token = req.cookies.token;

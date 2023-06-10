@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { parsedEnv } from '../parse-env.js';
 
 import User from '../models/user.model.js';
 

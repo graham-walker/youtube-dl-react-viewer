@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs-extra';
 
 import Job from '../models/job.model.js';
+import { parsedEnv } from '../parse-env.js';
 
 export default class Downloader {
     constructor() {

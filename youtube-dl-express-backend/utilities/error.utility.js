@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import path from 'path';
 
+import { parsedEnv } from '../parse-env.js';
 import DownloadError from '../models/error.model.js';
 
 export default class ErrorManager {

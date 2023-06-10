@@ -17,6 +17,7 @@ import Statistic from '../models/statistic.model.js';
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
 import { decrementStatistics } from '../utilities/statistic.utility.js';
+import { parsedEnv } from '../parse-env.js';
 
 const router = express.Router();
 
@@ -25,6 +26,8 @@ const errorManager = new ErrorManager();
 let updating = false;
 let verifying = false;
 let deleting = false;
+
+const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
 
 router.get('/', async (req, res) => {
     try {
@@ -233,8 +236,6 @@ router.post('/download_uploader_icons', async (req, res) => {
 router.post('/verify_hashes', async (req, res) => {
     const [busy, reason] = isBusy(['deleting', 'verifying']);
     if (busy) return res.status(500).json({ error: (reason === 'verifying hashes' ? 'Already ' : 'Cannot verify hashes while ') + reason });
-
-    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
 
     verifying = true;
     res.json({ success: 'Started verifying hashes, results will be saved to verified_hashes.txt' });
@@ -450,7 +451,6 @@ const verifyFileHash = async (file, directory) => {
 }
 
 const logHashResult = async (result, filename) => {
-    const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
     const message = `${result}\t\t${filename}`;
     console.log(message);
     await fs.appendFile(verifiedHashesFile, message + '\r\n');

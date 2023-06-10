@@ -2,6 +2,7 @@ import Video from '../models/video.model.js';
 import Statistic from '../models/statistic.model.js';
 
 import { applyTags } from './statistic.utility.js';
+import { parsedEnv } from '../parse-env.js';
 
 export const search = async (query, page, filter = {}, relevanceMeans = 'uploadDate', relevanceDirection = -1) => {
     let sortField = sortBy(query['sort'], relevanceMeans, relevanceDirection);

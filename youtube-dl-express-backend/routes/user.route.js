@@ -5,6 +5,8 @@ import sharp from 'sharp';
 import fs from 'fs-extra';
 import { v4 as uuidv4 } from 'uuid';
 
+import { parsedEnv } from '../parse-env.js';
+
 import User from '../models/user.model.js';
 import Activity from '../models/activity.model.js';
 

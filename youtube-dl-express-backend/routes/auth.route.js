@@ -1,6 +1,8 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 
+import { parsedEnv } from '../parse-env.js';
+
 import User from '../models/user.model.js';
 
 const router = express.Router();
