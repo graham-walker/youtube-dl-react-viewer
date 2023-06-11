@@ -162,7 +162,7 @@ export default class VideoPage extends Component {
                                     // Mark sponsor segments
                                     if (this.sponsorRef.current) {
                                         for (let sponsor of this.sponsorRef.current) {
-                                            if (this.context.user.onlySkipLocked && sponsor.locked == 0) continue;
+                                            if (this.context.user.onlySkipLocked && (sponsor.locked === 0 || sponsor.locked === null || sponsor.locked === false)) continue;
 
                                             if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
                                             if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;

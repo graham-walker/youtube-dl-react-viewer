@@ -22,6 +22,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
             .catch(err => {
                 setLoading(false);
             });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (loading
