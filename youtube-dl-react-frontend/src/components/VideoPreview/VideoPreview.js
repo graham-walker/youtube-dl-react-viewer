@@ -152,7 +152,7 @@ const VideoPreview = props => {
                                     className="ms-auto"
                                 >
                                     <small>
-                                        <Badge bg="light">
+                                        <Badge bg="light" title={`${video.width}x${video.height}`}>
                                             {resolutionToBadge(video.width, video.height)}
                                         </Badge>
                                     </small>
