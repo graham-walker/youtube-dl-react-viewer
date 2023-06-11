@@ -248,16 +248,16 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('userinactive', function () {
-                                    document.querySelectorAll('.skip-button').forEach(e => {
-                                        e.classList.remove('skip-visible');
-                                        e.classList.add('skip-hidden');
+                                    document.querySelectorAll('.player-button').forEach(e => {
+                                        e.classList.remove('player-button-visible');
+                                        e.classList.add('player-button-hidden');
                                     });
                                 });
 
                                 this.player.on('useractive', function () {
-                                    document.querySelectorAll('.skip-button').forEach(e => {
-                                        e.classList.add('skip-visible');
-                                        e.classList.remove('skip-hidden');
+                                    document.querySelectorAll('.player-button').forEach(e => {
+                                        e.classList.add('player-button-visible');
+                                        e.classList.remove('player-button-hidden');
                                     });
                                 });
 
@@ -370,22 +370,35 @@ export default class VideoPage extends Component {
                         <Col className={`keep-controls-open-${this.state.keepControlsOpen}`}>
                             <div data-vjs-player>
                                 <div
-                                    className="skip-button skip-back"
+                                    className="player-button play-pause"
+                                    onClick={() => {
+                                        if (this.player.paused()) {
+                                            this.player.play();
+                                        } else {
+                                            this.player.pause();
+                                        }
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon="play" />
+                                    <FontAwesomeIcon icon="pause" />
+                                </div>
+                                <div
+                                    className="player-button skip-back"
                                     onClick={() => {
                                         this.player.currentTime(Math.max(this.player.currentTime() - 10, 0));
                                         this.player.play();
                                     }}
                                 >
-                                    <FontAwesomeIcon icon="rotate-left" />10
+                                    <FontAwesomeIcon icon="rotate-left" />
                                 </div>
                                 <div
-                                    className="skip-button skip-forwards"
+                                    className="player-button skip-forwards"
                                     onClick={() => {
                                         this.player.currentTime(Math.min(this.player.currentTime() + 10, this.player.duration()));
                                         this.player.play();
                                     }}
                                 >
-                                    <FontAwesomeIcon icon="rotate-right" />10
+                                    <FontAwesomeIcon icon="rotate-right" />
                                 </div>
                                 <video
                                     controls

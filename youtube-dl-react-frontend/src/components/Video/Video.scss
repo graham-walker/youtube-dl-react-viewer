@@ -80,21 +80,61 @@
     display: block;
 }
 
-.skip-button {
+.player-button {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     font-weight: bold;
-    filter: drop-shadow(0 0 2px #2b333f);
     user-select: none;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 
-    &.skip-visible {
+    &.skip-back {
+        left: 15%;
+        transform: translate(-15%, -50%);
+
+        svg {
+            transform: rotateZ(45deg);
+        }
+    }
+
+    &.skip-forwards {
+        right: 15%;
+        transform: translate(15%, -50%);
+
+        svg {
+            transform: rotateZ(-45deg);
+        }
+    }
+
+    &.skip-back,
+    &.skip-forwards {
+        &::before {
+            content: '10';
+            position: absolute;
+            top: 39%;
+            left: 35%;
+            font-size: 1rem;
+            filter: drop-shadow(0 0 2px #2b333f);
+        }
+    }
+
+    &.play-pause {
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    &.player-button-visible {
         opacity: 1;
         pointer-events: all;
         transition: 0.1s ease opacity;
     }
 
-    &.skip-hidden {
+    &.player-button-hidden {
         opacity: 0;
         pointer-events: none;
         transition: 1s ease opacity;
@@ -105,34 +145,29 @@
     }
 
     svg {
-        font-size: 2rem;
-        position: absolute;
-        top: -120%;
-        left: -95%;
+        font-size: 3rem;
+        filter: drop-shadow(0 0 2px #2b333f);
     }
 }
 
-.skip-back {
-    left: 15%;
-
-    svg {
-        transform: rotateZ(45deg);
-    }
-}
-
-.skip-forwards {
-    right: 15%;
-
-    svg {
-        transform: rotateZ(-45deg);
-    }
-}
-
-.video-js:not(.vjs-has-started) .skip-button {
+.video-js:not(.vjs-has-started) .player-button {
     display: none;
 }
 
-.video-js.vjs-paused .skip-button {
+.video-js.vjs-paused .player-button {
     opacity: 1 !important;
     pointer-events: all !important;
+}
+
+.video-js.vjs-paused .play-pause svg.fa-pause {
+    display: none !important;
+}
+
+.video-js.vjs-playing .play-pause svg.fa-play {
+    display: none !important;
+}
+
+.video-js.vjs-waiting .play-pause svg,
+.video-js.vjs-seeking .play-pause svg {
+    display: none !important;
 }
