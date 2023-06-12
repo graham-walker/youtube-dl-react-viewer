@@ -261,27 +261,31 @@ To download videos from the web app you must be signed in with the superuser acc
 
 ## Importing Already Downloaded Videos
 
-You can import videos already downloaded with yt-dlp/youtube-dl by using the import script. To import videos they must have been downloaded with the `--write-info-json` option.
+You can import videos already downloaded with yt-dlp/youtube-dl as long as they were downloaded with the `--write-info-json` option.
 
-To use the import script:
-1. Navigate to `./youtube-dl-express-backend`
-2. Run `sudo npm run import -- -f "/Folder/To/Import" -j "Imported Videos" -c -r` (on Windows run as administrator)
+To import videos from the web app you must be signed in with the superuser account.
+1. Navigate to the admin panel `http://localhost:5000/admin`
+2. Scroll to the import videos section
 
 ```    
--f, --folder FOLDER                 Folder to import videos from
+Folder to import                    Folder on the server computer to import
+                                    videos from
 
--j, --job-name NAME                 Job imported videos will be added to.
+Job                                 Job imported videos will be added to.
                                     Imported videos will appear in the web app
                                     as if have been downloaded by this job
 
--r, --recursive                     Search subfolders for videos
+Search subfolders                   Search subfolders for videos
 
--c, --copy                          Copy files when importing instead of moving
+Copy files                          Copy files when importing instead of moving
                                     them
 
---override-ext EXT                  Sometimes the video file extension cannot
-                                    be determined by the import script. If you
-                                    know the extension you can set it here
+Continue on failed                  Continue importing videos if a single video
+                                    fails to import
+
+Override ext                        Sometimes the video file extension cannot
+                                    be determined by the importer. If you know
+                                    the extension you can set it here
 ```
 
 ## Issues & Limitations

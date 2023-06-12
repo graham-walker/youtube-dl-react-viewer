@@ -1,6 +1,6 @@
 import express from 'express';
 import os from 'os';
-import { spawnSync, execSync } from 'child_process';
+import { spawn, spawnSync, execSync } from 'child_process';
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
@@ -26,6 +26,7 @@ const errorManager = new ErrorManager();
 let updating = false;
 let verifying = false;
 let deleting = false;
+let importing = false;
 
 const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
 
@@ -68,7 +69,7 @@ router.post('/jobs/save/new', async (req, res) => {
 });
 
 router.post('/jobs/save/:jobId', async (req, res) => {
-    const [busy, reason] = isBusy(['deleting', 'downloading'], req.params.jobId);
+    const [busy, reason] = isBusy(['deleting', 'importing', 'downloading'], req.params.jobId);
     if (busy) return res.status(500).json({ error: 'Cannot save job while' + reason });
 
     let job;
@@ -89,7 +90,7 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 });
 
 router.post('/jobs/download/', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting'], req.params.jobId);
+    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'importing'], req.params.jobId);
     if (busy) return res.status(500).json({ error: 'Cannot start download while' + reason });
 
     if (!Array.isArray(req.body)
@@ -129,7 +130,7 @@ router.post('/jobs/stop', async (req, res) => {
 });
 
 router.post('/errors/repair/:errorId', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'downloading']);
+    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'importing', 'downloading']);
     if (busy) return res.status(500).json({ error: (reason === 'retrying import' ? 'Already ' : 'Cannot retry import while ') + reason });
 
     try {
@@ -142,7 +143,7 @@ router.post('/errors/repair/:errorId', async (req, res) => {
 });
 
 router.post('/youtube-dl/update', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'downloading']);
+    const [busy, reason] = isBusy(['updating', 'retrying', 'importing', 'downloading']);
     if (busy) return res.status(500).json({ error: (reason === 'updating youtube-dl' ? 'Already ' : 'Cannot update youtube-dl while ') + reason });
 
     updating = true;
@@ -319,7 +320,7 @@ router.post('/delete', async (req, res) => {
         if (req.query.preview === 'true') return res.json({ success: `${videos.length} video${videos.length !== 1 ? 's' : ''} will be deleted` });
 
         // Delete videos
-        const [busy, reason] = isBusy(['retrying', 'deleting', 'downloading', 'verifying']);
+        const [busy, reason] = isBusy(['retrying', 'deleting', 'downloading', 'importing', 'verifying']);
         if (busy) return res.status(500).json({ error: (reason === 'deleting videos' ? 'Already ' : 'Cannot delete videos while ') + reason });
 
         res.json({ success: `Deleting ${videos.length} video${videos.length !== 1 ? 's' : ''}, check the console for progress` });
@@ -407,12 +408,186 @@ router.post('/delete', async (req, res) => {
     }
 });
 
-const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'verifying'], jobId = null) => {
+router.post('/import', async (req, res) => {
+    let sentResponse = false;
+    try {
+        let { folder, jobName, subfolders, copy, continueOnFailed, overrideExt } = req.body;
+
+        if (overrideExt && overrideExt.startsWith('.')) overrideExt = overrideExt.slice(1);
+
+        if (!fs.existsSync(folder) || !fs.statSync(folder).isDirectory()) return res.status(500).json({ error: 'Folder does not exist' });
+
+        let job = await Job.findOne({ name: jobName });
+        if (!job) return res.status(500).json({ error: 'Job does not exist' });
+
+        const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'downloading', 'importing'], req.params.jobId);
+        if (busy) return res.status(500).json({ error: (reason === 'importing videos' ? 'Already ' : 'Cannot import videos while ') + reason });
+
+        importing = true;
+        res.json({ success: 'Import started, check the console for progress' });
+        sentResponse = true;
+        console.log(`Importing videos from: ${folder}`);
+
+        const importErrorFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'import_errors.txt');
+        fs.removeSync(importErrorFile); // Delete the error file from the last import
+
+        let files = await walk(folder, subfolders ? 0 : 1000);
+
+        let addedVideoCount = 0;
+        let alreadyAddedVideoCount = 0;
+        let failed = 0;
+
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].isFile() && files[i].name.endsWith('.info.json')) {
+                const infojsonFile = path.join(files[i].path, files[i].name);
+                console.log(`Found video metadata file: ${infojsonFile}`);
+
+                try {
+                    // Parse the video metadata file
+                    let infojsonData;
+                    try {
+                        infojsonData = JSON.parse(fs.readFileSync(infojsonFile, 'utf8'));
+                    } catch (err) {
+                        console.error('Unable to parse metadata');
+                        throw err;
+                    }
+
+                    // Check metadata for required properties
+                    let requiredProperties = ['id', 'extractor', 'title', 'extractor_key'];
+                    if (!overrideExt) requiredProperties.push('ext');
+
+                    for (let i = 0; i < requiredProperties.length; i++) {
+                        if (!infojsonData.hasOwnProperty(requiredProperties[i])) {
+                            const err = `Metadata missing required property: ${requiredProperties[i]}`;
+                            console.error(err);
+                            throw new Error(err);
+                        }
+                    }
+
+                    // Make sure video isn't duplicate
+                    if (await Video.countDocuments({ id: infojsonData.id, extractor: infojsonData.extractor }) > 0) {
+                        alreadyAddedVideoCount++;
+                        console.warn('Already downloaded video will be skipped');
+                        continue;
+                    }
+
+                    const basename = files[i].name.slice(0, -'info.json'.length);
+                    const videoFileName = basename + (overrideExt ? overrideExt : infojsonData.ext);
+
+                    // Get the downloaded date
+                    let downloaded;
+                    try {
+                        downloaded = (await fs.stat(path.join(files[i].path, videoFileName))).birthtime.getTime(); // Should default to ctime on OSs that do not support birthtime
+                    } catch (err) {
+                        console.error('Unable to get downloaded date from file');
+                        throw err;
+                    }
+
+                    // Get all files related to the video file
+                    let relatedFiles = files.filter(file =>
+                        file.isFile()
+                        && file.name.startsWith(basename) // Possible conflict if all videos are in the same folder and the basename starts the same as a different video
+                        && file.path === files[i].path
+                    );
+
+                    // Create the new directory
+                    const outputPath = path.join(
+                        parsedEnv.OUTPUT_DIRECTORY,
+                        'videos',
+                        infojsonData.extractor.toString(),
+                        infojsonData.id.toString(),
+                        Math.floor(new Date().getTime() / 1000).toString()
+                    );
+                    await fs.ensureDir(outputPath);
+
+                    // Move/copy files
+                    for (let i = 0; i < relatedFiles.length; i++) {
+                        let inputFile = path.join(relatedFiles[i].path, relatedFiles[i].name);
+                        console.log(`${copy ? 'Copying' : 'Moving'} file: ${inputFile}`)
+                        try {
+                            let outputFile = path.join(outputPath, relatedFiles[i].name);
+                            if (copy) {
+                                await fs.copyFile(inputFile, outputFile);
+                            } else {
+                                await fs.move(inputFile, outputFile);
+                            }
+                        } catch (err) {
+                            console.error(`Failed to ${copy ? 'copy' : 'move'} file`);
+                            throw err;
+                        }
+                    }
+
+                    console.log('Adding video to the database');
+                    // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename so node is used here instead
+                    let execArguments = [
+                        '--job-id',
+                        job._id,
+                        '--downloaded',
+                        downloaded,
+                        '--is-import',
+                        '--video',
+                        path.join(outputPath, videoFileName),
+                    ];
+                    if (process.platform === 'win32') {
+                        execArguments.unshift('--');
+                        execArguments.unshift('exec');
+                        execArguments.unshift('run');
+                    } else {
+                        execArguments.unshift('exec.js');
+                        execArguments.unshift('dotenv/config');
+                        execArguments.unshift('--require');
+                    }
+                    const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
+                    execProcess.stdout.on('data', (data) => console.log(data.toString()));
+                    execProcess.stderr.on('data', (data) => console.log(data.toString()));
+                    const exitCode = await new Promise((resolve, reject) => execProcess.on('close', resolve));
+
+                    if (exitCode !== 0) {
+                        let err = `Exec exited with status code ${exitCode}`;
+                        console.error(err);
+                        throw new Error(err);
+                    }
+
+                    try {
+                        await fs.appendFile(
+                            path.join(parsedEnv.OUTPUT_DIRECTORY, 'archive.txt'),
+                            infojsonData.extractor_key.toLowerCase() + ' ' + infojsonData.id + (process.platform === 'win32' ? '\r\n' : '\n')
+                        );
+                    }
+                    catch (err) {
+                        console.error('Failed to append to archive.txt');
+                        throw err;
+                    }
+                    addedVideoCount++;
+                } catch (err) {
+                    await fs.appendFile(importErrorFile, `${infojsonFile}\r\n${err.toString()}\r\n\r\n`);
+                    failed++;
+                    if (!continueOnFailed) {
+                        console.log('Stopping importing because of an error');
+                        break;
+                    }
+                }
+            }
+        }
+
+        console.log(`Imported ${addedVideoCount.toLocaleString()} videos (${alreadyAddedVideoCount.toLocaleString()} already downloaded, ${failed} failed)`);
+        if (failed > 0) console.log('Check import_errors.txt');
+
+        importing = false;
+    } catch (err) {
+        importing = false;
+        if (!sentResponse) return res.status(500).json({ error: 'Failed to start import' });
+        if (parsedEnv.VERBOSE) console.error(err);
+    }
+});
+
+const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'importing', 'verifying'], jobId = null) => {
     // Ordered by shortest expected operation
     if (updating && check.includes('updating')) return [true, 'updating youtube-dl'];
     if (errorManager.isBusy() && check.includes('retrying')) return [true, 'retrying import'];
     if (deleting && check.includes('deleting')) return [true, 'deleting videos'];
     if (downloader.isBusy(jobId) && check.includes('downloading')) return [true, 'downloading videos'];
+    if (importing && check.includes('importing')) return [true, 'importing videos'];
     if (verifying && check.includes('verifying')) return [true, 'verifying hashes'];
     return [false, null];
 }
@@ -468,6 +643,21 @@ const generateFileHash = async (filename) => {
             reject(err);
         });
     });
+}
+
+const walk = async (folder, depth = 0) => {
+    if (depth > 1000) return;
+    let files = await fs.readdir(folder, { withFileTypes: true });
+    let originalLength = files.length;
+    for (let i = 0; i < originalLength; i++) {
+        files[i].path = folder;
+        files[i].depth = depth;
+        if (files[i].isDirectory()) {
+            let moreFiles = await walk(path.join(folder, files[i].name), depth + 1);
+            if (moreFiles) files = files.concat(moreFiles);
+        }
+    }
+    return files;
 }
 
 export default router;

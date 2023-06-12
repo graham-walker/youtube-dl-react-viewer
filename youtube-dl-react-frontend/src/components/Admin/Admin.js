@@ -12,6 +12,7 @@ import JobDownloader from './JobDownloader/JobDownloader';
 import LogFileList from './LogFileList/LogFileList';
 import RetryImports from './RetryImports/RetryImports';
 import JobEditor from './JobEditor/JobEditor';
+import VideoImporter from './VideoImporter/VideoImporter';
 
 export default class AdminPage extends Component {
     static contextType = UserContext;
@@ -71,6 +72,7 @@ export default class AdminPage extends Component {
                         <YtdlUpdater youtubeDlPath={this.state.youtubeDlPath} />
                         <JobDownloader jobs={this.state.jobs} />
                         <JobEditor jobs={this.state.jobs} defaultActivejobId={this.state.defaultActivejobId} onJobsChange={(jobs) => this.setState({ jobs })} />
+                        <VideoImporter jobs={this.state.jobs} />
                         <VideoDeleter extractors={this.state.extractors} />
                         <ChannelIconDownloader />
                         <HashVerifier />
