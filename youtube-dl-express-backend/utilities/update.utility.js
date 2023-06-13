@@ -158,14 +158,13 @@ const applyUpdates = async () => {
 
             printProgress(progress);
         }
-        if (process.stdout.isTTY) logLine();
 
         version.lastUpdateCompleted = updateIds['1.3.0'];
         await version.save();
     }
 
     if (hasUpdates) {
-        logLine('Completed database upgrade.');
+        logLine('Completed database upgrade');
         console.timeEnd('Took');
     }
 }

@@ -38,7 +38,7 @@ const logError = (msg) => {
             msg = `(${new Date().toISOString()}) Error: ${msg.toString()}`;
         }
     } catch (err) {
-        msg = `(${new Date().toISOString()}) Error: Unknown error`;
+        msg = `(${new Date().toISOString()}) Error: Failed to print error`;
     }
 
     pushHistory(msg, 'danger');
@@ -48,18 +48,36 @@ const logError = (msg) => {
 
 const logStdout = (data, progress = false) => {
     try {
+        let msg = data.toString();
+        let progressComplete = false;
+
         if (
             !progress
-            && data.toString().trim().startsWith('[download]') && data.toString().trim().charAt(16) === '%'
+            && (
+                msg.trim().startsWith('[download]') && msg.trim().charAt(16) === '%'
+                || msg.trim().startsWith('[download] 100%')
+            )
         ) { progress = true; }
-    } catch (err) { }
 
-    pushHistory(data.toString(), 'secondary', progress, true);
-    if (!progress) writeLine(data.toString(), true);
-    try {
-        process.stdout.write(data.toString().gray);
+        if (progress
+            && (
+                msg.trim().startsWith('[download] 100%') // Final progress for yt-dlp downloads is '[download] 100%' without decimal
+                || msg.trim().endsWith('100.00%') // Final progress for database upgrade ends with '100.00%'
+            )
+        ) { progressComplete = true; }
+
+        if (progressComplete) msg += '\r\n';
+
+        pushHistory(msg, 'secondary', progress, true);
+        if (!progress || progressComplete) writeLine(msg, true);
+
+        try {
+            process.stdout.write(msg.gray);
+        } catch (err) {
+            console.log(msg.gray);
+        }
     } catch (err) {
-        console.log(data.toString().gray);
+        console.log('Failed to print stdout'.gray);
     }
 }
 
