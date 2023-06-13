@@ -14,7 +14,7 @@ import Uploader from './models/uploader.model.js';
 import Playlist from './models/playlist.model.js';
 import DownloadError from './models/error.model.js';
 
-import { parsedEnv, parsedErr } from './parse-env.js';
+import { parsedEnv } from './parse-env.js';
 import { incrementStatistics } from './utilities/statistic.utility.js';
 
 const program = commander.program;
@@ -22,8 +22,6 @@ const program = commander.program;
 let debug;
 
 (async () => {
-    if (parsedErr) throw parsedErr;
-
     debug = parsedEnv.VERBOSE;
 
     program.name('youtube-dl-exec-script')
