@@ -13,7 +13,7 @@ class Context extends Component {
     };
 
     componentDidMount() {
-        axios.get('/api/users/settings')
+        if (AuthService.getCurrentUser()) axios.get('/api/users/settings')
             .then(res => {
                 this.setState(res.data);
             })
