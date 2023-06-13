@@ -99,7 +99,6 @@ const expected = {
 }
 
 let env = {};
-let err = null;
 try {
     for (let key in expected) {
         if (!process.env.hasOwnProperty(key)) {
@@ -109,6 +108,7 @@ try {
                 env[key] = expected[key].default;
             }
         } else {
+            if (expected[key].required && !process.env[key]) throw new Error(`Required environment variable "${key}" not specified.`); // Required cannot be empty string
             // Parse environment variable values
             switch (expected[key].type) {
                 case String:
@@ -153,11 +153,11 @@ try {
     ) {
         env.OUTPUT_DIRECTORY = env.OUTPUT_DIRECTORY.slice(0, -1);
     }
-} catch (e) {
-    err = e;
+} catch (err) {
+    console.error(err);
+    process.exit(1);
 }
 
 const parsedEnv = env;
-const parsedErr = err;
 
-export { parsedEnv, parsedErr };
+export { parsedEnv };

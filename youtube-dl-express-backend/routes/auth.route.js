@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 
 import { parsedEnv } from '../parse-env.js';
+import { logError } from '../utilities/logger.utility.js';
 
 import User from '../models/user.model.js';
 
@@ -14,7 +15,7 @@ router.post('/register', async (req, res) => {
     try {
         await user.save();
     } catch (err) {
-        console.error(err);
+        logError(err);
         if (err.code === 11000 && err.keyPattern.username === 1) {
             return res.status(500).json({ error: 'Username is taken' });
         } else {

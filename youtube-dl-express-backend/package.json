@@ -13,6 +13,7 @@
   "author": "Graham Walker",
   "license": "MIT",
   "dependencies": {
+    "@colors/colors": "^1.5.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.0.0",
     "commander": "^6.1.0",

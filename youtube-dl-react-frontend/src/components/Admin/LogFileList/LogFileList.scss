@@ -1,0 +1,24 @@
+#logs {
+    white-space: pre;
+    font-family: monospace;
+    border-radius: var(--bs-border-radius);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    overflow: hidden;
+    background: #000;
+
+    > div {
+        overflow: auto;
+        min-height: 200px;
+        height: 200px;
+        resize: vertical;
+        padding: 0.375rem 0.75rem;
+
+        .text-log {
+            color: #ccc;
+        }
+
+        .text-secondary {
+            color: #767676 !important;
+        }
+    }
+}

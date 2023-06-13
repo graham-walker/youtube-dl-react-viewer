@@ -7,6 +7,7 @@ import Job from '../models/job.model.js';
 import Tag from '../models/tag.model.js';
 
 import { incrementStatistics } from './statistic.utility.js';
+import { logLine, logStdout } from './logger.utility.js';
 
 const updateIds = {
     '1.3.0': 1,
@@ -18,7 +19,7 @@ const applyUpdates = async () => {
 
     let hasUpdates = false;
     if (Math.max(...Object.keys(updateIds).map(x => updateIds[x]), 0) > version.lastUpdateCompleted) {
-        console.log('Upgrading database. This may take a while...');
+        logLine('Upgrading database. This may take a while...');
         console.time('Took');
         hasUpdates = true;
     }
@@ -157,25 +158,25 @@ const applyUpdates = async () => {
 
             printProgress(progress);
         }
-        if (process.stdout.isTTY) console.log();
+        if (process.stdout.isTTY) logLine();
 
         version.lastUpdateCompleted = updateIds['1.3.0'];
         await version.save();
     }
 
     if (hasUpdates) {
-        console.log('Completed database upgrade.');
+        logLine('Completed database upgrade.');
         console.timeEnd('Took');
     }
 }
 
 const printProgress = (message) => {
     if (!process.stdout.isTTY) { // clearLine & cursorTo are not available if there is no TTY (notably in the Docker console)
-        console.log(message);
+        logLine(message);
     } else {
         process.stdout.clearLine(1);
         process.stdout.cursorTo(0);
-        process.stdout.write(message);
+        logStdout(message, true);
     }
 }
 

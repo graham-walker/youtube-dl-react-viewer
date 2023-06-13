@@ -22,13 +22,12 @@ import userMiddleware from './middleware/user.middleware.js';
 
 import User from './models/user.model.js';
 
-import { parsedEnv, parsedErr } from './parse-env.js';
+import { parsedEnv } from './parse-env.js';
+import { logLine, logError } from './utilities/logger.utility.js';
+
 import applyUpdates from './utilities/update.utility.js';
 
 (async () => {
-    // Parse environment variables
-    if (parsedErr) throw parsedErr;
-
     // Connect to the database
     await mongoose.connect(parsedEnv.MONGOOSE_URL, {
         useNewUrlParser: true,
@@ -76,7 +75,7 @@ import applyUpdates from './utilities/update.utility.js';
     const deleteQueueFile = path.join(outputDirectory, 'delete_queue.txt');
     try {
         if (fs.existsSync(deleteQueueFile)) {
-            console.log('Removing files for previously deleted videos...');
+            logLine('Removing files for previously deleted videos...');
             let folders = fs.readFileSync(deleteQueueFile).toString().replace('\r\n', '\n').split('\n').filter(video => video !== '');
             for (let folder of folders) {
                 if (fs.existsSync(folder)) {
@@ -87,11 +86,11 @@ import applyUpdates from './utilities/update.utility.js';
                 }
             }
             fs.unlinkSync(deleteQueueFile);
-            console.log('Done');
+            logLine('Done');
         }
     } catch (err) {
-        console.log('Failed to remove files');
-        if (parsedEnv.VERBOSE) console.error(err);
+        logLine('Failed to remove files');
+        if (parsedEnv.VERBOSE) logError(err);
     }
 
     // Spoof type
@@ -110,7 +109,7 @@ import applyUpdates from './utilities/update.utility.js';
     // Start the server
     const backendPort = parsedEnv.BACKEND_PORT;
     app.listen(backendPort, () => {
-        console.log('Server started on port:', backendPort);
+        logLine('Server started on port: ' + backendPort);
     });
 
     // Create the superuser
@@ -127,6 +126,6 @@ import applyUpdates from './utilities/update.utility.js';
         }
     });
 })().catch(err => {
-    console.error(err);
+    logError(err);
     process.exit(1);
 });

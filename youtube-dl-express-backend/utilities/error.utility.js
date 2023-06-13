@@ -3,6 +3,7 @@ import path from 'path';
 
 import { parsedEnv } from '../parse-env.js';
 import DownloadError from '../models/error.model.js';
+import { logStdout } from './logger.utility.js';
 
 export default class ErrorManager {
     constructor() {
@@ -44,8 +45,8 @@ export default class ErrorManager {
         }
 
         const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
-        execProcess.stdout.on('data', (data) => console.log(data.toString()));
-        execProcess.stderr.on('data', (data) => console.log(data.toString()));
+        execProcess.stdout.on('data', (data) => logStdout(data));
+        execProcess.stderr.on('data', (data) => logStdout(data));
         const exitCode = await new Promise((resolve, reject) => execProcess.on('close', resolve));
 
         if (exitCode !== 0) {

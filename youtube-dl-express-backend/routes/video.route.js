@@ -15,6 +15,7 @@ import {
     limitVideoList,
 } from '../utilities/video.utility.js';
 import { parsedEnv } from '../parse-env.js';
+import { logError } from '../utilities/logger.utility.js';
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.get('/search/:page', async function (req, res) {
         videos = await search(req.query, page);
     }
     catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
         return res.sendStatus(500);
     }
 
@@ -36,13 +37,13 @@ router.get('/search/:page', async function (req, res) {
         try {
             totals = await getTotals(req.query);
         } catch (err) {
-            if (parsedEnv.VERBOSE) console.error(err);
+            if (parsedEnv.VERBOSE) logError(err);
             return res.sendStatus(500);
         }
         try {
             randomVideo = await getRandomVideo(req.query, totals.count);
         } catch (err) {
-            if (parsedEnv.VERBOSE) console.error(err);
+            if (parsedEnv.VERBOSE) logError(err);
             return res.sendStatus(500);
         }
     }
@@ -116,7 +117,7 @@ router.get('/:extractor/:id', async (req, res) => {
         if (jobVideos) [jobVideos, jobVideosOffset] = limitVideoList(jobVideos, video);
 
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err)
+        if (parsedEnv.VERBOSE) logError(err)
         return res.sendStatus(500);
     }
 
@@ -156,8 +157,8 @@ router.get('/:extractor/:id', async (req, res) => {
             sponsorSegments = sponsorRes.data;
         } catch (err) {
             if (err?.response?.status !== 404) {
-                console.error('Failed to get sponsor segments');
-                if (parsedEnv.VERBOSE) console.error(err);
+                logError('Failed to get sponsor segments');
+                if (parsedEnv.VERBOSE) logError(err);
             }
         }
     }
@@ -192,7 +193,7 @@ router.get('/:extractor/:id/comments', async (req, res) => {
 
         res.json({ comments: video.comments });
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
         return res.sendStatus(500);
     }
 });

@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 
 import Job from '../models/job.model.js';
 import { parsedEnv } from '../parse-env.js';
+import { logLine, logStdout } from './logger.utility.js';
 
 export default class Downloader {
     constructor() {
@@ -80,13 +81,12 @@ export default class Downloader {
             // start process
             this.process = downloadVideos(jobArguments);
 
-            console.log('Downloading job ' + job.name);
+            logLine('Downloading job ' + job.name);
             this.process.on('close', async (code) => {
                 job.lastCompleted = new Date();
                 await job.save();
-                console.log();
-                console.log(`youtube-dl exited with code ${code}`);
-                console.log(`Job ${job.name} finished`);
+                logLine(`youtube-dl exited with code ${code} (${code === 0 ? 'success' : 'failure'})`);
+                logLine(`Job ${job.name} finished`);
 
                 this.queued.shift();
                 if (this.queued.length > 0) {
@@ -206,11 +206,11 @@ const downloadVideos = (jobArguments) => {
     const youtubeDlProcess = spawn(parsedEnv.YOUTUBE_DL_PATH, jobArguments, { windowsHide: true });
 
     youtubeDlProcess.stdout.on('data', (data) => {
-        process.stdout.write(data);
+        logStdout(data);
     });
 
     youtubeDlProcess.stderr.on('data', (data) => {
-        process.stdout.write(data);
+        logStdout(data);
     });
 
     return youtubeDlProcess;

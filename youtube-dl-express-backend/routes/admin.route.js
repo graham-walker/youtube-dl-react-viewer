@@ -18,6 +18,7 @@ import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
 import { decrementStatistics } from '../utilities/statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
+import { logLine, logWarn, logError, history, logStdout } from '../utilities/logger.utility.js';
 
 const router = express.Router();
 
@@ -42,7 +43,21 @@ router.get('/', async (req, res) => {
             errors,
             extractors,
             adminFiles,
-            youtubeDlPath: process.env.YOUTUBE_DL_PATH
+            youtubeDlPath: process.env.YOUTUBE_DL_PATH,
+            consoleOutput: history,
+        });
+    } catch (err) {
+        res.sendStatus(500);
+    }
+});
+
+router.get('/logs', async (req, res) => {
+    try {
+        let adminFiles = (await fs.readdir(parsedEnv.OUTPUT_DIRECTORY, { withFileTypes: true })).filter(file => file.isFile()).map(file => file.name);
+
+        res.json({
+            adminFiles,
+            consoleOutput: history,
         });
     } catch (err) {
         res.sendStatus(500);
@@ -137,7 +152,7 @@ router.post('/errors/repair/:errorId', async (req, res) => {
         let result = await errorManager.repair(req.params.errorId);
         res.json(result);
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
         res.sendStatus(500);
     }
 });
@@ -154,13 +169,14 @@ router.post('/youtube-dl/update', async (req, res) => {
                 updating = false;
                 return res.json({ success: output.toString() });
             } catch (err) {
-                if (parsedEnv.VERBOSE) console.error(err.toString());
+                if (parsedEnv.VERBOSE) logError(err.toString());
                 updating = false;
                 return res.status(500).json({ error: `Command failed YOUTUBE_DL_UPDATE_COMMAND=${parsedEnv.YOUTUBE_DL_UPDATE_COMMAND}` });
             }
         } else {
             let updateProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
             if (updateProcess.status === 0) {
+                logStdout(updateProcess.stdout);
                 let message = updateProcess.stdout.split(os.EOL);
                 if (message[message.length - 1] === '') message.pop();
                 message = message.pop();
@@ -211,25 +227,25 @@ router.post('/download_uploader_icons', async (req, res) => {
                 });
                 await fs.ensureDir(path.dirname(channelIconFile));
                 await fs.writeFile(channelIconFile, iconRes.data);
-                console.log(`Downloaded icon for ${uploader.extractor}/${uploaderName}`);
+                logLine(`Downloaded icon for ${uploader.extractor}/${uploaderName}`);
             } catch (err) {
                 if (err?.response?.status === 404) {
-                    console.error(`Icon does not exist for ${uploader.extractor}/${uploaderName || uploader.name}`);
+                    logError(`Icon does not exist for ${uploader.extractor}/${uploaderName || uploader.name}`);
                 } else if (err?.response?.status === 429) {
-                    console.error(`Rate limit hit`);
+                    logError(`Rate limit hit`);
                 } else {
-                    console.error(`Failed to download icon for ${uploader.extractor}/${uploaderName || uploader.name}`);
+                    logError(`Failed to download icon for ${uploader.extractor}/${uploaderName || uploader.name}`);
                 }
-                if (parsedEnv.VERBOSE) console.error(err);
+                if (parsedEnv.VERBOSE) logError(err);
             }
         }
         if (!sentResponse) {
             return res.json({ success: 'All uploader icons downloaded' });
         } else {
-            console.log('Finished downloading uploader icons');
+            logLine('Finished downloading uploader icons');
         }
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
         if (!sentResponse) return res.sendStatus(500);
     }
 });
@@ -266,9 +282,9 @@ router.post('/verify_hashes', async (req, res) => {
 
         await fs.appendFile(verifiedHashesFile, 'FINISHED HASH VERIFICATION ' + new Date().toISOString() + '\r\n');
         await fs.appendFile(verifiedHashesFile, mismatches + ' MISMATCHES');
-        console.log(`Finished verifying hashes, ${mismatches} mismatches`);
+        logLine(`Finished verifying hashes, ${mismatches} mismatches`);
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
     }
     verifying = false;
 });
@@ -378,7 +394,7 @@ router.post('/delete', async (req, res) => {
                         const uploader = await Uploader.findById(video.uploaderDocument, null, { session });
                         if (uploader) {
                             uploader.statistics = await decrementStatistics(video, uploader, session);
-                            console.log(uploader.statistics.totalVideoCount);
+                            logLine(uploader.statistics.totalVideoCount);
                             if (uploader.statistics.totalVideoCount <= 0) {
                                 await uploader.deleteOne();
                             } else {
@@ -389,22 +405,22 @@ router.post('/delete', async (req, res) => {
 
                     // session.commitTransaction();
                     // session.endSession();
-                    console.log(`Deleted video ${videoName}`);
+                    logLine(`Deleted video ${videoName}`);
                 } catch (err) {
                     // session.abortTransaction();
                     // session.endSession();
-                    console.log(`Failed to delete video ${videoName}`)
-                    if (parsedEnv.VERBOSE) console.error(err);
+                    logLine(`Failed to delete video ${videoName}`)
+                    if (parsedEnv.VERBOSE) logError(err);
                 }
             }
             deleting = false;
-            console.log('Finished deleting videos');
+            logLine('Finished deleting videos');
         } catch (err) {
             deleting = false;
             throw err;
         }
     } catch (err) {
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
     }
 });
 
@@ -426,7 +442,7 @@ router.post('/import', async (req, res) => {
         importing = true;
         res.json({ success: 'Import started, check the console for progress' });
         sentResponse = true;
-        console.log(`Importing videos from: ${folder}`);
+        logLine(`Importing videos from: ${folder}`);
 
         const importErrorFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'import_errors.txt');
         fs.removeSync(importErrorFile); // Delete the error file from the last import
@@ -440,7 +456,7 @@ router.post('/import', async (req, res) => {
         for (let i = 0; i < files.length; i++) {
             if (files[i].isFile() && files[i].name.endsWith('.info.json')) {
                 const infojsonFile = path.join(files[i].path, files[i].name);
-                console.log(`Found video metadata file: ${infojsonFile}`);
+                logLine(`Found video metadata file: ${infojsonFile}`);
 
                 try {
                     // Parse the video metadata file
@@ -448,7 +464,7 @@ router.post('/import', async (req, res) => {
                     try {
                         infojsonData = JSON.parse(fs.readFileSync(infojsonFile, 'utf8'));
                     } catch (err) {
-                        console.error('Unable to parse metadata');
+                        logError('Unable to parse metadata');
                         throw err;
                     }
 
@@ -459,7 +475,7 @@ router.post('/import', async (req, res) => {
                     for (let i = 0; i < requiredProperties.length; i++) {
                         if (!infojsonData.hasOwnProperty(requiredProperties[i])) {
                             const err = `Metadata missing required property: ${requiredProperties[i]}`;
-                            console.error(err);
+                            logError(err);
                             throw new Error(err);
                         }
                     }
@@ -467,7 +483,7 @@ router.post('/import', async (req, res) => {
                     // Make sure video isn't duplicate
                     if (await Video.countDocuments({ id: infojsonData.id, extractor: infojsonData.extractor }) > 0) {
                         alreadyAddedVideoCount++;
-                        console.warn('Already downloaded video will be skipped');
+                        logWarn('Already downloaded video will be skipped');
                         continue;
                     }
 
@@ -479,7 +495,7 @@ router.post('/import', async (req, res) => {
                     try {
                         downloaded = (await fs.stat(path.join(files[i].path, videoFileName))).birthtime.getTime(); // Should default to ctime on OSs that do not support birthtime
                     } catch (err) {
-                        console.error('Unable to get downloaded date from file');
+                        logError('Unable to get downloaded date from file');
                         throw err;
                     }
 
@@ -503,7 +519,7 @@ router.post('/import', async (req, res) => {
                     // Move/copy files
                     for (let i = 0; i < relatedFiles.length; i++) {
                         let inputFile = path.join(relatedFiles[i].path, relatedFiles[i].name);
-                        console.log(`${copy ? 'Copying' : 'Moving'} file: ${inputFile}`)
+                        logLine(`${copy ? 'Copying' : 'Moving'} file: ${inputFile}`)
                         try {
                             let outputFile = path.join(outputPath, relatedFiles[i].name);
                             if (copy) {
@@ -512,12 +528,12 @@ router.post('/import', async (req, res) => {
                                 await fs.move(inputFile, outputFile);
                             }
                         } catch (err) {
-                            console.error(`Failed to ${copy ? 'copy' : 'move'} file`);
+                            logError(`Failed to ${copy ? 'copy' : 'move'} file`);
                             throw err;
                         }
                     }
 
-                    console.log('Adding video to the database');
+                    logLine('Adding video to the database');
                     // On non-Windows platforms npm incorrectly escapes the "$" character which can appear in the filename so node is used here instead
                     let execArguments = [
                         '--job-id',
@@ -538,13 +554,13 @@ router.post('/import', async (req, res) => {
                         execArguments.unshift('--require');
                     }
                     const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
-                    execProcess.stdout.on('data', (data) => console.log(data.toString()));
-                    execProcess.stderr.on('data', (data) => console.log(data.toString()));
+                    execProcess.stdout.on('data', (data) => logStdout(data));
+                    execProcess.stderr.on('data', (data) => logStdout(data));
                     const exitCode = await new Promise((resolve, reject) => execProcess.on('close', resolve));
 
                     if (exitCode !== 0) {
                         let err = `Exec exited with status code ${exitCode}`;
-                        console.error(err);
+                        logError(err);
                         throw new Error(err);
                     }
 
@@ -555,7 +571,7 @@ router.post('/import', async (req, res) => {
                         );
                     }
                     catch (err) {
-                        console.error('Failed to append to archive.txt');
+                        logError('Failed to append to archive.txt');
                         throw err;
                     }
                     addedVideoCount++;
@@ -563,21 +579,21 @@ router.post('/import', async (req, res) => {
                     await fs.appendFile(importErrorFile, `${infojsonFile}\r\n${err.toString()}\r\n\r\n`);
                     failed++;
                     if (!continueOnFailed) {
-                        console.log('Stopping importing because of an error');
+                        logError('Stopping importing because of an error');
                         break;
                     }
                 }
             }
         }
 
-        console.log(`Imported ${addedVideoCount.toLocaleString()} videos (${alreadyAddedVideoCount.toLocaleString()} already downloaded, ${failed} failed)`);
-        if (failed > 0) console.log('Check import_errors.txt');
+        logLine(`Imported ${addedVideoCount.toLocaleString()} videos (${alreadyAddedVideoCount.toLocaleString()} already downloaded, ${failed} failed)`);
+        if (failed > 0) logLine('Check import_errors.txt');
 
         importing = false;
     } catch (err) {
         importing = false;
         if (!sentResponse) return res.status(500).json({ error: 'Failed to start import' });
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
     }
 });
 
@@ -619,7 +635,7 @@ const verifyFileHash = async (file, directory) => {
         } else {
             await logHashResult('FAILED TO TEST', filename);
         }
-        if (parsedEnv.VERBOSE) console.error(err);
+        if (parsedEnv.VERBOSE) logError(err);
     }
 
     return 0;
@@ -627,7 +643,7 @@ const verifyFileHash = async (file, directory) => {
 
 const logHashResult = async (result, filename) => {
     const message = `${result}\t\t${filename}`;
-    console.log(message);
+    logLine(message);
     await fs.appendFile(verifiedHashesFile, message + '\r\n');
 }
 
