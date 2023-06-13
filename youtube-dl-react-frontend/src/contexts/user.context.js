@@ -1,5 +1,6 @@
 import React, { createContext, Component } from 'react';
 import AuthService from '../services/auth.service';
+import axios from '../utilities/axios.utility';
 
 export const UserContext = createContext();
 
@@ -10,6 +11,16 @@ class Context extends Component {
             this.setState({ user });
         }
     };
+
+    componentDidMount() {
+        axios.get('/api/users/settings')
+            .then(res => {
+                this.setState(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
 
     render() {
         return (

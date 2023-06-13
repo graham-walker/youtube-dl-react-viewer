@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { parsedEnv } from '../parse-env.js';
 import { logError } from '../utilities/logger.utility.js';
 
+import { settingsFields } from './user.route.js';
+
 import User from '../models/user.model.js';
 
 const router = express.Router();
@@ -30,10 +32,7 @@ router.post('/login', async (req, res) => {
 
     let user;
     try {
-        user = await User.findOne(
-            { username },
-            'username password isSuperuser resumeVideos enableSponsorblock enableAutoplay reportBytesUsingIec useCircularAvatars avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic'
-        );
+        user = await User.findOne({ username }, 'username password isSuperuser ' + settingsFields);
     } catch (err) {
         return res.sendStatus(500);
     }

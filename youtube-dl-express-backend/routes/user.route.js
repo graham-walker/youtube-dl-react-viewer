@@ -13,13 +13,12 @@ import Activity from '../models/activity.model.js';
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
 
+export const settingsFields = 'resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout';
+
 router.get('/settings', async (req, res) => {
     let user;
     try {
-        user = await User.findOne(
-            { _id: req.userId },
-            '-_id username resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout'
-        );
+        user = await User.findOne({ _id: req.userId }, '-_id username isSuperuser ' + settingsFields);
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -31,8 +30,7 @@ router.get('/settings', async (req, res) => {
 router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     let user;
     try {
-        user = await User.findOne({ _id: req.userId },
-            'username password isSuperuser resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout');
+        user = await User.findOne({ _id: req.userId }, 'username password isSuperuser ' + settingsFields);
     } catch (err) {
         return res.sendStatus(500);
     }
