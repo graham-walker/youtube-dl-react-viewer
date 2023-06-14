@@ -13,6 +13,7 @@ import Uploader from '../models/uploader.model.js';
 import Video from '../models/video.model.js';
 import Playlist from '../models/playlist.model.js';
 import Statistic from '../models/statistic.model.js';
+import Version from '../models/version.model.js';
 
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
@@ -595,6 +596,24 @@ router.post('/import', async (req, res) => {
         importing = false;
         if (!sentResponse) return res.status(500).json({ error: 'Failed to start import' });
         if (parsedEnv.VERBOSE) logError(err);
+    }
+});
+
+router.post('/statistics/recalculate', async (req, res) => {
+    try {
+        let version = await Version.findOne({ accessKey: 'version' });
+        if (!version) version = await new Version().save();
+
+        const cancel = req.query?.cancel === 'true';
+
+        version.recalculateOnRestart = !cancel;
+
+        await version.save();
+
+        return res.json({ success: cancel ? 'Canceled' : 'Statistics will be recalculated the next time the web app is restarted. During that time the web app will not be accessible' });
+    } catch (err) {
+        if (parsedEnv.VERBOSE) logError(err);
+        return res.sendStatus(500);
     }
 });
 

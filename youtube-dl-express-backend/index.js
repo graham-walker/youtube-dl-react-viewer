@@ -25,7 +25,7 @@ import User from './models/user.model.js';
 import { parsedEnv } from './parse-env.js';
 import { logLine, logError } from './utilities/logger.utility.js';
 
-import applyUpdates from './utilities/update.utility.js';
+import { applyUpdates, recalculateStatistics } from './utilities/update.utility.js';
 
 (async () => {
     // Connect to the database
@@ -37,6 +37,7 @@ import applyUpdates from './utilities/update.utility.js';
 
     // Apply updates when the version number changes
     await applyUpdates();
+    await recalculateStatistics();
 
     // Create the express server
     const app = express();

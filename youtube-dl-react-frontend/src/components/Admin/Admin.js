@@ -13,6 +13,7 @@ import LogFileList from './LogFileList/LogFileList';
 import RetryImports from './RetryImports/RetryImports';
 import JobEditor from './JobEditor/JobEditor';
 import VideoImporter from './VideoImporter/VideoImporter';
+import RecalcStatistics from './RecalcStatistics/RecalcStatistics';
 
 export default class AdminPage extends Component {
     static contextType = UserContext;
@@ -78,6 +79,7 @@ export default class AdminPage extends Component {
                         <VideoDeleter extractors={this.state.extractors} />
                         <ChannelIconDownloader />
                         <HashVerifier />
+                        <RecalcStatistics />
                         <RetryImports errors={this.state.errors} />
                     </div>
                 }
