@@ -662,7 +662,7 @@ let debug;
         playlistUploader: infojsonData.playlist_uploader,
         playlistUploaderId: infojsonData.playlist_uploader_id,
         playlistUploaderUrl: infojsonData.playlist_uploader_url,
-        playlistDescription: infojsonData.playlist_description,
+        playlistDescription: infojsonData.playlist_description || ytdlpPlaylistDescription,
         hashtags: hashtags,
         likeDislikeRatio: likeDislikeRatio,
         directory: slash(path.relative(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos'), videoDirectory)),
