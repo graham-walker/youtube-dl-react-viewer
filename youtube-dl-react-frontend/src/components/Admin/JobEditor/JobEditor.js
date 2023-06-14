@@ -211,7 +211,6 @@ class JobForm extends Component {
                             name="urls"
                             value={this.state.urls}
                             onChange={this.handleInputChange}
-                            required
                         />
                     </Form.Group>
                     <Accordion>
