@@ -98,11 +98,10 @@ export default class TagsList extends Component {
 
     render() {
         const display = this.state.display.map((tag, i) =>
-            <div className="w-auto p-0">
+            <div className="w-auto p-0" key={i}>
                 <h5>
                     <Link
                         to={createSearchLink(tag.name)}
-                        key={i}
                     >
                         <Badge
                             bg="secondary"
@@ -152,7 +151,7 @@ export default class TagsList extends Component {
                                                                 name="show"
                                                                 onChange={this.handleInputChange}
                                                                 value={this.state.show}
-                                                                inline
+                                                                inline="true"
                                                             >
                                                                 <option value="tags">Tags</option>
                                                                 <option value="categories">Categories</option>
@@ -168,7 +167,7 @@ export default class TagsList extends Component {
                                                                 name="sort"
                                                                 onChange={this.handleInputChange}
                                                                 value={this.state['sort']}
-                                                                inline
+                                                                inline="true"
                                                             >
                                                                 <option value="count">Count</option>
                                                                 <option value="alphabetical">Alphabetical</option>

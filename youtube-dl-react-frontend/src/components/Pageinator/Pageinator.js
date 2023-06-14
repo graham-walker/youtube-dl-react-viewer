@@ -24,18 +24,18 @@ export default class Paginator extends Component {
         }
 
         items.push(
-            <LinkContainer to={`/${this.props.baseUrl}/1`}>
+            <LinkContainer key="first" to={`/${this.props.baseUrl}/1`}>
                 <Pagination.First disabled={page === 1} className="pagination-text" />
             </LinkContainer>
         );
         items.push(
-            <LinkContainer to={`/${this.props.baseUrl}/${page - 1}`}>
+            <LinkContainer key="prev" to={`/${this.props.baseUrl}/${page - 1}`}>
                 <Pagination.Prev disabled={page === 1} className="pagination-text" />
             </LinkContainer>
         );
         for (let i = start; i <= end; i++) {
             items.push(
-                <LinkContainer to={`/${this.props.baseUrl}/${i}`}>
+                <LinkContainer key={i} to={`/${this.props.baseUrl}/${i}`}>
                     <Pagination.Item active={i === page} style={{ width: '36px !important' }} key={i}>
                         {i}
                     </Pagination.Item>
@@ -43,12 +43,12 @@ export default class Paginator extends Component {
             );
         }
         items.push(
-            <LinkContainer to={`/${this.props.baseUrl}/${page + 1}`}>
+            <LinkContainer key="next" to={`/${this.props.baseUrl}/${page + 1}`}>
                 <Pagination.Next disabled={page === this.props.maxPages} className="pagination-text" />
             </LinkContainer>
         );
         items.push(
-            <LinkContainer to={`/${this.props.baseUrl}/${this.props.maxPages}`}>
+            <LinkContainer key="last" to={`/${this.props.baseUrl}/${this.props.maxPages}`}>
                 <Pagination.Last disabled={page === this.props.maxPages} className="pagination-text" />
             </LinkContainer>
         );

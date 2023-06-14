@@ -36,7 +36,6 @@
 - Subtitle support
 - Autoplay & looping
 - .MKV playback in the browser with type spoofing
-- Native Flash video playback
 - Open video streams directly in VLC
 - Automatic playlist creation
 - Similar video recommendations
@@ -82,9 +81,9 @@
 2. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation)
 
 3. [Install the latest versions of FFmpeg and FFprobe](https://ffmpeg.org/download.html)
-4. [Install Node.js >=16.14.2 and npm >=9.2.0](https://nodejs.org/en/download/current/)
+4. [Install Node.js 18.16.0 and npm 9.2.0](https://nodejs.org/en/download/current/)
 
-5. [Install MongoDB >=6.0.0](https://www.mongodb.com/try/download/community)
+5. [Install MongoDB 6.0.0](https://www.mongodb.com/try/download/community)
 
 6. [Download the source code of the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip to the location of your choosing
@@ -132,7 +131,7 @@ JWT_TOKEN_SECRET                    Secret key to sign the JSON Web Token. If
 MONGOOSE_URL                        Database connection URL. If the database
                                     does not exist it will be created
                                     (url, default:
-                                    mongodb://localhost:27017/youtubeDlDB)
+                                    mongodb://127.0.0.1:27017/youtubeDlDB)
 
 BACKEND_PORT                        Port used by the web app
                                     (0-65535, default: 5000)
@@ -286,6 +285,15 @@ Continue on failed                  Continue importing videos if a single video
 Override ext                        Sometimes the video file extension cannot
                                     be determined by the importer. If you know
                                     the extension you can set it here
+```
+
+If the web app was installed using Docker you will need to copy your existing downloads into the Docker Volume before they can be imported.
+
+```
+docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl/TEMP
+
+# Import this folder
+/youtube-dl/TEMP
 ```
 
 ## Issues & Limitations

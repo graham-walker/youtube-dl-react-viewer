@@ -1,7 +1,7 @@
 const expected = {
     'MONGOOSE_URL': {
         type: String,
-        default: 'mongodb://localhost:27017/youtubeDlDB',
+        default: 'mongodb://127.0.0.1:27017/youtubeDlDB',
     },
     'BACKEND_PORT': {
         type: Number,

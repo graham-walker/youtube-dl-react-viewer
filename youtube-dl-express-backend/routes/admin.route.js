@@ -167,6 +167,7 @@ router.post('/youtube-dl/update', async (req, res) => {
             try {
                 let output = execSync(parsedEnv.YOUTUBE_DL_UPDATE_COMMAND);
                 updating = false;
+                logStdout(output);
                 return res.json({ success: output.toString() });
             } catch (err) {
                 if (parsedEnv.VERBOSE) logError(err.toString());

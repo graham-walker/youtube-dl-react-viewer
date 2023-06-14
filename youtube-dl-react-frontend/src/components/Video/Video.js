@@ -13,7 +13,6 @@ import history from '../../utilities/history.utility';
 import { createSearchLink } from '../../utilities/search.utility';
 import ISO6391 from 'iso-639-1';
 import videojs from 'video.js';
-import 'videojs-flash';
 import axios from '../../utilities/axios.utility';
 import { CommentsLoader } from './Comments/Comments';
 
@@ -142,7 +141,7 @@ export default class VideoPage extends Component {
                                 fluid: true,
                                 autoplay: true,
                                 playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
-                                techOrder: ['html5', 'flash'],
+                                techOrder: ['html5'],
                             }, () => {
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
@@ -334,13 +333,16 @@ export default class VideoPage extends Component {
     }
 
     saveActivity() {
-        if (this.context.user?.recordWatchHistory && this.player) {
+        if (this.context.user?.recordWatchHistory && this.state.activityDocument && this.player) {
             let stopTime = this.player.currentTime();
             axios
                 .post(`/api/activity/record`, {
                     eventType: 'watched',
                     activityDocument: this.state.activityDocument,
                     stopTime,
+                })
+                .catch(err => {
+                    console.error(err);
                 });
         }
     }

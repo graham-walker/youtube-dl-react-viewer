@@ -1,8 +1,8 @@
-FROM node:15-alpine3.12
+FROM node:18.16.0-alpine3.18
 USER 0
 
 # Fetch packages required for building, as well as ffmpeg and python3 pip
-RUN apk add --no-cache make build-base python2 ffmpeg py3-pip attr
+RUN apk add --no-cache make build-base python3 ffmpeg py3-pip attr
 
 # Copy source code into the docker daemon
 WORKDIR /opt/youtube-dl-react-viewer
@@ -17,13 +17,13 @@ RUN npm install --unsafe-perm
 RUN cp .env.sample .env && npm run build
 
 # Remove packages used for building
-RUN apk del make build-base python2
+RUN apk del make build-base
 
 # Change workdir to the backend folder
 WORKDIR /opt/youtube-dl-react-viewer/youtube-dl-express-backend
 
-# Change the default database hostname from localhost to 'db'
-RUN sed -i 's/localhost:27017/db:27017/g' .env.sample
+# Change the default database hostname from '127.0.0.1' to 'db'
+RUN sed -i 's/127.0.0.1:27017/db:27017/g' .env.sample
 
 # Create the entrypoint shell script. This will read the .env.sample file, check if the user has specified these in the environment, write to a .env file, and spawn the backend
 RUN echo '#!/bin/sh' >> docker-entrypoint.sh && \

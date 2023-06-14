@@ -2,7 +2,7 @@ version: "2.4"
 services:
 
     db:
-        image: mongo:4-bionic
+        image: mongo:6.0-jammy
         restart: unless-stopped
         mem_limit: 512m
         networks:
@@ -15,7 +15,6 @@ services:
         image: graham-walker/youtube-dl-react-viewer:1.3.0
         restart: unless-stopped
         mem_limit: 512m
-        #user: "1000"
         networks:
             - ytrv_net
         ports:
