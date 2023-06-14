@@ -262,8 +262,11 @@ class JobForm extends Component {
     }
 }
 
-const defaultArguments = `# Sign in to websites:
+const defaultArguments = `# Replace with your cookie file to sign in to websites
 #--cookies "/Path/To/cookies.txt"
+
+# Uncomment this line to prevent yt-dlp from downloading playlist metafiles every time
+#--no-write-playlist-metafiles
 
 # These options will BREAK the script, do not set them:
 #--batch-file
