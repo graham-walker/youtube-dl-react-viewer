@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs-extra';
+
 const expected = {
     'MONGOOSE_URL': {
         type: String,
@@ -148,11 +151,13 @@ try {
     }
 
     // Additional validation
+    env.OUTPUT_DIRECTORY = path.resolve(env.OUTPUT_DIRECTORY);
     if (env.OUTPUT_DIRECTORY.endsWith('/')
         || env.OUTPUT_DIRECTORY.endsWith('\\')
     ) {
-        env.OUTPUT_DIRECTORY = env.OUTPUT_DIRECTORY.slice(0, -1);
+        env.OUTPUT_DIRECTORY.slice(0, -1);
     }
+    fs.ensureDirSync(env.OUTPUT_DIRECTORY);
 } catch (err) {
     console.error(err);
     process.exit(1);
