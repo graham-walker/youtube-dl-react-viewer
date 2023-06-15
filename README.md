@@ -60,6 +60,7 @@
     - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'`
     - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
     - If installing yt-dlp set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
+    - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
     - Other [environment variables](#environment-variables) can be set at this time
 
 5. Build the image and start the container `sudo docker-compose up -d`
@@ -85,7 +86,7 @@
 
 5. [Install MongoDB 6.0.0](https://www.mongodb.com/try/download/community)
 
-6. [Download the source code of the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
+6. [Download the Source code (zip) for the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip to the location of your choosing
     - Set the [environment variables](#environment-variables) by editing `.env`
         - Rename `.sample.env` to `.env` in `./youtube-dl-express-backend` (you may need to enable view hidden files and folders)
@@ -93,17 +94,16 @@
         - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
         - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'`
         - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recomended. Value cannot be `'secret'`
+        - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
         - On Windows make sure `FFMPEG_PATH` is set to `C:/Path/To/ffmpeg.exe` instead of `ffmpeg`. PATH cannot be used
         - On Windows either set `YOUTUBE_DL_PATH` to `C:/Path/To/yt-dlp.exe` or add `yt-dlp` to PATH.
         - On Linux if you installed yt-dlp from a package manager set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
-    - Install additional dependencies `sudo sh install.sh` (on Windows run `install.bat` as administrator) 
+    - Install additional dependencies `sudo sh install.sh` (on Windows run `install.bat` as administrator)
     - Start the web app `sudo sh start-server.sh` (on Windows run `start-server.bat`)
     - Access the web app in the browser `http://localhost:5000`
-        - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux)
-        - If this does not work check your firewall settings
-    - (Optional) Start the web app using PM2 to auto restart the server if it crashes `sudo pm2 start ./youtube-dl-express-backend/pm2.config.json`
-        - View the console output `sudo pm2 logs youtube-dl-react-viewer`
-        - Stop the web app `sudo pm2 stop youtube-dl-react-viewer`
+        - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking node
+    - View the console output `sudo pm2 logs youtube-dl-react-viewer`
+    - Stop the web app `sudo pm2 stop youtube-dl-react-viewer`
 
 ### Open URLs in VLC
 To open videos in VLC from the browser you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
@@ -135,6 +135,10 @@ MONGOOSE_URL                        Database connection URL. If the database
 
 BACKEND_PORT                        Port used by the web app
                                     (0-65535, default: 5000)
+
+SECURE_COOKIES                      Only serve cookies over HTTPS. Enable if
+                                    not running locally
+                                    (true|false, default: false)
 
 YOUTUBE_DL_PATH                     Path to yt-dlp/youtube-dl. Forks should
                                     work as drop in replacements
@@ -287,7 +291,7 @@ Override ext                        Sometimes the video file extension cannot
                                     the extension you can set it here
 ```
 
-If the web app was installed using Docker you will need to copy your existing downloads into the Docker Volume before they can be imported.
+If the web app was installed using Docker you will need to copy your existing downloads into the Docker volume before they can be imported.
 
 ```
 docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl/TEMP
@@ -335,7 +339,10 @@ There are two main types of errors that can occur when downloading videos:
     You can attempt to reimport videos from the failed to import section of the admin panel. This will likely still fail until a version of the web app that fixes the issue is released. Report import errors [here](https://github.com/graham-walker/youtube-dl-react-viewer/issues).
 
 ## FAQ
+**Q:** How do I sign in to websites that require a login?
 
+**A:** In job settings open advanced options and add this line to override config `--cookies "/Path/To/cookies.txt"`
+#
 **Q:** Can I update youtube-dl from the web app?
 
 **A:** You can update youtube-dl from the youtube-dl section of the admin panel.
