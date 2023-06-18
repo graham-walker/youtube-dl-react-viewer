@@ -11,6 +11,7 @@ import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import axios from '../../utilities/axios.utility';
 import AccordionButton from '../AccordionButton/AccordionButton';
+import parsedEnv from '../../parse-env';
 
 export default class VideoList extends Component {
     static contextType = UserContext;
@@ -42,8 +43,8 @@ export default class VideoList extends Component {
         ) {
             let parsed = queryString.parse(this.props.location.search);
             document.title = parsed.search
-                ? `${parsed.search} - ${window.documentTitle}`
-                : window.documentTitle;
+                ? `${parsed.search} - ${parsedEnv.REACT_APP_BRAND}`
+                : parsedEnv.REACT_APP_BRAND;
         }
 
         if (prevProps.location.search !== this.props.location.search) {

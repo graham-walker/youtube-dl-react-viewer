@@ -9,6 +9,7 @@ import {
 } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
+import parsedEnv from '../../parse-env';
 
 export default class Job extends Component {
     static contextType = UserContext;
@@ -31,7 +32,7 @@ export default class Job extends Component {
                         loading: false,
                         job: res.data.job,
                     }, () => {
-                        document.title = `${this.state.job.name} - ${window.documentTitle}`;
+                        document.title = `${this.state.job.name} - ${parsedEnv.REACT_APP_BRAND}`;
                     });
                 }
             }).catch(err => {

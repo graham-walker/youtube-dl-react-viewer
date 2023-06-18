@@ -23,6 +23,7 @@ import UserContext from './contexts/user.context';
 import UploaderList from './components/UploaderList/UploaderList';
 import history from './utilities/history.utility';
 import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause } from '@fortawesome/free-solid-svg-icons';
+import parsedEnv from './parse-env';
 
 library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause);
 
@@ -131,7 +132,7 @@ function App() {
 							path="/global"
 							exact
 							render={() =>
-								<Page clamp="350px" title={window.documentTitle}>
+								<Page clamp="350px" title={parsedEnv.REACT_APP_BRAND}>
 									<GlobalPasswordForm />
 								</Page>
 							}

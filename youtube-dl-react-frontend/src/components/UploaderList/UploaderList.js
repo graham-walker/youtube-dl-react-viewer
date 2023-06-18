@@ -7,6 +7,7 @@ import { UserContext } from '../../contexts/user.context';
 import { bytesToSizeString, dateToTimeSinceString } from '../../utilities/format.utility';
 import axios from '../../utilities/axios.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
+import parsedEnv from '../../parse-env';
 
 export default class UploaderList extends Component {
     static contextType = UserContext;
@@ -24,7 +25,7 @@ export default class UploaderList extends Component {
     }
 
     componentDidMount() {
-        document.title = `Uploaders - ${window.documentTitle}`;
+        document.title = `Uploaders - ${parsedEnv.REACT_APP_BRAND}`;
         this.getUploaders();
     }
 

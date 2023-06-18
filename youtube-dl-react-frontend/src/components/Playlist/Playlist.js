@@ -11,6 +11,7 @@ import {
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
 import Description from '../Video/Description/Description';
+import parsedEnv from '../../parse-env';
 
 export default class Playlist extends Component {
     static contextType = UserContext;
@@ -33,7 +34,7 @@ export default class Playlist extends Component {
                         loading: false,
                         playlist: res.data.playlist,
                     });
-                    document.title = `${res.data.playlist.name} - ${window.documentTitle}`;
+                    document.title = `${res.data.playlist.name} - ${parsedEnv.REACT_APP_BRAND}`;
                 }
             }).catch(err => {
                 this.setState({ error: err });

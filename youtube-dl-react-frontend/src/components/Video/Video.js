@@ -15,6 +15,7 @@ import ISO6391 from 'iso-639-1';
 import videojs from 'video.js';
 import axios from '../../utilities/axios.utility';
 import { CommentsLoader } from './Comments/Comments';
+import parsedEnv from '../../parse-env';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -125,7 +126,7 @@ export default class VideoPage extends Component {
                         resumeTime: res.data.resumeTime,
                         activityDocument: res.data.activityDocument,
                     }, () => {
-                        document.title = `${res.data.video.title} - ${window.documentTitle}`;
+                        document.title = `${res.data.video.title} - ${parsedEnv.REACT_APP_BRAND}`;
 
                         if ('mediaSession' in navigator && 'MediaMetadata' in window) {
                             navigator.mediaSession.metadata = new window.MediaMetadata({

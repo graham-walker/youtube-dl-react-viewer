@@ -13,6 +13,7 @@ import {
 } from '../../utilities/format.utility';
 import { Pie } from 'react-chartjs-2';
 import axios from '../../utilities/axios.utility';
+import parsedEnv from '../../parse-env';
 
 export default class StatisticsPage extends Component {
     static contextType = UserContext;
@@ -27,7 +28,7 @@ export default class StatisticsPage extends Component {
     }
 
     componentDidMount() {
-        document.title = `Statistics - ${window.documentTitle}`;
+        document.title = `Statistics - ${parsedEnv.REACT_APP_BRAND}`;
 
         axios
             .get('/api/statistics')

@@ -7,6 +7,7 @@ import Description from '../Description/Description';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import { Spinner } from 'react-bootstrap';
+import parsedEnv from '../../../parse-env';
 
 const CommentsLoader = memo(function CommentsLoader(props) {
     const [loading, setLoading] = useState(true);
@@ -104,7 +105,7 @@ const Comment = props => {
             <Image
                 width={48}
                 height={48}
-                src={process.env.REACT_APP_LOAD_EXTERNAL_THUMBNAILS.toLowerCase() === 'true' ? comment.author_thumbnail : '/default-avatar.svg'}
+                src={parsedEnv.REACT_APP_LOAD_EXTERNAL_THUMBNAILS ? comment.author_thumbnail : '/default-avatar.svg'}
                 onError={(e) => { defaultImage(e, 'avatar') }}
                 roundedCircle={userContext.user?.useCircularAvatars ?? true}
             />

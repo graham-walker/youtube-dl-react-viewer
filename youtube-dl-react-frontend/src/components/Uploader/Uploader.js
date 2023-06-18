@@ -13,6 +13,7 @@ import {
 } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
+import parsedEnv from '../../parse-env';
 
 export default class UploaderPage extends Component {
     static contextType = UserContext;
@@ -35,7 +36,7 @@ export default class UploaderPage extends Component {
                         loading: false,
                         uploader: res.data.uploader,
                     });
-                    document.title = `${res.data.uploader.name} - ${window.documentTitle}`;
+                    document.title = `${res.data.uploader.name} - ${parsedEnv.REACT_APP_BRAND}`;
                 }
             }).catch(err => {
                 this.setState({ error: err });

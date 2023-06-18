@@ -9,6 +9,7 @@ import history from '../../utilities/history.utility';
 import queryString from 'query-string';
 import { defaultImage } from '../../utilities/image.utility';
 import ThemeController from '../ThemeController/ThemeController';
+import parsedEnv from '../../parse-env';
 
 class AppNavbar extends Component {
     static contextType = UserContext;
@@ -192,7 +193,7 @@ class AppNavbar extends Component {
                                     </>
                                 }
                                 <ThemeController onThemeChange={(theme) => { this.setState({ theme }) }} />
-                                {process.env.REACT_APP_SHOW_VERSION_TAG !== 'false' && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.scriptVersion}</Badge></small>}
+                                {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.scriptVersion}</Badge></small>}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
@@ -207,18 +208,21 @@ class AppNavbar extends Component {
 const NavbarBrandContent = props => {
     return (
         <>
-            <Image
-                width={36}
-                height={36}
-                className="brand-image"
-                src={
-                    props.theme === 'light'
-                        ? (process.env.REACT_APP_LIGHT_THEME_LOGO || '/logo.svg')
-                        : ((process.env.REACT_APP_DARK_THEME_LOGO || '/logo.svg'))
-                }
-                onError={(e) => { e.target.src = '/logo-navbar-light.png'; }}
-            />
-            {process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND : 'youtube-dl Viewer'}
+            {
+                ((props.theme === 'light' && parsedEnv.REACT_APP_LIGHT_THEME_LOGO) || (props.theme === 'dark' && parsedEnv.REACT_APP_DARK_THEME_LOGO)) &&
+                <Image
+                    width={36}
+                    height={36}
+                    className="brand-image"
+                    src={
+                        props.theme === 'light'
+                            ? parsedEnv.REACT_APP_LIGHT_THEME_LOGO
+                            : parsedEnv.REACT_APP_DARK_THEME_LOGO
+                    }
+                    onError={(e) => { e.target.src = '/logo.svg'; }}
+                />
+            }
+            {parsedEnv.REACT_APP_BRAND}
         </>
     );
 }

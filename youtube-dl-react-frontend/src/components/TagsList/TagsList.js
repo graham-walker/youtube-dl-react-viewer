@@ -9,6 +9,7 @@ import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import AccordionButton from '../AccordionButton/AccordionButton';
+import parsedEnv from '../../parse-env';
 
 export default class TagsList extends Component {
     constructor(props) {
@@ -29,7 +30,7 @@ export default class TagsList extends Component {
     }
 
     componentDidMount() {
-        document.title = `${this.state.show.charAt(0).toUpperCase() + this.state.show.slice(1)} - ${window.documentTitle}`;
+        document.title = `${this.state.show.charAt(0).toUpperCase() + this.state.show.slice(1)} - ${parsedEnv.REACT_APP_BRAND}`;
 
         let parsed = queryString.parse(this.props.location.search);
         parsed = this.queryStringDefaults(parsed);

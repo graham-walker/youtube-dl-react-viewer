@@ -7,6 +7,7 @@ import Page from '../Page/Page';
 import { getErrorMessage } from '../../utilities/format.utility';
 import axios from '../../utilities/axios.utility';
 import { defaultImage } from '../../utilities/image.utility';
+import parsedEnv from '../../parse-env';
 
 export default class SettingsPage extends Component {
     static contextType = UserContext;
@@ -22,7 +23,7 @@ export default class SettingsPage extends Component {
     }
 
     componentDidMount() {
-        document.title = `Settings - ${window.documentTitle}`;
+        document.title = `Settings - ${parsedEnv.REACT_APP_BRAND}`;
 
         axios
             .get('/api/users/settings').then(res => {

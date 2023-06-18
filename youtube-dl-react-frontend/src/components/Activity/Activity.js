@@ -6,6 +6,7 @@ import { UserContext } from '../../contexts/user.context';
 import { defaultImage } from '../../utilities/image.utility';
 import VideoPreview from '../VideoPreview/VideoPreview';
 import axios from '../../utilities/axios.utility';
+import parsedEnv from '../../parse-env';
 
 export default class ActivityPage extends Component {
     static contextType = UserContext;
@@ -24,7 +25,7 @@ export default class ActivityPage extends Component {
     }
 
     componentDidMount() {
-        document.title = `History - ${window.documentTitle}`;
+        document.title = `History - ${parsedEnv.REACT_APP_BRAND}`;
         this.getActivity();
     }
 

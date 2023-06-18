@@ -14,6 +14,7 @@ import RetryImports from './RetryImports/RetryImports';
 import JobEditor from './JobEditor/JobEditor';
 import VideoImporter from './VideoImporter/VideoImporter';
 import RecalcStatistics from './RecalcStatistics/RecalcStatistics';
+import parsedEnv from '../../parse-env';
 
 export default class AdminPage extends Component {
     static contextType = UserContext;
@@ -35,7 +36,7 @@ export default class AdminPage extends Component {
     }
 
     componentDidMount() {
-        document.title = `Admin - ${window.documentTitle}`;
+        document.title = `Admin - ${parsedEnv.REACT_APP_BRAND}`;
 
         axios
             .get('/api/admin').then(res => {
@@ -66,11 +67,7 @@ export default class AdminPage extends Component {
                         style={{ maxWidth: '1200px' }}
                     >
                         <h1 className="mb-4">Admin</h1>
-                        {
-                            !!process.env?.REACT_APP_CHECK_FOR_UPDATES
-                            && process.env.REACT_APP_CHECK_FOR_UPDATES.toLowerCase() === 'true'
-                            && <UpdateChecker />
-                        }
+                        {parsedEnv.REACT_APP_CHECK_FOR_UPDATES && <UpdateChecker />}
                         <LogFileList adminFiles={this.state.adminFiles} consoleOutput={this.state.consoleOutput} />
                         <YtdlUpdater youtubeDlPath={this.state.youtubeDlPath} />
                         <JobDownloader jobs={this.state.jobs} />

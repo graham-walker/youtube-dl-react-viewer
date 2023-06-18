@@ -1,3 +1,5 @@
+import parsedEnv from "../parse-env";
+
 /**
  * Converts a date object into a string that represents the time since the date in the largest possible unit.
  * @param  {Date}   date Date object
@@ -133,7 +135,7 @@ export const getErrorMessage = (err, defaultMessage = 'Unknown error') => {
 
 export const getWarningColor = (job, prefix = '') => {
     if (!job.lastCompleted) return '';
-    const depth = process.env?.REACT_APP_OUT_OF_DATE_COLOR_DAYS ?? 30;
+    const depth = parsedEnv.REACT_APP_OUT_OF_DATE_COLOR_DAYS;
     const daysSince = depth - Math.min(Math.round(Math.abs((new Date(job.lastCompleted) - new Date()) / 145440000)), depth);
     const percent = daysSince / depth;
     if (percent === 0) return prefix + 'text-danger';

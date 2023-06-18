@@ -4,9 +4,9 @@ import './index.scss';
 import '../node_modules/videojs-hotkeys/videojs.hotkeys.min.js';
 import '../node_modules/video.js/dist/video-js.min.css'
 import App from './App';
+import parsedEnv from './parse-env';
 
-window.documentTitle = process.env.REACT_APP_BRAND;
-document.title = window.documentTitle;
+document.title = parsedEnv.REACT_APP_BRAND;
 window.gitHubLink = 'https://github.com/graham-walker/youtube-dl-react-viewer';
 window.githubApiLink = 'https://api.github.com/repos/graham-walker/youtube-dl-react-viewer/releases/latest';
 window.gitHubLatestReleaseLink = 'https://github.com/graham-walker/youtube-dl-react-viewer/releases/latest';
