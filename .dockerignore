@@ -1,4 +1,7 @@
 TODO.txt
+TODO.odt
+.~lock.TODO.odt#
+CHECKS.txt
 
 #releases
 /releases
@@ -26,3 +29,4 @@ TODO.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+debug.log*
