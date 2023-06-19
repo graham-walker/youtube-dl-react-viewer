@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 cd .\youtube-dl-react-frontend
 call npm install
 call npm run build

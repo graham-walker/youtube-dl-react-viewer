@@ -1,3 +1,4 @@
+cd -P -- "$(dirname -- "$0")"
 cd ./youtube-dl-react-frontend
 npm install --unsafe-perm
 npm run build
