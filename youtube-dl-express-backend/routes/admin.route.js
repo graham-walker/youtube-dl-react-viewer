@@ -86,7 +86,7 @@ router.post('/jobs/save/new', async (req, res) => {
 
 router.post('/jobs/save/:jobId', async (req, res) => {
     const [busy, reason] = isBusy(['deleting', 'importing', 'downloading'], req.params.jobId);
-    if (busy) return res.status(500).json({ error: 'Cannot save job while' + reason });
+    if (busy) return res.status(500).json({ error: 'Cannot save job while ' + reason });
 
     let job;
     try {
@@ -107,7 +107,7 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 
 router.post('/jobs/download/', async (req, res) => {
     const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'importing'], req.params.jobId);
-    if (busy) return res.status(500).json({ error: 'Cannot start download while' + reason });
+    if (busy) return res.status(500).json({ error: 'Cannot start download while ' + reason });
 
     if (!Array.isArray(req.body)
         || req.body.length === 0
