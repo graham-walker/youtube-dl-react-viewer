@@ -186,6 +186,17 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <Form.Group className="mb-3" controlId="fitThumbnails">
+                        <Form.Check
+                            custom
+                            checked={this.state.fitThumbnails}
+                            type="checkbox"
+                            name="fitThumbnails"
+                            label="Crop thumbnails to 16:9"
+                            id="fitThumbnails"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="useCircularAvatars">
                         <Form.Check
                             custom

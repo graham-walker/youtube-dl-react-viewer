@@ -41,11 +41,11 @@ const VideoPreview = props => {
 
         const videoImage = <>
             <div
-                className="video-thumbnail bg-light"
-                style={{ width: props.width }}
+                className="video-thumbnail bg-light force-16-9" // Default thumbnail always 16:9
+                style={{ width: props.width, borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
             >
                 <Image
-                    style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
+                    style={{ filter: props.watched ? 'brightness(75%)' : 'none' }}
                     src="/default-thumbnail.svg"
                     onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
                 />
@@ -166,11 +166,11 @@ const VideoPreview = props => {
 
         const videoImage = <>
             <div
-                className="video-thumbnail bg-light"
-                style={{ width: props.width }}
+                className={`video-thumbnail bg-light${(userContext.user?.fitThumbnails ?? true) ? ' force-16-9' : ''}`}
+                style={{ width: props.width, borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
             >
                 <Image
-                    style={{ filter: props.watched ? 'brightness(75%)' : 'none', borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
+                    style={{ filter: props.watched ? 'brightness(75%)' : 'none' }}
                     src={getImage(video, 'thumbnail', props.small ? 'small' : 'medium')}
                     onLoad={(e) => e.target.parentElement.style.setProperty('background-color', 'transparent', 'important')}
                     onError={(e) => defaultImage(e, 'thumbnail')}

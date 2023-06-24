@@ -90,4 +90,9 @@
         width: auto;
         height: 100%;
     }
+
+    &.force-16-9 img {
+        width: 100%;
+        object-fit: cover;
+    }
 }
