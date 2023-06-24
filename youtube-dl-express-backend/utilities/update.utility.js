@@ -63,12 +63,12 @@ const applyUpdates = async () => {
             if (video.uploader || video.uploaderId || video.channelId) {
                 uploader = await Uploader.findOne({
                     extractor: video.extractor,
-                    id: video.channelId || video.uploaderId || video.uploader,
+                    id: video.uploaderId || video.channelId || video.uploader,
                 });
                 if (!uploader) {
                     uploader = await new Uploader({
                         extractor: video.extractor,
-                        id: video.channelId || video.uploaderId || video.uploader,
+                        id: video.uploaderId || video.channelId || video.uploader,
                         name: video.uploader || video.uploaderId || video.channelId,
                         url: video.uploaderUrl,
                     }).save();
@@ -214,12 +214,12 @@ const recalculateStatistics = async () => {
             if (video.uploader || video.uploaderId || video.channelId) {
                 uploader = await Uploader.findOne({
                     extractor: video.extractor,
-                    id: video.channelId || video.uploaderId || video.uploader,
+                    id: video.uploaderId || video.channelId || video.uploader,
                 });
                 if (!uploader) {
                     uploader = await new Uploader({
                         extractor: video.extractor,
-                        id: video.channelId || video.uploaderId || video.uploader,
+                        id: video.uploaderId || video.channelId || video.uploader,
                         name: video.uploader || video.uploaderId || video.channelId,
                         url: video.uploaderUrl,
                     }).save();

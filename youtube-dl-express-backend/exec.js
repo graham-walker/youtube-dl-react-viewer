@@ -482,7 +482,7 @@ let debug;
         try {
             uploader = await Uploader.findOne({
                 extractor: infojsonData.extractor,
-                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
+                id: infojsonData.uploader_id || infojsonData.channel_id || infojsonData.uploader,
             });
             if (uploader) {
                 uploader.name = infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id;
@@ -491,7 +491,7 @@ let debug;
             }
             if (!uploader) uploader = await new Uploader({
                 extractor: infojsonData.extractor,
-                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
+                id: infojsonData.uploader_id || infojsonData.channel_id  || infojsonData.uploader,
                 name: infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id,
                 url: infojsonData.uploader_url,
             }).save();
