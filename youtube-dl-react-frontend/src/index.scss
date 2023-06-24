@@ -7,17 +7,20 @@ $grid-breakpoints: (
     md: 768px,
     lg: 992px,
     xl: 1200px,
-    xxl: 1440px,
-    xxxl: 1660px,
+    xxl: 1400px,
+    xxxl: 1600px,
+    xxxxl: 1800px,
 );
 
+// Container widths should be at least 30px less than the breakpoint, divisible by 12, and divisible by 10
 $container-max-widths: (
     sm: 540px,
     md: 720px,
     lg: 960px,
     xl: 1140px,
-    xxl: 1380px,
+    xxl: 1320px,
     xxxl: 1560px,
+    xxxxl: 1740px,
 );
 
 $dark: #000; // Make dark OLED dark
