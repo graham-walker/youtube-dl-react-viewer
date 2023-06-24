@@ -397,7 +397,6 @@ router.post('/delete', async (req, res) => {
                         const uploader = await Uploader.findById(video.uploaderDocument, null, { session });
                         if (uploader) {
                             uploader.statistics = await decrementStatistics(video, uploader, session);
-                            logLine(uploader.statistics.totalVideoCount);
                             if (uploader.statistics.totalVideoCount <= 0) {
                                 await uploader.deleteOne();
                             } else {
