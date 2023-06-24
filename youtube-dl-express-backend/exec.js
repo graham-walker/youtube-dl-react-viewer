@@ -234,7 +234,7 @@ let debug;
             path.join(videoDirectory, basename + '.' + ext + '.' + extensionFromUrl(infojsonData.thumbnail))
         );
     }
-    if (infojsonData.hasOwnProperty('thumbnails')) {
+    if (infojsonData.hasOwnProperty('thumbnails') && Array.isArray(infojsonData.thumbnails)) {
         for (let i = 0; i < infojsonData.thumbnails.length; i++) {
             if (infojsonData.thumbnails[i].hasOwnProperty('id')
                 && infojsonData.thumbnails[i].hasOwnProperty('url')
@@ -285,8 +285,8 @@ let debug;
 
     let thumbnailFiles = [];
     let totalThumbnailFilesize = 0;
-    let largestThumbnailData;
-    let largestThumbnailFilesize = 0;
+    let bestThumbnailData;
+    let bestThumbnailFilesize = 0;
     for (let i = 0; i < potentialThumbnailFiles.length; i++) {
         const [thumbnailData, thumbnailFilesize, thumbnailMd5] = getFileData(potentialThumbnailFiles[i], false, null);
 
@@ -297,12 +297,31 @@ let debug;
 
             files = files.filter(file => file !== path.basename(potentialThumbnailFiles[i]));
 
-            // Choose the thumbnail to be used creating the resized thumbnails
-            if (thumbnailFilesize >= largestThumbnailFilesize) {
-                largestThumbnailData = thumbnailData;
-                largestThumbnailFilesize = thumbnailFilesize;
+            // Get best thumbnail based on filesize
+            if (thumbnailFilesize >= bestThumbnailFilesize) {
+                bestThumbnailData = thumbnailData;
+                bestThumbnailFilesize = thumbnailFilesize;
             }
         }
+    }
+
+    // Get best thumbnail using preference score
+    let preference = -999999;
+    let preferenceThumbnailFile;
+    if (infojsonData.hasOwnProperty('thumbnails') && Array.isArray(infojsonData.thumbnails)) {
+        for (let thumbnail of infojsonData.thumbnails) {
+            if (thumbnail.hasOwnProperty('id') && thumbnail.hasOwnProperty('url') && thumbnail.hasOwnProperty('preference') && typeof thumbnail.preference === 'number') {
+                const thumbnailExt = extensionFromUrl(thumbnail.url);
+                const potentialThumbnailFile = path.join(videoDirectory, basename + '.' + thumbnail.id + '.' + thumbnailExt);
+                if (thumbnail.preference > preference && fs.existsSync(potentialThumbnailFile)) {
+                    preference = thumbnail.preference;
+                    preferenceThumbnailFile = potentialThumbnailFile;
+                }
+            }
+        }
+    }
+    if (preferenceThumbnailFile) {
+        [bestThumbnailData, bestThumbnailFilesize] = getFileData(preferenceThumbnailFile, true, null);
     }
 
     // Create the resized thumbnail files
@@ -325,7 +344,7 @@ let debug;
     let smallResizedThumbnailWidth;
     let smallResizedThumbnailHeight;
 
-    if (largestThumbnailData) {
+    if (bestThumbnailData) {
         console.log('Creating resized thumbnails...');
         fs.ensureDirSync(resizedThumbnailsDirectory);
         [
@@ -333,13 +352,13 @@ let debug;
             mediumResizedThumbnailMd5,
             mediumResizedThumbnailWidth,
             mediumResizedThumbnailHeight
-        ] = await generateThumbnailFile(largestThumbnailData, 720, 405, mediumResizedThumbnailFile, infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
+        ] = await generateThumbnailFile(bestThumbnailData, 720, 405, mediumResizedThumbnailFile, infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
         [
             smallResizedThumbnailFilesize,
             smallResizedThumbnailMd5,
             smallResizedThumbnailWidth,
             smallResizedThumbnailHeight
-        ] = await generateThumbnailFile(largestThumbnailData, 168, 95, smallResizedThumbnailFile ,infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
+        ] = await generateThumbnailFile(bestThumbnailData, 168, 95, smallResizedThumbnailFile ,infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
     }
 
     // Index the subtitle file(s) (if they exist)
@@ -689,14 +708,14 @@ let debug;
             md5: annotationsMd5,
         } : undefined,
         thumbnailFiles: thumbnailFiles,
-        mediumResizedThumbnailFile: largestThumbnailData !== undefined ? {
+        mediumResizedThumbnailFile: bestThumbnailData !== undefined ? {
             name: path.basename(mediumResizedThumbnailFile),
             filesize: mediumResizedThumbnailFilesize,
             md5: mediumResizedThumbnailMd5,
             width: mediumResizedThumbnailWidth,
             height: mediumResizedThumbnailHeight,
         } : undefined,
-        smallResizedThumbnailFile: largestThumbnailData !== undefined ? {
+        smallResizedThumbnailFile: bestThumbnailData !== undefined ? {
             name: path.basename(smallResizedThumbnailFile),
             filesize: smallResizedThumbnailFilesize,
             md5: smallResizedThumbnailMd5,
