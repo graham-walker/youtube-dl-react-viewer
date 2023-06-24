@@ -333,13 +333,13 @@ let debug;
             mediumResizedThumbnailMd5,
             mediumResizedThumbnailWidth,
             mediumResizedThumbnailHeight
-        ] = await generateThumbnailFile(largestThumbnailData, 720, 405, mediumResizedThumbnailFile);
+        ] = await generateThumbnailFile(largestThumbnailData, 720, 405, mediumResizedThumbnailFile, infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
         [
             smallResizedThumbnailFilesize,
             smallResizedThumbnailMd5,
             smallResizedThumbnailWidth,
             smallResizedThumbnailHeight
-        ] = await generateThumbnailFile(largestThumbnailData, 168, 95, smallResizedThumbnailFile);
+        ] = await generateThumbnailFile(largestThumbnailData, 168, 95, smallResizedThumbnailFile ,infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
     }
 
     // Index the subtitle file(s) (if they exist)
@@ -890,10 +890,10 @@ const extensionFromUrl = (url) => {
     return 'jpg';
 }
 
-const generateThumbnailFile = async (sourceData, width, height, filepath) => {
+const generateThumbnailFile = async (sourceData, width, height, filepath, fit = 'inside') => {
     try {
         const data = await sharp(sourceData)
-            .resize({ width: width, height: height, fit: sharp.fit.inside })
+            .resize({ width: width, height: height, fit: sharp.fit[fit] })
             .jpeg({ quality: parsedEnv.THUMBNAIL_QUALITY, chromaSubsampling: parsedEnv.THUMBNAIL_CHROMA_SUBSAMPLING })
             .toBuffer();
         const filesize = data.length;
