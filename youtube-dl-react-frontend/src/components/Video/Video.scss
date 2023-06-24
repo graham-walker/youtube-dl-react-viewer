@@ -1,7 +1,11 @@
 @media screen and (min-width: 1200px) {
     .recommendations-column {
-        max-width: 400px;
+        width: 400px;
     }
+}
+
+[data-vjs-player="true"] {
+    margin: 0 auto;
 }
 
 .vjs-poster {

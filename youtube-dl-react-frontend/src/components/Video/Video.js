@@ -47,6 +47,7 @@ export default class VideoPage extends Component {
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
+        this.playerRef = React.createRef();
     }
 
     componentDidMount() {
@@ -54,6 +55,8 @@ export default class VideoPage extends Component {
         this.interval = setInterval(() => {
             if (this.player && !this.player.paused()) this.saveActivity();
         }, 10000);
+        this.handleResize = this.handleResize.bind(this);
+        window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
@@ -61,6 +64,25 @@ export default class VideoPage extends Component {
         if (this.player) this.player.dispose();
         clearInterval(this.interval);
         if ('mediaSession' in navigator && 'MediaMetadata' in window) navigator.mediaSession.metadata = null;
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    handleResize() {
+        if (this.playerRef.current && this.state.video.height && this.state.video.width) {
+            let newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - (window.innerWidth < 1200 ? 24 : 424); // Change width if sidebar visible
+            let newHeight = (this.state.video.height / this.state.video.width) * newWidth;
+
+            // if (window.innerWidth > 1200) { // Only cap height on desktop view
+            const maxHeight = window.innerHeight * 0.7;
+            if (newHeight > maxHeight) {
+                newWidth = (maxHeight / newHeight) * newWidth;
+                newHeight = maxHeight;
+            }
+            // }
+
+            this.playerRef.current.style.width = newWidth + 'px';
+            this.playerRef.current.style.height = newHeight + 'px';
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -126,6 +148,7 @@ export default class VideoPage extends Component {
                         resumeTime: res.data.resumeTime,
                         activityDocument: res.data.activityDocument,
                     }, () => {
+                        this.handleResize();
                         document.title = `${res.data.video.title} - ${parsedEnv.REACT_APP_BRAND}`;
 
                         if ('mediaSession' in navigator && 'MediaMetadata' in window) {
@@ -139,7 +162,7 @@ export default class VideoPage extends Component {
 
                         if (!this.player) {
                             this.player = videojs(this.videoRef.current, {
-                                fluid: true,
+                                fluid: (this.state.video.width && this.state.video.height) ? undefined : true,
                                 autoplay: true,
                                 playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
                                 techOrder: ['html5'],
@@ -371,7 +394,7 @@ export default class VideoPage extends Component {
                 {!this.state.loading && <>
                     <Row>
                         <Col className={`keep-controls-open-${this.state.keepControlsOpen}`}>
-                            <div data-vjs-player>
+                            <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"
                                     onClick={() => {
