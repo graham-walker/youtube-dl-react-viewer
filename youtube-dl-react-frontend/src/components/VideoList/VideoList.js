@@ -204,7 +204,7 @@ export default class VideoList extends Component {
                         <Row
                             className={
                                 (this.context.user?.useLargeLayout === undefined || this.context.user?.useLargeLayout)
-                                ? 'row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1'
+                                ? 'row-cols-xxxxl-5 row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1'
                                 : 'row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1'
                             }
                             style={{
