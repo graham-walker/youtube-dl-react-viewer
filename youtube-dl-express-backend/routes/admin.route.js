@@ -219,6 +219,7 @@ router.post('/download_uploader_icons', async (req, res) => {
 
             let uploaderName;
             try {
+                if (!uploader.url) continue;
                 uploaderName = uploader.url.split('/').pop();
                 if (uploader.extractor === 'youtube' && uploaderName.startsWith('@')) uploaderName = uploaderName.substring(1);
 
