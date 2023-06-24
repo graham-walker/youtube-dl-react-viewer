@@ -267,7 +267,7 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('error', function (e) {
-                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The default format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload. Firefox generally works.'
+                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.'
                                 });
 
                                 this.player.on('userinactive', function () {
@@ -763,7 +763,7 @@ export default class VideoPage extends Component {
                                                     delay={{ show: 250, hide: 400 }}
                                                     overlay={
                                                         <Tooltip>
-                                                            Spoof the content type of .MKV files to attempt to play them in the browser. Works on some browsers (Firefox)
+                                                            Spoof the content type of .MKV files to attempt to play them. If this does not work try a different browser
                                                         </Tooltip>
                                                     }
                                                 >
