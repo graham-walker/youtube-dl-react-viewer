@@ -57,11 +57,11 @@
 
 4. Set the environment variables by editing `docker-compose.yaml`
     - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
-    - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'`
+    - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
     - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
-    - If installing yt-dlp set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
+    - Set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
     - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-    - Other [environment variables](#environment-variables) can be set at this time
+    - Other [environment variables](#environment-variables) can optionally be set
 
 5. Build the image and start the container `sudo docker-compose up -d`
 
@@ -77,31 +77,30 @@
 
 ### Manual Installation
 
-1. [Install Python 3.7+](https://www.python.org/downloads/) (skip step on Windows)
+1. [Install Python 3.7+](https://www.python.org/downloads/) (this step can be skipped on Windows)
 
-2. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation)
+2. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation) and add `yt-dlp` to PATH
 
-3. [Install the latest versions of FFmpeg and FFprobe](https://ffmpeg.org/download.html)
+3. [Install the latest versions of FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
 4. [Install Node.js 18.16.0 and npm 9.2.0](https://nodejs.org/en/download/current/)
 
 5. [Install MongoDB 6.0.0](https://www.mongodb.com/try/download/community)
 
 6. [Download the Source code (zip) for the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip to the location of your choosing
-    - Set the [environment variables](#environment-variables) by editing `.env`
-        - Rename `.sample.env` to `.env` in `./youtube-dl-express-backend` (you may need to enable view hidden files and folders)
-        - Set `OUTPUT_DIRECTORY` to the location you want to save downloads
+    - Set the environment variables by renaming `.sample.env` to `.env` in `./youtube-dl-express-backend` and editing `.env` (you may need to enable view hidden files and folders)
+        - Set `OUTPUT_DIRECTORY` to the location you want to save downloads. Set to an empty directory
         - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
-        - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'`
+        - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
         - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recomended. Value cannot be `'secret'`
         - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-        - On Windows make sure `FFMPEG_PATH` is set to `C:/Path/To/ffmpeg.exe` instead of `ffmpeg`. PATH cannot be used
-        - On Windows either set `YOUTUBE_DL_PATH` to `C:/Path/To/yt-dlp.exe` or add `yt-dlp` to PATH.
-        - On Linux if you installed yt-dlp from a package manager set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
+        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH does not work correctly on Windows
+        - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
+        - Other [environment variables](#environment-variables) can optionally be set
     - Install additional dependencies `sudo sh install.sh` (on Windows run `install.bat` as administrator)
     - Start the web app `sudo sh start-server.sh` (on Windows run `start-server.bat`)
     - Access the web app in the browser `http://localhost:5000`
-        - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking node
+        - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking Node.js
     - View the console output `sudo pm2 logs youtube-dl-react-viewer`
     - Stop the web app `sudo pm2 stop youtube-dl-react-viewer`
 
@@ -119,8 +118,10 @@ SUPERUSER_USERNAME                  Superuser username. The superuser is
                                     (string < 50, default: admin)
 
 SUPERUSER_PASSWORD                  Superuser password. If the value is
-                                    `password` the app will not start
-                                    (string !== password, default: password)
+                                    `password` or less than 8 characters the 
+                                    app will not start
+                                    (string > 8 && !== password, default:
+                                    password)
 
 JWT_TOKEN_SECRET                    Secret key to sign the JSON Web Token. If
                                     the value is `secret` the app will not
@@ -307,8 +308,7 @@ docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl
 
 - **Browser Playback:**
     <br>
-    The default format code used when downloading videos is based on [TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts](https://github.com/TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts).
-    This format code requires saving videos as `.mkv` files to ensure a successful merge. This can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload. Firefox generally works.
+    The default format code used when downloading videos is based on [TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts](https://github.com/TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts). The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.
 - **Xattrs:**
     <br>
     Windows does not support xattrs. Videos downloaded on Windows will not have xattrs added to them.
@@ -387,6 +387,8 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [x] Verify the integrity of video file hashes
 - [x] SponsorBlock Implementation
 - [x] Display video chapters in the player
+
+**Future release:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
