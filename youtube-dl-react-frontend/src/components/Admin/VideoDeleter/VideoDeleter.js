@@ -3,6 +3,7 @@ import { Form, Button, Card, Alert, OverlayTrigger, Tooltip } from 'react-bootst
 import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class VideoDeleter extends Component {
     static contextType = UserContext;
@@ -44,6 +45,8 @@ class VideoDeleter extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#delete-videos-anchor');
                 });
         });
     }
@@ -57,7 +60,7 @@ class VideoDeleter extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">Delete videos</h5>
+                <h5 id="delete-videos-anchor" className="mb-4">Delete videos</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}

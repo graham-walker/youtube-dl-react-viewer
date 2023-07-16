@@ -3,6 +3,7 @@ import { Button, Card, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 const LogFileList = (props) => {
 
@@ -21,6 +22,7 @@ const LogFileList = (props) => {
                 setAdminFiles(res.data.adminFiles);
                 setConsoleOutput(res.data.consoleOutput);
                 if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
+                scrollToElement('#logs-anchor');
             }).catch(err => {
                 alert(getErrorMessage(err));
             });
@@ -28,7 +30,7 @@ const LogFileList = (props) => {
 
     return (
         <>
-            <h5 className="mb-4">Logs</h5>
+            <h5 id="logs-anchor" className="mb-4">Logs</h5>
             <Card className="mb-4">
                 <Card.Body>
                     {adminFiles && adminFiles.length > 0 && adminFiles.map((file, i) => {

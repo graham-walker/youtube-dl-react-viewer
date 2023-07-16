@@ -3,6 +3,7 @@ import { Button, Card, Alert } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class HashVerifier extends Component {
     static contextType = UserContext;
@@ -27,6 +28,8 @@ class HashVerifier extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#file-integrity-anchor');
                 });
         });
     }
@@ -34,7 +37,7 @@ class HashVerifier extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">File integrity</h5>
+                <h5 id="file-integrity-anchor" className="mb-4">File integrity</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}

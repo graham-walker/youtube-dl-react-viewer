@@ -3,6 +3,7 @@ import { Button, Card, Alert } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class YtdlUpdater extends Component {
     static contextType = UserContext;
@@ -33,6 +34,8 @@ class YtdlUpdater extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#youtube-dl-anchor');
                 });
         });
     }
@@ -40,7 +43,7 @@ class YtdlUpdater extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">youtube-dl</h5>
+                <h5 className="mb-4" id="youtube-dl-anchor">youtube-dl</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}

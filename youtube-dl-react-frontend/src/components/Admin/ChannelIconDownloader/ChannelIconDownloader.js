@@ -3,6 +3,7 @@ import { Button, Card, Alert } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class ChannelIconDownloader extends Component {
     static contextType = UserContext;
@@ -28,6 +29,8 @@ class ChannelIconDownloader extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#uploader-icons-anchor');
                 });
         });
     }
@@ -35,7 +38,7 @@ class ChannelIconDownloader extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">Uploader icons</h5>
+                <h5 id="uploader-icons-anchor" className="mb-4">Uploader icons</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}

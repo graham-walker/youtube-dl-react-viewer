@@ -4,6 +4,7 @@ import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class VideoImporter extends Component {
     static contextType = UserContext;
@@ -43,6 +44,8 @@ class VideoImporter extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#import-videos-anchor');
                 });
         });
     }
@@ -56,7 +59,7 @@ class VideoImporter extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">Import videos</h5>
+                <h5 id="import-videos-anchor" className="mb-4">Import videos</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can import</Alert>}

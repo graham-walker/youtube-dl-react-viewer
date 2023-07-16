@@ -5,6 +5,7 @@ import { getErrorMessage, getWarningColor } from '../../../utilities/format.util
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 const JobEditor = (props) => {
 
@@ -23,7 +24,7 @@ const JobEditor = (props) => {
 
     return (
         <>
-            <h5 className="mb-4">Jobs</h5>
+            <h5 id="jobs-anchor" className="mb-4">Jobs</h5>
             <Card className="mb-4">
                 <Tab.Container defaultActiveKey={props.defaultActivejobId || 'new'}>
                     <Card.Header>
@@ -149,6 +150,8 @@ class JobForm extends Component {
                     }
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#jobs-anchor');
                 });
         })
     }

@@ -3,6 +3,7 @@ import { Form, Button, Alert, Card } from 'react-bootstrap';
 import { getErrorMessage, getWarningColor } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 class JobDownloader extends Component {
     static contextType = UserContext;
@@ -31,6 +32,7 @@ class JobDownloader extends Component {
         let formAction = e.target.name;
         this.setState({ success: undefined, error: undefined }, () => {
             if (formAction === 'download' && this.state.selected.length === 0) {
+                scrollToElement('#download-anchor');
                 return this.setState({ error: 'Select one or more jobs' });
             }
 
@@ -47,6 +49,8 @@ class JobDownloader extends Component {
                     });
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#download-anchor');
                 });
         });
     }
@@ -54,7 +58,7 @@ class JobDownloader extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4">Download</h5>
+                <h5 id="download-anchor" className="mb-4">Download</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can download</Alert>}

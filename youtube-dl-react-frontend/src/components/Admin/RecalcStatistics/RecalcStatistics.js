@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Card, Alert } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import axios from '../../../utilities/axios.utility';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 const RecalcStatistics = (props) => {
     const [success, setSuccess] = useState(undefined);
@@ -16,12 +17,14 @@ const RecalcStatistics = (props) => {
                 setError(res.data.error);
             }).catch(err => {
                 setError(getErrorMessage(err));
+            }).finally(() => {
+                scrollToElement('#recalculate-statistics-anchor');
             });
     }
 
     return (
         <>
-            <h5 className="mb-4">Recalculate statistics</h5>
+            <h5 id="recalculate-statistics-anchor" className="mb-4">Recalculate statistics</h5>
             <Card className="mb-4">
                 <Card.Body>
                     {!!success && <Alert variant="success">{success}</Alert>}
