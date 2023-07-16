@@ -75,6 +75,7 @@ export default class Downloader {
             if (process.platform === 'win32') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);
             if (job.isAudioOnly) jobArguments.push('--extract-audio');
             if (job.downloadComments) jobArguments.push('--write-comments');
+            if (!job.isAudioOnly && job.recodeVideo) jobArguments.push('--recode-video', 'mp4');
             jobArguments = parsedArguments.concat(jobArguments);
             jobArguments = jobArguments.concat(parsedUrls);
 

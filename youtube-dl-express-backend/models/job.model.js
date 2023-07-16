@@ -12,6 +12,7 @@ const jobSchema = new mongoose.Schema({
     lastCompleted: { type: Date, default: null },
     statistics: { type: statisticSchema, default: () => ({}) },
     downloadComments: { type: Boolean, default: false },
+    recodeVideo: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

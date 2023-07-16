@@ -38,7 +38,7 @@ const applyUpdates = async () => {
         await Tag.syncIndexes({});
 
         // Reset job statistics
-        await Job.updateMany({}, { $set: { statistics: { default: () => ({}) }, downloadComments: false } });
+        await Job.updateMany({}, { $set: { statistics: { default: () => ({}) }, downloadComments: false, recodeVideo: false } });
 
         // Reset global statistics
         await Statistic.deleteMany({});

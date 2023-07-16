@@ -73,6 +73,7 @@ router.post('/jobs/save/new', async (req, res) => {
             formatCode: req.body.formatCode,
             isAudioOnly: req.body.isAudioOnly,
             downloadComments: req.body.downloadComments,
+            recodeVideo: req.body.recodeVideo,
             urls: req.body.urls,
             arguments: req.body.arguments,
             overrideUploader: req.body.overrideUploader,
@@ -95,6 +96,7 @@ router.post('/jobs/save/:jobId', async (req, res) => {
         job.formatCode = req.body.formatCode;
         job.isAudioOnly = req.body.isAudioOnly;
         job.downloadComments = req.body.downloadComments;
+        job.recodeVideo = req.body.recodeVideo;
         job.urls = req.body.urls;
         job.arguments = req.body.arguments;
         job.overrideUploader = req.body.overrideUploader;
