@@ -537,7 +537,8 @@ export default class VideoPage extends Component {
                                             <MiniStatisticColumn
                                                 title="FPS"
                                                 icon="tachometer-alt"
-                                                statistic={video.fps}
+                                                statistic={isNaN(parseFloat(video.fps, 10)) ? video.fps : parseFloat(video.fps, 10).toFixed(2)}
+                                                detailedStatistic={video.fps}
                                             />
                                         }
                                         {!!video.videoFile.filesize &&
