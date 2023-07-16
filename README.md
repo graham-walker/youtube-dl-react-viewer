@@ -400,8 +400,6 @@ Planned features in no particular order. There is no timeline or guarantee featu
 
 ## License/Credits
 
-- The default format codes in `./youtube-dl-react-frontend/src/components/Admin/Admin.js` are based on [TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts](https://github.com/TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts) created by [TheFrenchGhosty](https://github.com/TheFrenchGhosty), [GNU GENERAL PUBLIC LICENSE
-Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 - The function `doProbeSync()` in `./youtube-dl-express-backend/exec.js` is based on [node-ffprobe](https://github.com/ListenerApproved/node-ffprobe#readme), [MIT](https://opensource.org/licenses/MIT)
 - Created with [facebook/create-react-app](https://github.com/facebook/create-react-app), [MIT](https://opensource.org/licenses/MIT)
 - Permission to mirror the videos in the live demo obtained from [Public Domain Films](https://www.youtube.com/channel/UCm0SxTO3_kulT6SE0AAeHOw)
