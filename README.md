@@ -246,6 +246,9 @@ To download videos from the web app you must be signed in with the superuser acc
 
     Download comments               Should comments be downloaded. Only works
                                     if using yt-dlp
+    
+    Recode video                    Convert downloaded videos to mp4 to
+                                    increase browser playback compatibility
 
     URLs                            URLs that will be downloaded by the job.
                                     URLs can be individual videos, channels, 
