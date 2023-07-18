@@ -328,7 +328,7 @@ const defaultArguments = `# Replace with your cookie file to sign in to websites
 #--sleep-requests 1
 #--datebefore "$(date --date="30 days ago" +%Y%m%d)"
 `;
-const defaultFormatCode = '(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/best';
-const defaultFormatCodeAudioOnly = '(bestaudio[acodec^=aac]/bestaudio)/best';
+const defaultFormatCode = 'bestvideo*+bestaudio/best';
+const defaultFormatCodeAudioOnly = 'bestaudio/best';
 
 export default JobEditor;

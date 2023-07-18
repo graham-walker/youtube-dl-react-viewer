@@ -305,13 +305,14 @@ docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl
 ```
 
 ## Issues & Limitations
+- **Browser Playback:**
+    <br>
+    By default the format code `bestvideo*+bestaudio/best` is used. This can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.
+
+    To create videos with better browser playback compatability, try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` or enable recode video in job settings.
 - **Playlists:**
     <br>
     youtube-dl only downloads playlist metadata if a video was downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video, it will not appear in the playlist in the web app. To mitigate this, download videos that appear in playlists before downloading individual videos.
-
-- **Browser Playback:**
-    <br>
-    The default format code used when downloading videos is based on [TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts](https://github.com/TheFrenchGhosty/TheFrenchGhostys-YouTube-DL-Archivist-Scripts). The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.
 - **Xattrs:**
     <br>
     Windows does not support xattrs. Videos downloaded on Windows will not have xattrs added to them.
