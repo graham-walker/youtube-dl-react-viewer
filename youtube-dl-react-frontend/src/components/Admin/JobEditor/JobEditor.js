@@ -93,7 +93,7 @@ class JobForm extends Component {
             formatCode: defaultFormatCode,
             isAudioOnly: false,
             downloadComments: false,
-            recodeVideo: true,
+            recodeVideo: false,
             urls: '',
             arguments: defaultArguments,
             overrideUploader: '',
