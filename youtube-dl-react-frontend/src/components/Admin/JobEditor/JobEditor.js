@@ -301,14 +301,13 @@ const defaultArguments = `# Replace with your cookie file to sign in to websites
 #--compat-options youtube-dl
 
 # These options are not required, but are used by default:
-#--write-all-thumbnails can be replaced with --write-thumbnail
+#--write-thumbnail can be replaced with --write-all-thumbnails
 #--all-subs can be replaced with --write-sub or --write-auto-sub
 #--merge-output-format can cause downloads to fail depending on the format code used
 --write-description
 --write-annotations
---write-all-thumbnails
+--write-thumbnail
 --all-subs
---merge-output-format mkv
 --add-metadata
 --xattrs
 --xattr-set-filesize
