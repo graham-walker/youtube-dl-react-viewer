@@ -211,7 +211,7 @@ class JobForm extends Component {
                             checked={this.state.recodeVideo}
                             type="checkbox"
                             name="recodeVideo"
-                            label="Recode video if necessary to improve browser playback compatability (may reduce quality)"
+                            label="Recode video to mp4 to improve browser playback compatibility (may reduce quality)"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
