@@ -391,13 +391,14 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [x] Verify the integrity of video file hashes
 - [x] SponsorBlock Implementation
 - [x] Display video chapters in the player
+- [x] Chat replay (YouTube only)
 
 **Future release:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
 - [ ] Refetch metadata for downloaded videos
-- [ ] Livestream chat replay
+- [ ] Twitch chat replay
 
 ## License/Credits
 

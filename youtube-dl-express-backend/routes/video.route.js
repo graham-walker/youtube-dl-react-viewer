@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import slash from 'slash';
 import axios from 'axios';
+import fs from 'fs-extra';
 
 import Video from '../models/video.model.js';
 import Activity from '../models/activity.model.js';
@@ -192,6 +193,99 @@ router.get('/:extractor/:id/comments', async (req, res) => {
         )?.toJSON();
 
         res.json({ comments: video.comments });
+    } catch (err) {
+        if (parsedEnv.VERBOSE) logError(err);
+        return res.sendStatus(500);
+    }
+});
+
+router.get('/:extractor/:id/livechat', async (req, res) => {
+    try {
+        const extractor = req.params.extractor;
+        let video = (await Video.findOne({ extractor, id: req.params.id }, '-_id directory subtitleFiles').exec()
+        )?.toJSON();
+
+        switch (extractor) {
+            case 'youtube':
+                for (let subtitleFile of video.subtitleFiles) {
+                    if (subtitleFile.language === 'live_chat') {
+                        let comments = (await fs.readFile(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, subtitleFile.name)))
+                            .toString()
+                            .replaceAll('\r\n', '\n')
+                            .split('\n')
+                            .filter(comment => !!comment)
+                            .map(comment => {
+                                let parsed;
+                                try {
+                                    parsed = JSON.parse(comment);
+                                } catch(err) {
+                                    return null;
+                                }
+
+                                let message = '';
+                                try {
+                                    let runs = parsed.replayChatItemAction.actions[0].addChatItemAction.item.liveChatTextMessageRenderer.message.runs;
+                                    for (let run of runs) {
+                                        if (run.hasOwnProperty('text')) {
+                                            message += run.text;
+                                        } else if (run.hasOwnProperty('emoji')) {
+                                            if (run.emoji.isCustomEmoji) {
+                                                message += run.emoji.shortcuts[0];
+                                            } else {
+                                                message += run.emoji.emojiId;
+                                            }
+                                        }
+                                    }
+                                    if (!message) throw new Error('Empty message');
+                                } catch (err) { message = null; }
+
+                                let name = '';
+                                try {
+                                    name = parsed.replayChatItemAction.actions[0].addChatItemAction.item.liveChatTextMessageRenderer.authorName.simpleText;
+                                    if (!name) throw new Error('Unknown user');
+                                } catch (err) { name = 'Unknown user'; }
+
+                                let photo = null;
+                                try {
+                                    photo = parsed.replayChatItemAction.actions[0].addChatItemAction.item.liveChatTextMessageRenderer.authorPhoto.thumbnails.pop().url;
+                                    if (!photo) throw new Error('Unknown photo');
+                                } catch (err) { photo = null; }
+
+                                let offsetMs = null;
+                                try {
+                                    offsetMs = parseInt(parsed.replayChatItemAction.videoOffsetTimeMsec, 10);
+                                    if (isNaN(offsetMs) || (!offsetMs && offsetMs !== 0)) throw new Error('Invalid time');
+                                } catch (err) { offsetMs = null; }
+
+                                let date = null;
+                                try {
+                                    let timestamp = parseInt(parsed.replayChatItemAction.actions[0].addChatItemAction.item.liveChatTextMessageRenderer.timestampUsec, 10);
+                                    if (isNaN(timestamp) || (!timestamp && timestamp !== 0)) throw new Error('Invalid timestamp');
+                                    date = new Date(timestamp / 1000);
+                                } catch (err) { date = null; }
+
+                                if (message && offsetMs !== null) {
+                                    return {
+                                        name,
+                                        photo,
+                                        offset: offsetMs / 1000,
+                                        date,
+                                        message,
+                                    };
+                                }
+                                return null;
+                            })
+                            .filter(comment => !!comment);
+                        if (!comments || comments.length === 0) return res.sendStatus(404);
+                        return res.json({ comments });
+                    }
+                }
+                break;
+            // case 'twitch': // Twitch rechat extraction is currently broken
+            //     break;
+            default:
+                return res.sendStatus(404);
+        }
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
         return res.sendStatus(500);

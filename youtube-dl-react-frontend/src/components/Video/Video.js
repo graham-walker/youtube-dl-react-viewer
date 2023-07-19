@@ -16,6 +16,7 @@ import videojs from 'video.js';
 import axios from '../../utilities/axios.utility';
 import { CommentsLoader } from './Comments/Comments';
 import parsedEnv from '../../parse-env';
+import ChatReplay from './ChatReplay/ChatReplay';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -44,6 +45,7 @@ export default class VideoPage extends Component {
             spoofContentType: localStorage.getItem('spoofContentType') === null ? true : localStorage.getItem('spoofContentType') === 'true',
             keepControlsOpen: localStorage.getItem('keepControlsOpen') || 'never', // never, windowed, fullscreen, always
             redirect: false,
+            playerTime: 0,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -260,6 +262,8 @@ export default class VideoPage extends Component {
                                             console.log('Skipped sponsor');
                                         }
                                     }
+
+                                    this.setState({ playerTime: this.player.currentTime() })
                                 });
 
                                 this.player.on('ended', () => {
@@ -321,12 +325,14 @@ export default class VideoPage extends Component {
         });
 
         for (let subtitle of video.subtitleFiles) {
-            this.player.addRemoteTextTrack({
-                kind: 'subtitles',
-                srclang: subtitle.language,
-                label: ISO6391.getName(subtitle.language) + (subtitle.isAutomatic ? ' (Automatic)' : ''),
-                src: baseSrc + encodeURIComponent(subtitle.name),
-            }, false);
+            if (subtitle.language !== 'live_chat' && subtitle.language !== 'rechat') {
+                this.player.addRemoteTextTrack({
+                    kind: 'subtitles',
+                    srclang: subtitle.language,
+                    label: ISO6391.getName(subtitle.language) + (subtitle.isAutomatic ? ' (Automatic)' : ''),
+                    src: baseSrc + encodeURIComponent(subtitle.name),
+                }, false);
+            }
         }
     }
 
@@ -776,6 +782,7 @@ export default class VideoPage extends Component {
                                             </div>
                                         </Form.Group>
                                     </Form>
+                                    {video.extractor === 'youtube' && video.subtitleFiles.findIndex(subtitle => subtitle.language === 'live_chat' || subtitle.language === 'rechat') !== -1 && <ChatReplay id={video.id} extractor={video.extractor} time={this.state.playerTime} />}
                                     <div className="card mb-3">
                                         <Tab.Container
                                             defaultActiveKey={this.state.activeTab}
