@@ -42,7 +42,7 @@ export default class VideoPage extends Component {
             activityDocument: undefined,
             loop: localStorage.getItem('loop') === null ? false : localStorage.getItem('loop') === 'true',
             autoplay: localStorage.getItem('autoplay') === null ? false : localStorage.getItem('autoplay') === 'true',
-            spoofContentType: localStorage.getItem('spoofContentType') === null ? true : localStorage.getItem('spoofContentType') === 'true',
+            spoofContentType: localStorage.getItem('spoofContentType') === null ? false : localStorage.getItem('spoofContentType') === 'true',
             keepPlayerControlsVisible: localStorage.getItem('keepPlayerControlsVisible') || 'never', // never, windowed, fullscreen, always
             redirect: false,
             playerTime: 0,
