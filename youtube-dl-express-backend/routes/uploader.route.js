@@ -23,7 +23,7 @@ router.get('/page/:page', async (req, res) => {
     try {
         // Uploaders with 0 videos are playlist uploaders. They should not be shown since playlists are not searchable yet
         uploaders = await Uploader
-            .find({ 'statistics.totalVideoCount': { $gt: 0 } }, '-_id extractor id name playlistCreatedCount statistics.totalVideoCount'
+            .find({}, '-_id extractor id name statistics.totalVideoCount'
                 + ' statistics.totalVideoFilesize statistics.newestVideoDateUploaded')
             .collation({ locale: 'en' })
             .sort({ name: 1 })
@@ -32,7 +32,7 @@ router.get('/page/:page', async (req, res) => {
             .lean()
             .exec();
         totalWebsites = (await Uploader.distinct('extractor')).length;
-        totalUploaders = await Uploader.countDocuments({ 'statistics.totalVideoCount': { $gt: 0 } });
+        totalUploaders = await Uploader.countDocuments();
         maxPages = Math.ceil(totalUploaders / perPage);
     } catch (err) {
         return res.sendStatus(500);

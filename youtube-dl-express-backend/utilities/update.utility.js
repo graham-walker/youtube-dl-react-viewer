@@ -63,12 +63,12 @@ const applyUpdates = async () => {
             if (video.uploader || video.uploaderId || video.channelId) {
                 uploader = await Uploader.findOne({
                     extractor: video.extractor,
-                    id: video.uploaderId || video.channelId || video.uploader,
+                    id: video.channelId || video.uploaderId || video.uploader,
                 });
                 if (!uploader) {
                     uploader = await new Uploader({
                         extractor: video.extractor,
-                        id: video.uploaderId || video.channelId || video.uploader,
+                        id: video.channelId || video.uploaderId || video.uploader,
                         name: video.uploader || video.uploaderId || video.channelId,
                         url: video.uploaderUrl,
                     }).save();
@@ -88,30 +88,6 @@ const applyUpdates = async () => {
             // Set uploader document
             video.uploaderDocument = uploader?._id;
 
-            // Recreate playlist uploader
-            let playlistUploader;
-            if (video.playlistUploader || video.playlistUploaderId) {
-                playlistUploader = await Uploader.findOne({
-                    extractor: video.extractor,
-                    id: video.playlistUploaderId || video.playlistUploader,
-                });
-                if (!playlistUploader) {
-                    playlistUploader = await new Uploader({
-                        extractor: video.extractor,
-                        id: video.playlistUploaderId || video.playlistUploader,
-                        name: video.playlistUploader || video.playlistUploaderId,
-                    }).save();
-                }
-
-                // Update playlist uploader name
-                if (video.uploadDate === playlistUploader.statistics.newestVideoDateUploaded) {
-                    playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
-                    await playlistUploader.save();
-                }
-
-                // Video statistics are not counted for playlist uploaders
-            }
-
             // Recreate playlists
             let playlist;
             if (video.playlistTitle || video.playlist || video.playlistId) {
@@ -125,20 +101,15 @@ const applyUpdates = async () => {
                         id: video.playlistId || video.playlist || video.playlistTitle,
                         name: video.playlistTitle || video.playlist || video.playlistId,
                         description: video.playlistDescription,
-                        uploaderDocument: playlistUploader,
+                        uploaderName: video.playlistUploader || video.playlistUploaderId,
                     }).save();
-
-                    // Update the playlist uploader playlists created count
-                    if (playlistUploader) {
-                        playlistUploader.playlistCreatedCount++;
-                        await playlistUploader.save();
-                    }
                 }
 
                 // Update playlist name and description
                 if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
                     playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
                     playlist.description = video.playlistDescription || playlist.description;
+                    playlist.uploaderName = video.playlistUploader || video.playlistUploaderId || playlist.uploaderName;
                     await playlist.save();
                 }
 
@@ -214,12 +185,12 @@ const recalculateStatistics = async () => {
             if (video.uploader || video.uploaderId || video.channelId) {
                 uploader = await Uploader.findOne({
                     extractor: video.extractor,
-                    id: video.uploaderId || video.channelId || video.uploader,
+                    id: video.channelId || video.uploaderId || video.uploader,
                 });
                 if (!uploader) {
                     uploader = await new Uploader({
                         extractor: video.extractor,
-                        id: video.uploaderId || video.channelId || video.uploader,
+                        id: video.channelId || video.uploaderId || video.uploader,
                         name: video.uploader || video.uploaderId || video.channelId,
                         url: video.uploaderUrl,
                     }).save();
@@ -239,30 +210,6 @@ const recalculateStatistics = async () => {
             // Set uploader document
             video.uploaderDocument = uploader?._id;
 
-            // Recreate playlist uploader
-            let playlistUploader;
-            if (video.playlistUploader || video.playlistUploaderId) {
-                playlistUploader = await Uploader.findOne({
-                    extractor: video.extractor,
-                    id: video.playlistUploaderId || video.playlistUploader,
-                });
-                if (!playlistUploader) {
-                    playlistUploader = await new Uploader({
-                        extractor: video.extractor,
-                        id: video.playlistUploaderId || video.playlistUploader,
-                        name: video.playlistUploader || video.playlistUploaderId,
-                    }).save();
-                }
-
-                // Update playlist uploader name
-                if (video.uploadDate === playlistUploader.statistics.newestVideoDateUploaded) {
-                    playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
-                    await playlistUploader.save();
-                }
-
-                // Video statistics are not counted for playlist uploaders
-            }
-
             // Recreate playlists
             let playlist;
             if (video.playlistTitle || video.playlist || video.playlistId) {
@@ -276,20 +223,15 @@ const recalculateStatistics = async () => {
                         id: video.playlistId || video.playlist || video.playlistTitle,
                         name: video.playlistTitle || video.playlist || video.playlistId,
                         description: video.playlistDescription,
-                        uploaderDocument: playlistUploader,
+                        uploaderName: video.playlistUploader || video.playlistUploaderId,
                     }).save();
-
-                    // Update the playlist uploader playlists created count
-                    if (playlistUploader) {
-                        playlistUploader.playlistCreatedCount++;
-                        await playlistUploader.save();
-                    }
                 }
 
                 // Update playlist name and description
                 if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
                     playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
                     playlist.description = video.playlistDescription || playlist.description;
+                    playlist.uploaderName = video.playlistUploader || video.playlistUploaderId || playlist.uploaderName;
                     await playlist.save();
                 }
 

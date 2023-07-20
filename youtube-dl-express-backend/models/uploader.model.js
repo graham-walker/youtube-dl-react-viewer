@@ -7,7 +7,6 @@ const uploaderSchema = new mongoose.Schema({
     id: { type: String, required: true, index: true },
     name: { type: String, required: true },
     url: { type: String, default: null },
-    playlistCreatedCount: { type: Number, default: 0 },
     statistics: { type: statisticSchema, default: () => ({}) },
 }, {
     timestamps: true,

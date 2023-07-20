@@ -133,14 +133,6 @@ export default class UploaderPage extends Component {
                                         detailedStatistic={statistics.totalDislikeCount.toLocaleString() + ' dislikes'}
                                     />
                                 }
-                                {!!uploader.playlistCreatedCount &&
-                                    <MiniStatisticColumn
-                                        title="Playlists"
-                                        icon="list"
-                                        statistic={abbreviateNumber(uploader.playlistCreatedCount)}
-                                        detailedStatistic={uploader.playlistCreatedCount.toLocaleString() + ' playlists'}
-                                    />
-                                }
                                 {!!uploader.url &&
                                     <MiniStatisticColumn
                                         title="Channel URL"

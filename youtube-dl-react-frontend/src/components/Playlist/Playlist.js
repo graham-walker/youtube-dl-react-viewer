@@ -44,7 +44,7 @@ export default class Playlist extends Component {
     render() {
         const playlist = this.state.playlist;
         const statistics = playlist?.statistics;
-        const uploader = playlist?.uploaderDocument;
+        const uploaderName = playlist?.uploaderName;
         const video = statistics?.newestVideo;
 
         return (
@@ -82,30 +82,8 @@ export default class Playlist extends Component {
                                         Updated {dateToTimeSinceString(new Date(statistics.newestVideoDateUploaded))}
                                     </span>
                                 </p>
-                                {(!!uploader || playlist.description) && <hr />}
-                                {!!uploader &&
-                                    <div className="media-container mb-2">
-                                        <Link
-                                            to={`/uploaders/${uploader.extractor}/${uploader.id}`}
-                                            className="me-3"
-                                        >
-                                            <Image
-                                                width={48}
-                                                height={48}
-                                                src={getImage(uploader, 'avatar')}
-                                                onError={(e) => { defaultImage(e, 'avatar') }}
-                                                roundedCircle={this.context.user?.useCircularAvatars ?? true}
-                                            />
-                                        </Link>
-                                        <div className="media-body align-self-center">
-                                            <Link
-                                                to={`/uploaders/${uploader.extractor}/${uploader.id}`}
-                                                className="text-dark fw-bold">
-                                                {uploader.name}
-                                            </Link>
-                                        </div>
-                                    </div>
-                                }
+                                {(!!uploaderName || playlist.description) && <hr />}
+                                {!!uploaderName && <p className="fw-bold">{uploaderName}</p>}
                                 {playlist.description && <Description text={playlist.description} />}
                             </div>
                         </Col>

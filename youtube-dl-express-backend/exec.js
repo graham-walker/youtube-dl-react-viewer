@@ -358,7 +358,7 @@ let debug;
             smallResizedThumbnailMd5,
             smallResizedThumbnailWidth,
             smallResizedThumbnailHeight
-        ] = await generateThumbnailFile(bestThumbnailData, 168, 95, smallResizedThumbnailFile ,infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
+        ] = await generateThumbnailFile(bestThumbnailData, 168, 95, smallResizedThumbnailFile, infojsonData.extractor === 'youtube' ? 'cover' : 'inside');
     }
 
     // Index the subtitle file(s) (if they exist)
@@ -482,7 +482,7 @@ let debug;
         try {
             uploader = await Uploader.findOne({
                 extractor: infojsonData.extractor,
-                id: infojsonData.uploader_id || infojsonData.channel_id || infojsonData.uploader,
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
             });
             if (uploader) {
                 uploader.name = infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id;
@@ -491,31 +491,12 @@ let debug;
             }
             if (!uploader) uploader = await new Uploader({
                 extractor: infojsonData.extractor,
-                id: infojsonData.uploader_id || infojsonData.channel_id  || infojsonData.uploader,
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
                 name: infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id,
                 url: infojsonData.uploader_url,
             }).save();
         } catch (err) {
             console.error('Failed to retrieve uploader document');
-            throw err;
-        }
-    }
-
-    let playlistUploader;
-    if (infojsonData.playlist_uploader || infojsonData.playlist_uploader_id) {
-        try {
-            playlistUploader = await Uploader.findOne({
-                extractor: infojsonData.extractor,
-                id: infojsonData.playlist_uploader_id || infojsonData.playlist_uploader,
-            });
-            if (!playlistUploader) playlistUploader = await new Uploader({
-                extractor: infojsonData.extractor,
-                id: infojsonData.playlist_uploader_id || infojsonData.playlist_uploader,
-                name: infojsonData.playlist_uploader || infojsonData.playlist_uploader_id,
-                // Uploader URL is not available for playlist uploaders
-            }).save();
-        } catch (err) {
-            console.error('Failed to retrieve playlist uploader document');
             throw err;
         }
     }
@@ -548,14 +529,8 @@ let debug;
                     id: infojsonData.playlist_id || infojsonData.playlist || infojsonData.playlist_title,
                     name: infojsonData.playlist_title || infojsonData.playlist || infojsonData.playlist_id,
                     description: infojsonData.playlist_description || ytdlpPlaylistDescription,
-                    uploaderDocument: playlistUploader,
+                    uploaderName: infojsonData.playlist_uploader || infojsonData.playlist_uploader_id,
                 }).save();
-
-                // Update the uploader playlist created count
-                if (playlistUploader) {
-                    playlistUploader.playlistCreatedCount++;
-                    await playlistUploader.save();
-                }
             }
         } catch (err) {
             console.error('Failed to retrieve playlist document');
@@ -764,17 +739,13 @@ let debug;
         await uploader.save();
     }
 
-    if (playlistUploader && video.uploadDate === playlistUploader.statistics.newestVideoDateUploaded) {
-        playlistUploader.name = video.playlistUploader || video.playlistUploaderId || playlistUploader.name;
-        await playlistUploader.save();
-    }
-
     if (playlist) {
         playlist.statistics = await incrementStatistics(video, playlist);
 
         if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
             playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
             playlist.description = video.playlistDescription || ytdlpPlaylistDescription || playlist.description;
+            playlist.uploaderName = video.playlistUploader || video.playlistUploaderId || playlist.uploaderName;
         }
 
         await playlist.save();

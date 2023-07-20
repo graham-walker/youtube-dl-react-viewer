@@ -7,8 +7,8 @@ const playlistSchema = new mongoose.Schema({
     id: { type: String, required: true, index: true },
     name: { type: String, required: true },
     description: { type: String, default: null },
-    uploaderDocument: { type: mongoose.Schema.ObjectId, ref: 'Uploader', default: null },
     statistics: { type: statisticSchema, default: () => ({}) },
+    uploaderName: { type: String, default: null },
 }, {
     timestamps: true,
 });
