@@ -4,7 +4,7 @@
 
 **youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp)/[youtube-dl](https://github.com/ytdl-org/youtube-dl) created using the MERN stack. Supports viewing and downloading videos. The web app is not platform specific and should work on any Windows, Linux, or macOS machine.
 
-📷[Screenshots](https://imgur.com/a/xpa9rPg) | 🌎[Live Demo](https://react.gwalkerux.com)
+📷[Screenshots](https://imgur.com/a/l23b3dZ) | 🌎[Live Demo](https://react.gwalkerux.com)
 
 ---
 
