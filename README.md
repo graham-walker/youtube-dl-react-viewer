@@ -2,15 +2,11 @@
 <img src="./youtube-dl-react-frontend/public/logo.svg" alt="icon" width="100px" height="100px" />
 <h1 align="center">youtube-dl-react-viewer</h1>
 
-**youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp)/[youtube-dl](https://github.com/ytdl-org/youtube-dl) created using the MERN stack. Supports viewing and downloading videos. The web app is not platform specific and should work on any Windows, Linux, or macOS machine.
+**youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp)/[youtube-dl](https://github.com/ytdl-org/youtube-dl) created using the MERN stack. Supports viewing and downloading videos. **Usage with yt-dlp is assumed but most forks should work.**
 
 📷[Screenshots](https://imgur.com/a/l23b3dZ) | 🌎[Live Demo](https://react.gwalkerux.com)
 
 ---
-
-**Some installation methods may require additional configuration. Reading the README is strongly recommend before attempting to install the web app.**
-
-**yt-dlp is assumed but most forks should work.**
 
 - [FEATURES](#features)
 - ✨[INSTALL WITH DOCKER](#docker-installation)✨
@@ -25,24 +21,26 @@
 - [LICENSE/CREDITS](#licensecredits)
 - [DISCLAIMER](#disclaimer)
 
+---
+
 ## Features
 - Watch downloaded videos in the browser across your devices
 - Download videos by creating and running download jobs
 - Import your existing downloads
-- Watch history and resume playback
-- User accounts
 - SponsorBlock integration
+- Watch history and resume playback
 - Full-text search and sort
 - Subtitle support
 - Autoplay & looping
-- .MKV playback in the browser with type spoofing
-- Open video streams directly in VLC
-- Automatic playlist creation
+- Open video streams in VLC
+- Automatically generated playlists
 - Similar video recommendations
-- Statistics for downloaded videos
-- Hashes downloads to preserve integrity
 - Sitewide password protection
-- OLED dark theme
+- Dark/OLED dark theme
+- Channel icon downloader (YouTube and SoundCloud only)
+- Verify the integrity (hash) of downloads
+- Download video comments
+- YouTube chat replay
 
 ## Install
 
@@ -90,12 +88,12 @@
 6. [Download the Source code (zip) for the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip to the location of your choosing
     - Navigate to `cd ./youtube-dl-react-viewer/youtube-dl-express-backend`
-    - Copy `.sample.env` to `.env` (you may need to enable view hidden files and folders)
+    - Copy `.env.sample` to `.env` (you may need to enable view hidden files and folders)
     - Set environment variables by editing `.env`
         - Set `OUTPUT_DIRECTORY` to the location you want to save downloads. Set to an empty directory
         - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
         - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
-        - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recomended. Value cannot be `'secret'`
+        - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
         - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
         - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH for FFmpeg does not work in the web app on Windows
         - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
