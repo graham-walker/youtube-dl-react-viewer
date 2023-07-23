@@ -63,10 +63,11 @@
     - If you are not planning on using yt-dlp set the update command for your fork `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install your-fork-name`
     - Other [environment variables](#environment-variables) can optionally be set
 
-5. Build the image and start the container `docker compose up -d` (if using Compose V1 `docker-compose up -d`)
+5. Build the image and start the container `docker compose up -d` (on Linux run as sudo)
+    - If using Compose V1 run `docker-compose up -d` instead
 
 6. Install yt-dlp or your preferred fork to the container
-    - Open the container command line `docker exec -it youtube-dl-react-viewer-app-1 /bin/sh`
+    - Open the container command line `docker exec -it youtube-dl-react-viewer-app-1 /bin/sh` (on Linux run as sudo)
     - Install yt-dlp `python3 -m pip install --no-deps -U yt-dlp`
 
 7. Access the web app in the browser `http://localhost:5000`
@@ -88,17 +89,20 @@
 
 6. [Download the Source code (zip) for the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
     - Unzip to the location of your choosing
-    - Set the environment variables by renaming `.sample.env` to `.env` in `./youtube-dl-express-backend` and editing `.env` (you may need to enable view hidden files and folders)
+    - Navigate to `cd ./youtube-dl-react-viewer/youtube-dl-express-backend`
+    - Copy `.sample.env` to `.env` (you may need to enable view hidden files and folders)
+    - Set environment variables by editing `.env`
         - Set `OUTPUT_DIRECTORY` to the location you want to save downloads. Set to an empty directory
         - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
         - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
         - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recomended. Value cannot be `'secret'`
         - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH does not work correctly on Windows
+        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH for FFmpeg does not work in the web app on Windows
         - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
         - Other [environment variables](#environment-variables) can optionally be set
-    - Install additional dependencies `sh install.sh` (on Windows run `install.bat`)
-    - Start the web app `sh start-server.sh` (on Windows run `start-server.bat`)
+    - Return to the parent directory `cd ..`
+    - Install additional dependencies and build the web app `sh install.sh` (on Windows run `install.bat` instead)
+    - Start the web app `sh start-server.sh` (on Windows run `start-server.bat` instead)
     - Access the web app in the browser `http://localhost:5000`
         - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking Node.js
     - View the console output `pm2 logs youtube-dl-react-viewer`
