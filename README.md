@@ -59,11 +59,11 @@
     - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
     - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
     - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
-    - Set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
     - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
+    - If you are not planning on using yt-dlp set the update command for your fork `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install your-fork-name`
     - Other [environment variables](#environment-variables) can optionally be set
 
-5. Build the image and start the container `sudo docker-compose up -d`
+5. Build the image and start the container `docker compose up -d` (if using Compose V1 `docker-compose up -d`)
 
 6. Install yt-dlp or your preferred fork to the container
     - Open the container command line `docker exec -it youtube-dl-react-viewer-app-1 /bin/sh`
@@ -97,12 +97,12 @@
         - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH does not work correctly on Windows
         - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
         - Other [environment variables](#environment-variables) can optionally be set
-    - Install additional dependencies `sudo sh install.sh` (on Windows run `install.bat` as administrator)
-    - Start the web app `sudo sh start-server.sh` (on Windows run `start-server.bat`)
+    - Install additional dependencies `sh install.sh` (on Windows run `install.bat`)
+    - Start the web app `sh start-server.sh` (on Windows run `start-server.bat`)
     - Access the web app in the browser `http://localhost:5000`
         - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking Node.js
-    - View the console output `sudo pm2 logs youtube-dl-react-viewer`
-    - Stop the web app `sudo pm2 stop youtube-dl-react-viewer`
+    - View the console output `pm2 logs youtube-dl-react-viewer`
+    - Stop the web app `pm2 stop youtube-dl-react-viewer`
 
 ### Open URLs in VLC
 To open videos in VLC from the browser you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).

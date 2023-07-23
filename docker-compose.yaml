@@ -27,6 +27,8 @@ services:
             - SUPERUSER_USERNAME=admin
             - SUPERUSER_PASSWORD=password
             - JWT_TOKEN_SECRET=secret
+            - SECURE_COOKIES=false
+            - YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp
 
 volumes:
     ytrv_db:
