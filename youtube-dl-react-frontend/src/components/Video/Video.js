@@ -271,7 +271,7 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('error', function (e) {
-                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'An error has occurred. The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.'
+                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'A playback error has occurred. The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.'
                                 });
 
                                 this.player.on('userinactive', function () {
@@ -679,6 +679,13 @@ export default class VideoPage extends Component {
                                 variant="primary"
                                 className="mb-2 me-2"
                                 href={'vlc://' + window.location.origin + '/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
+                                onClick={() => {
+                                    let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
+                                    if (!warned && window.innerWidth > 768) {
+                                        alert('To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. You can do this with https://github.com/stefansundin/vlc-protocol/');
+                                        localStorage.setItem('seenVLCWarning', 'true');
+                                    }
+                                }}
                             >
                                 <FontAwesomeIcon icon="play" /> Open in VLC
                             </Button>
@@ -687,6 +694,13 @@ export default class VideoPage extends Component {
                                     variant="primary"
                                     className="mb-2 me-2"
                                     href={'vlc://file:///' + encodeURI(this.state.localVideoPath).replace(/!/g, '%21')}
+                                    onClick={() => {
+                                        let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
+                                        if (!warned && window.innerWidth > 768) {
+                                            alert('To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. You can do this with https://github.com/stefansundin/vlc-protocol/');
+                                            localStorage.setItem('seenVLCWarning', 'true');
+                                        }
+                                    }}
                                 >
                                     <FontAwesomeIcon icon="play" /> Open in VLC (local)
                                 </Button>

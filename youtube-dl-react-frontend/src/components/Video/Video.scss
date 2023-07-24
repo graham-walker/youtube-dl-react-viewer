@@ -175,3 +175,9 @@
 .video-js.vjs-seeking .play-pause svg {
     display: none !important;
 }
+
+@media screen and (max-width: 768px) {
+    .vjs-error .vjs-error-display::before {
+        display: none;
+    }
+}

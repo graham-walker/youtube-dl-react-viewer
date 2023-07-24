@@ -107,7 +107,9 @@
     - Stop the web app `pm2 stop youtube-dl-react-viewer`
 
 ### Open URLs in VLC
-To open videos in VLC from the browser you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
+To open videos using the open in VLC button on PC/Mac you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
+
+No additional configuration is required for iOS/Android devices.
 
 ## Environment Variables
 <!-- Do not go past col 80 -->
@@ -309,7 +311,7 @@ docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl
 ## Issues & Limitations
 - **Browser Playback:**
     <br>
-    By default the format code `bestvideo*+bestaudio/best` is used. This can sometimes create videos with codecs individual browsers do not support. Try enabling spoof type, use a different browser, or change the format code and redownload.
+    By default the format code `bestvideo*+bestaudio/best` is used. This can sometimes create videos with codecs individual browsers do not support. If a playback error occurs, try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.
 
     To create videos with better browser playback compatibility, try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` or enable recode video in job settings.
 - **Playlists:**
