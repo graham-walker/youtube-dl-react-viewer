@@ -68,9 +68,9 @@
     - Open the container command line `docker exec -it youtube-dl-react-viewer-app-1 /bin/sh` (on Linux run as sudo)
     - Install yt-dlp `python3 -m pip install --no-deps -U yt-dlp`
 
-7. Access the web app in the browser `http://localhost:5000`
+7. View the web app in the browser `http://localhost:5000`
     - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux)
-    - If this does not work check your firewall settings
+    - If this does not work check if your firewall settings are blocking Node.js
 
 8. Downloads can be found in the Docker volume `youtube-dl-react-viewer_ytrv_downloads`
 
@@ -91,17 +91,18 @@
     - Copy `.env.sample` to `.env` (you may need to enable view hidden files and folders)
     - Set environment variables by editing `.env`
         - Set `OUTPUT_DIRECTORY` to the location you want to save downloads. Set to an empty directory
+            - On Windows it is recommended to use a location as close to the root directory as possible `C:\youtube-dl` to avoid issues with the path length limit
         - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
         - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
         - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
         - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH for FFmpeg does not work in the web app on Windows
+        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH for FFmpeg does not work with the web app on Windows
         - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
         - Other [environment variables](#environment-variables) can optionally be set
     - Return to the parent directory `cd ..`
     - Install additional dependencies and build the web app `sh install.sh` (on Windows run `install.bat` instead)
     - Start the web app `sh start-server.sh` (on Windows run `start-server.bat` instead)
-    - Access the web app in the browser `http://localhost:5000`
+    - View the web app in the browser `http://localhost:5000`
         - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking Node.js
     - View the console output `pm2 logs youtube-dl-react-viewer`
     - Stop the web app `pm2 stop youtube-dl-react-viewer`
@@ -272,7 +273,7 @@ To download videos from the web app you must be signed in with the superuser acc
 
 ## Importing Already Downloaded Videos
 
-You can import videos already downloaded with yt-dlp/youtube-dl as long as they were downloaded with the `--write-info-json` option.
+You can import videos already downloaded with yt-dlp/youtube-dl as long as they were downloaded with the `--write-info-json` option and the `.json` file is in the same folder as the video.
 
 To import videos from the web app you must be signed in with the superuser account.
 1. Navigate to the admin panel `http://localhost:5000/admin`
@@ -310,24 +311,26 @@ docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl
 
 ## Issues & Limitations
 - **Browser Playback:**
-    <br>
-    By default the format code `bestvideo*+bestaudio/best` is used. This can sometimes create videos with codecs individual browsers do not support. If a playback error occurs, try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.
+    <br/>
+    The format code `bestvideo*+bestaudio/best` is used by default. This can sometimes create videos with codecs individual browsers do not support. If a playback error occurs, try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.
 
-    To create videos with better browser playback compatibility, try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` or enable recode video in job settings.
+    To create videos with better browser playback compatibility, try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` or enable recode video in job settings (may reduce quality).
+
 - **Playlists:**
-    <br>
-    youtube-dl only downloads playlist metadata if a video was downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video, it will not appear in the playlist in the web app. To mitigate this, download videos that appear in playlists before downloading individual videos.
+    <br/>
+    youtube-dl only downloads playlist metadata if a video was downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video, it will not appear in the automatically generated playlist in the web app. The best approach to prevent this is to download playlists before downloading individual videos.
+
 - **Xattrs:**
-    <br>
+    <br/>
     Windows does not support xattrs. Videos downloaded on Windows will not have xattrs added to them.
 
 - **Windows Path Limit:**
-    <br>
-    Windows file paths cannot be longer than 260 characters. To prevent errors where downloaded file names are too long to be saved set your output directory to the root of your drive `C:\videos`. Alternatively, you can remove the path length limitation by [enabling long paths](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later).
+    <br/>
+    Windows file paths cannot be longer than 260 characters. To prevent errors where downloaded file names are too long, set the output directory to a location as close to the root directory as possible `C:\youtube-dl`. Alternatively, you can remove the path length limit by [enabling long paths](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later).
 
 - **PM2 and Windows**
-    <br>
-    When running the web app using PM2 on Windows, console windows may briefly flash on the screen when starting a job. This is due to how PM2 interacts when the process it managing spawns sub-processes. You can start the web app with node instead, however, it will not auto restart if it crashes.
+    <br/>
+    PM2 is used to manage the web app process if it was installed using the manual install method. On Windows, console windows may briefly appear when starting a download job. This is an issue that occurs when a process PM2 is managing spawns a subprocess. To prevent this you can start the web app with node instead, however, it will not auto restart if it crashes.
     ```
     cd ./youtube-dl-express-backend
     node --require dotenv/config index.js
@@ -338,30 +341,30 @@ docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl
 There are two main types of errors that can occur when downloading videos:
 1. **youtube-dl fails to download a video**
     <br/>
-    This could happen for many reasons: poor internet connection, incompatible format code, broken extractor, private video, etc. These errors are not recorded by the web app. You may be able to spot the error in console output. youtube-dl will try to download the video again the next time the job is run. If you notice a video did not download but do not see an error on the admin page it is most likely because youtube-dl failed to download it.
+    This could happen for many reasons: poor internet connection, incompatible format code, broken extractor, private video, etc. These errors are not recorded by the web app, but can be seen in the console output. youtube-dl will try to download the video again the next time the job is run. If you notice a video did not download but do not see an error on the admin page it is most likely because youtube-dl failed to download it.
 
 2. **youtube-dl successfully downloads a video, but the web app fails to import it**
     <br/>
-    This could happen if the web app cannot read the metadata returned by youtube-dl or could not determine which files are the video file, thumbnails, subtitles, etc. youtube-dl will not try to redownload the video as it has already successfully downloaded.
+    This could happen if the web app could not read the metadata downloaded by youtube-dl or could not identify the video file, thumbnails, subtitles, etc. youtube-dl will not try to redownload the video as it has been successfully downloaded.
     
     You can attempt to reimport videos from the failed to import section of the admin panel. This will likely still fail until a version of the web app that fixes the issue is released. Report import errors [here](https://github.com/graham-walker/youtube-dl-react-viewer/issues).
 
 ## FAQ
 **Q:** How do I sign in to websites that require a login?
 
-**A:** In job settings open advanced options and add this line to override config `--cookies "/Path/To/cookies.txt"`
+**A:** You can set cookies for individual jobs to login to websites. Sign in and export a Netscape cookie file for the website. Edit a job, open advanced options and add this line to override config `--cookies "C:/Path/To/cookies.txt"`
 #
 **Q:** Can I update youtube-dl from the web app?
 
 **A:** You can update youtube-dl from the youtube-dl section of the admin panel.
 
-If you installed youtube-dl with a package manager set the environment variable `YOUTUBE_DL_UPDATE_COMMAND` to the correct update command.
+If you installed youtube-dl with a package manager you may need to set the environment variable `YOUTUBE_DL_UPDATE_COMMAND` to the correct update command.
 #
 **Q:** How can I add uploader icons to the web app?
 
-**A:** Uploader icons for YouTube and SoundCloud can be downloaded from the uploader icons section of the admin panel.
+**A:** Uploader icons for YouTube and SoundCloud can be downloaded automatically from the uploader icons section of the admin panel.
 
-For other websites uploader icons must be downloaded manually and placed in the `./avatars` folder. Use the Network tab of the browser DevTools to find the expected filename. 
+For other websites uploader icons must be downloaded manually and placed in the `./avatars` folder of the output directory. Use the Network tab of the browser DevTools to find the expected filename. 
 #
 **Q:** I am running out of space. Can I use a second hard drive or change/add another output directory?
 
@@ -371,7 +374,7 @@ If you need more space than a single hard drive can offer, use a drive pooling s
 #
 **Q:** Where files generated by youtube-dl, such as `archive.txt` located?
 
-**A:** These files are located at the base of the output directory. You can also view them from the logs section of the admin panel.
+**A:** These files are located at the root of the output directory. You can also view them from the logs section of the admin panel.
 #
 **Q:** Can I delete downloaded videos?
 
@@ -401,8 +404,10 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
-- [ ] Refetch metadata for downloaded videos
+- [ ] Refetch updated metadata for downloaded videos
 - [ ] Twitch chat replay
+- [ ] Stream audio only mode
+- [ ] Download job scheduling
 
 ## License/Credits
 
