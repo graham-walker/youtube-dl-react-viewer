@@ -50,7 +50,7 @@
 
 2. Navigate to `cd ./youtube-dl-react-viewer`
 
-3. Select the release you want to install `git checkout tags/v1.2.1`
+3. Select the release you want to install `git checkout tags/v1.3.0`
     - Installing from main is not recommended as database breaking changes can be made between releases
 
 4. Set the environment variables by editing `docker-compose.yaml`
@@ -385,13 +385,13 @@ If you are deleting videos because you are running low on storage, note that the
 ## Planned
 Planned features in no particular order. There is no timeline or guarantee features will be added.
 
-**In latest release (1.2.1):**
+**In release 1.2.1:**
 - [x] Import already downloaded videos
 - [x] Docker container
 - [x] Uploader pages
 - [x] Update youtube-dl from the web app
 
-**In upcoming release:**
+**In release 1.3.0:**
 - [x] Watch history
 - [x] Video playback resume
 - [x] Dark aware theme
@@ -400,7 +400,7 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [x] Display video chapters in the player
 - [x] Chat replay (YouTube only)
 
-**Future release:**
+**In future release:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
