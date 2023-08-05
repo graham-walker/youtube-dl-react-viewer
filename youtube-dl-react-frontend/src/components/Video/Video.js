@@ -812,7 +812,7 @@ export default class VideoPage extends Component {
                                                     variant="pills"
                                                     className="flex-column"
                                                 >
-                                                    {!!video.uploader &&
+                                                    {!!video.uploaderDocument &&
                                                         <Nav.Item
                                                             className="w-100"
                                                             style={{ whiteSpace: 'nowrap' }}
@@ -821,13 +821,13 @@ export default class VideoPage extends Component {
                                                                 eventKey="uploader"
                                                                 onClick={(e) => { this.setState({ activeTab: 'uploader' }) }}
                                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                                                title={'Videos by ' + video.uploader}
+                                                                title={'Videos by ' + video.uploaderDocument.name}
                                                             >
-                                                                <FontAwesomeIcon icon="user" /> Videos by {video.uploader}
+                                                                <FontAwesomeIcon icon="user" /> Videos by {video.uploaderDocument.name}
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     }
-                                                    {!!video.playlist &&
+                                                    {!!video.playlistDocument &&
                                                         <Nav.Item
                                                             className="w-100"
                                                             style={{ whiteSpace: 'nowrap' }}
@@ -836,9 +836,9 @@ export default class VideoPage extends Component {
                                                                 eventKey="playlist"
                                                                 onClick={(e) => { this.setState({ activeTab: 'playlist' }) }}
                                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                                                title={video.playlist}
+                                                                title={video.playlistDocument.name}
                                                             >
-                                                                <FontAwesomeIcon icon="list" /> {video.playlist}
+                                                                <FontAwesomeIcon icon="list" /> {video.playlistDocument.name}
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     }

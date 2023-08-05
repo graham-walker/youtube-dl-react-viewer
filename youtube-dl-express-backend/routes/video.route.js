@@ -91,7 +91,7 @@ router.get('/:extractor/:id', async (req, res) => {
             video.downloadedCommentCount = downloadedCommentCount;
         } catch (err) { }
 
-        if (video.uploader) uploaderVideos = await Video.find(
+        if (video.uploaderDocument) uploaderVideos = await Video.find(
             { uploaderDocument: video.uploaderDocument },
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
@@ -99,8 +99,8 @@ router.get('/:extractor/:id', async (req, res) => {
             .lean()
             .exec();
 
-        if (video.playlistId) playlistVideos = await Video.find(
-            { extractor: video.extractor, playlistId: video.playlistId },
+        if (video.playlistDocument) playlistVideos = await Video.find(
+            { playlistDocument: video.playlistDocument },
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ playlistIndex: 1 })
