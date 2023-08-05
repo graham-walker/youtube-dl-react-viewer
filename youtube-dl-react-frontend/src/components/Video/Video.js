@@ -730,14 +730,19 @@ export default class VideoPage extends Component {
                             >
                                 <FontAwesomeIcon icon="trash" /> Delete
                             </Button>}
-                            <hr />
-                            <CommentsLoader
-                                key={video.id + video.extractor}
-                                id={video.id}
-                                extractor={video.extractor}
-                                player={this.player}
-                                uploader={video?.uploader}
-                            />
+                            {!!video.downloadedCommentCount &&
+                                <>
+                                    <hr />
+                                    <CommentsLoader
+                                        key={video.id + video.extractor}
+                                        id={video.id}
+                                        extractor={video.extractor}
+                                        player={this.player}
+                                        uploader={video?.uploader}
+                                        commentCount={video.downloadedCommentCount}
+                                    />
+                                </>
+                            }
                         </Col>
                         <Col
                             xs="12"

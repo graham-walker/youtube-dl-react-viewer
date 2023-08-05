@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef, memo } from 'react';
-import { Image, Form, Badge } from 'react-bootstrap';
+import { Image, Form, Badge, Button } from 'react-bootstrap';
 import { defaultImage } from '../../../utilities/image.utility';
 import { dateToTimeSinceString, abbreviateNumber } from '../../../utilities/format.utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,26 +12,37 @@ import parsedEnv from '../../../parse-env';
 const CommentsLoader = memo(function CommentsLoader(props) {
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState(null);
+    const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        axios
-            .get(`/api/videos/${props.extractor}/${props.id}/comments`)
-            .then(res => {
-                setLoading(false);
-                setComments(res.data.comments);
-            })
-            .catch(err => {
-                setLoading(false);
-            });
+        if (visible) {
+            axios
+                .get(`/api/videos/${props.extractor}/${props.id}/comments`)
+                .then(res => {
+                    setLoading(false);
+                    setComments(res.data.comments);
+                })
+                .catch(err => {
+                    setLoading(false);
+                });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [visible]);
 
-    return (loading
-        ? <Spinner animation="border" />
-        : (!!comments
-            ? <Comments comments={comments} player={props.player} uploader={props.uploader} />
-            : <strong>Failed to load comments</strong>
-        )
+    return (
+        <div className={`card mb-3${visible ? ' p-3' : ''}${visible && !loading ? ' pb-0' : ''}`}>
+            {!visible
+                ? <Button onClick={() => setVisible(true)} variant="none">Show {props.commentCount.toLocaleString()} comment{props.commentCount !== 1 ? 's' : ''}</Button>
+                : (
+                    loading
+                        ? <div className="text-center"><Spinner animation="border" /></div>
+                        : (!!comments
+                            ? <Comments comments={comments} player={props.player} uploader={props.uploader} />
+                            : <strong>Failed to load comments</strong>
+                        )
+                )
+            }
+        </div>
     );
 });
 
@@ -71,7 +82,7 @@ const Comments = props => {
     }
 
     return (
-        <div className="video-comments mb-3">
+        <div className="video-comments">
             <p className="fw-bold">{props.comments.length.toLocaleString()} Comment{props.comments.length !== 1 ? 's' : ''}</p>
             <Form className="form-inline mb-4">
                 <Form.Group>
@@ -86,7 +97,7 @@ const Comments = props => {
                     </Form.Select>
                 </Form.Group>
             </Form>
-            <div style={{ maxHeight: 'calc(100vh - 56px - 1.5rem)', overflow: 'auto' }} ref={scrollRef}>
+            <div style={{ maxHeight: '100vh', overflow: 'auto', paddingRight: '1rem', marginRight: '-1rem' }} ref={scrollRef}>
                 {!!groupedComments && n2(groupedComments)}
             </div>
         </div>

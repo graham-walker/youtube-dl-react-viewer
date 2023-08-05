@@ -78,12 +78,18 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
         + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId'
-        + ' playlistDocument ' + fields + metadataFields
+        + ' playlistDocument commentCount ' + fields + metadataFields
         )
             .populate('uploaderDocument playlistDocument jobDocument' + metadataFields)
             .exec()
         )?.toJSON();
         if (!video) return res.sendStatus(404);
+
+        let downloadedCommentCount = 0;
+        try {
+            downloadedCommentCount = (await Video.aggregate([{ $match: { extractor: req.params.extractor, id: req.params.id } }, { $project: { comments: { $size: '$comments' } } }]))[0]?.comments;
+            video.downloadedCommentCount = downloadedCommentCount;
+        } catch (err) { }
 
         if (video.uploader) uploaderVideos = await Video.find(
             { uploaderDocument: video.uploaderDocument },
@@ -218,7 +224,7 @@ router.get('/:extractor/:id/livechat', async (req, res) => {
                                 let parsed;
                                 try {
                                     parsed = JSON.parse(comment);
-                                } catch(err) {
+                                } catch (err) {
                                     return null;
                                 }
 
