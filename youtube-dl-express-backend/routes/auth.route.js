@@ -59,6 +59,7 @@ router.post('/login', async (req, res) => {
             httpOnly: true,
             sameSite: 'strict',
             secure: parsedEnv.SECURE_COOKIES,
+            maxAge: 2 * 365 * 24 * 60 * 60 * 1000,
         })
         .json({ user });
 });
@@ -77,6 +78,7 @@ router.post('/global', async (req, res) => {
             httpOnly: true,
             sameSite: 'strict',
             secure: parsedEnv.SECURE_COOKIES,
+            maxAge: 2 * 365 * 24 * 60 * 60 * 1000,
         })
         .send();
 });
