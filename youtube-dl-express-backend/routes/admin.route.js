@@ -491,8 +491,8 @@ router.post('/import', async (req, res) => {
                         continue;
                     }
 
-                    const basename = files[i].name.slice(0, -'info.json'.length);
-                    const videoFileName = basename + (overrideExt ? overrideExt : infojsonData.ext);
+                    const basename = files[i].name.slice(0, -'.info.json'.length);
+                    const videoFileName = basename + '.' + (overrideExt ? overrideExt : infojsonData.ext);
 
                     // Get the downloaded date
                     let downloaded;
