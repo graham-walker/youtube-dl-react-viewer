@@ -241,25 +241,29 @@ export default class VideoPage extends Component {
                                     // Skip sponsors
                                     if (this.sponsorRef.current) {
                                         let currentTime = this.player.currentTime();
-                                        let skip = false;
-                                        for (let sponsor of this.sponsorRef.current) {
-                                            if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
-                                            if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
-                                            if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
-                                            if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
-                                            if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
-                                            if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
-                                            if (!this.context.user.skipFiller && sponsor.category === 'music_offtopic') continue;
-                                            if (!this.context.user.skipMusicOfftopic && sponsor.category === 'filler') continue;
 
-                                            if (currentTime >= sponsor.segment[0] && currentTime < sponsor.segment[1]) {
-                                                currentTime = sponsor.segment[1];
-                                                skip = true;
+                                        if (Math.ceil(currentTime) < Math.ceil(this.player.duration())) { // Fix getting stuck in a loop when skipping outros
+
+                                            let skip = false;
+                                            for (let sponsor of this.sponsorRef.current) {
+                                                if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
+                                                if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
+                                                if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
+                                                if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
+                                                if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
+                                                if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
+                                                if (!this.context.user.skipFiller && sponsor.category === 'music_offtopic') continue;
+                                                if (!this.context.user.skipMusicOfftopic && sponsor.category === 'filler') continue;
+
+                                                if (currentTime >= sponsor.segment[0] && currentTime < sponsor.segment[1]) {
+                                                    currentTime = sponsor.segment[1];
+                                                    skip = true;
+                                                }
                                             }
-                                        }
-                                        if (skip) {
-                                            this.player.currentTime(currentTime);
-                                            console.log('Skipped sponsor');
+                                            if (skip) {
+                                                this.player.currentTime(currentTime);
+                                                console.log('Skipped sponsor');
+                                            }
                                         }
                                     }
 
