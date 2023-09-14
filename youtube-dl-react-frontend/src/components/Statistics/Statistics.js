@@ -135,8 +135,8 @@ export default class StatisticsPage extends Component {
                                                 '.description',
                                                 '.annotations.xml',
                                                 'Thumbnails',
-                                                'Small Thumbnail Files',
-                                                'Subtitle Files',
+                                                'Resized Thumbnails',
+                                                'Subtitles',
                                             ],
                                             datasets: [{
                                                 data: [
