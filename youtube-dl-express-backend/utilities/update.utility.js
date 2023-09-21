@@ -11,6 +11,7 @@ import { logLine, logStdout } from './logger.utility.js';
 
 const updateIds = {
     '1.3.0': 1,
+    '1.3.1_comments': 2,
 };
 
 const applyUpdates = async () => {
@@ -130,10 +131,35 @@ const applyUpdates = async () => {
 
             await video.save();
 
-            printProgress(`Doing version 1.3.0 migrations... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
+            printProgress(`Doing version 1.3.0 migrations 1/1... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
         }
 
         version.lastUpdateCompleted = updateIds['1.3.0'];
+        await version.save();
+    }
+
+    if (updateIds['1.3.1_comments'] > version.lastUpdateCompleted) {
+        // Add downloadedCommentCount from comments length
+        const results = await Video.aggregate([
+            {
+                $addFields: {
+                    downloadedCommentCount: { $size: { $ifNull: ['$comments', []] } }
+                }
+            }
+        ]);
+
+        for (let [i, doc] of results.entries()) {
+            await Video.updateOne(
+                { _id: doc._id },
+                { downloadedCommentCount: doc.downloadedCommentCount }
+            );
+            printProgress(`Doing version 1.3.1 migrations 1/1... ${(((i + 1) / results.length) * 100).toFixed(2)}%`);
+        }
+
+        // Remove comments from the database (they are now read from the filesystem)
+        await Video.updateMany({}, { $set: { comments: [] } });
+
+        version.lastUpdateCompleted = updateIds['1.3.1_comments'];
         await version.save();
     }
 

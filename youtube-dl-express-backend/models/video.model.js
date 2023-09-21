@@ -79,7 +79,8 @@ const videoSchema = new mongoose.Schema({
     repostCount: { type: Number, default: null },
     averageRating: { type: Number, default: null },
     commentCount: { type: Number, default: null },
-    comments: [{ type: commentSchema }],
+    comments: [{ type: commentSchema }], // Unused now that comments are stored on the filesystem
+    downloadedCommentCount: { type: Number, default: null },
     ageLimit: { type: Number, default: null },
     webpageUrl: { type: String, default: null },
     categories: [{ type: String }],

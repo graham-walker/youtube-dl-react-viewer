@@ -13,6 +13,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState(null);
     const [visible, setVisible] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (visible) {
@@ -23,6 +24,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
                     setComments(res.data.comments);
                 })
                 .catch(err => {
+                    setError(err?.response?.data?.error || 'Failed to load comments');
                     setLoading(false);
                 });
         }
@@ -38,7 +40,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
                         ? <div className="text-center"><Spinner animation="border" /></div>
                         : (!!comments
                             ? <Comments comments={comments} player={props.player} uploader={props.uploader} />
-                            : <strong>Failed to load comments</strong>
+                            : <p><strong>{error}</strong></p>
                         )
                 )
             }

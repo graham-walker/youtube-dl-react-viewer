@@ -67,7 +67,6 @@ router.get('/:extractor/:id', async (req, res) => {
     let firstUploaderVideo;
     let firstPlaylistVideo;
     let firstJobVideo;
-    const metadataFields = req.query?.metadata === 'true' ? ' comments' : '';
 
     try {
         video = (await Video.findOne({
@@ -78,18 +77,12 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
         + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId'
-        + ' playlistDocument commentCount ' + fields + metadataFields
+        + ' playlistDocument commentCount downloadedCommentCount ' + fields
         )
-            .populate('uploaderDocument playlistDocument jobDocument' + metadataFields)
+            .populate('uploaderDocument playlistDocument jobDocument')
             .exec()
         )?.toJSON();
         if (!video) return res.sendStatus(404);
-
-        let downloadedCommentCount = 0;
-        try {
-            downloadedCommentCount = (await Video.aggregate([{ $match: { extractor: req.params.extractor, id: req.params.id } }, { $project: { comments: { $size: '$comments' } } }]))[0]?.comments;
-            video.downloadedCommentCount = downloadedCommentCount;
-        } catch (err) { }
 
         if (video.uploaderDocument) uploaderVideos = await Video.find(
             { uploaderDocument: video.uploaderDocument },
@@ -193,12 +186,68 @@ router.get('/:extractor/:id', async (req, res) => {
 
 router.get('/:extractor/:id/comments', async (req, res) => {
     try {
-        let video = (await Video.findOne({ extractor: req.params.extractor, id: req.params.id }, '-_id comments')
-            .populate('comments')
-            .exec()
-        )?.toJSON();
+        let video = (await Video.findOne({ extractor: req.params.extractor, id: req.params.id }, '-_id extractor downloadedCommentCount directory infoFile').exec())?.toJSON();
 
-        res.json({ comments: video.comments });
+        if (!video) return res.status(500).json({ error: 'Video does not exist' });
+
+        if (!video.downloadedCommentCount) return res.status(500).json({ error: 'Video has no downloaded comments' });
+
+        let infoFilePath = path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.infoFile.name);
+
+        if (!await fs.exists(infoFilePath)) return res.status(500).json({ error: 'Could not find video info.json' });
+
+        let infojsonData = JSON.parse((await fs.readFile(infoFilePath)));
+
+        if (!infojsonData.comments) return res.status(500).json({ error: 'Video has no downloaded comments' });
+
+        switch (video.extractor) {
+            case 'youtube':
+                if (!Array.isArray(infojsonData.comments)) {
+                    logError('Invalid comment schema: Not array');
+                    return res.status(500).json({ error: 'Invalid comment schema' });
+                }
+                for (let i = 0; i < infojsonData.comments.length; i++) {
+                    if (typeof infojsonData.comments[i] !== 'object') {
+                        logError('Invalid comment schema: Not object');
+                        return res.status(500).json({ error: 'Invalid comment schema' });
+                    }
+
+                    infojsonData.comments[i] = Object.assign({
+                        author: 'Unknown',
+                        author_id: 'unknown',
+                        parent: 'root',
+                        like_count: 0,
+                        is_favorited: false,
+                        author_thumbnail: '/default-avatar.svg',
+                        author_is_uploader: false,
+                    }, infojsonData.comments[i]);
+
+                    let comment = infojsonData.comments[i];
+
+                    if (
+                        (!comment.hasOwnProperty('author') || typeof comment.author !== 'string' || !comment.author)
+                        || (!comment.hasOwnProperty('author_id') || typeof comment.author_id !== 'string' || !comment.author_id)
+                        || (!comment.hasOwnProperty('id') || typeof comment.id !== 'string' || !comment.id)
+                        || (
+                            (!comment.hasOwnProperty('text') || typeof comment.text !== 'string' || !comment.text)
+                            && (!comment.hasOwnProperty('html') || typeof comment.html !== 'string' || !comment.html)
+                        )
+                        || (!comment.hasOwnProperty('timestamp') || typeof comment.timestamp !== 'number' || !comment.timestamp || comment.timestamp < 0)
+                        || (!comment.hasOwnProperty('parent') || typeof comment.parent !== 'string' || !comment.parent) // Top level is 'root'
+                        || (!comment.hasOwnProperty('like_count') || typeof comment.like_count !== 'number')
+                        || (!comment.hasOwnProperty('is_favorited') || typeof comment.is_favorited !== 'boolean')
+                        || (!comment.hasOwnProperty('author_thumbnail') || typeof comment.author_thumbnail !== 'string' || !comment.author_thumbnail)
+                        || (!comment.hasOwnProperty('author_is_uploader') || typeof comment.author_is_uploader !== 'boolean')
+                    ) {
+                        logError('Invalid comment schema: ' + JSON.stringify(comment));
+                        return res.status(500).json({ error: 'Invalid comment schema' });
+                    }
+                }
+                break;
+            default:
+                return res.status(500).json({ error: 'Comment parser for extractor not implemented' });
+        }
+        return res.json({ comments: infojsonData.comments });
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
         return res.sendStatus(500);
@@ -290,7 +339,7 @@ router.get('/:extractor/:id/livechat', async (req, res) => {
             // case 'twitch': // Twitch rechat extraction is currently broken
             //     break;
             default:
-                return res.sendStatus(404);
+                return res.status(500).json({ error: 'Chat replay for extractor not implemented' });
         }
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);

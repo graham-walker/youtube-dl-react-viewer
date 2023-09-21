@@ -12,7 +12,8 @@ const ChatReplay = (props) => {
     const [comments, setComments] = useState(null);
     const [rendered, setRendered] = useState([]);
     const [lastCommentIndex, setLastCommentIndex] = useState(null);
-    const [visible, setVisible] = useState(localStorage.getItem('showChatReplay') === null ? false : localStorage.getItem('showChatReplay') === 'true')
+    const [visible, setVisible] = useState(localStorage.getItem('showChatReplay') === null ? false : localStorage.getItem('showChatReplay') === 'true');
+    const [error, setError] = useState(null);
 
     const userContext = useContext(UserContext);
 
@@ -27,6 +28,7 @@ const ChatReplay = (props) => {
             })
             .catch(err => {
                 setLoading(false);
+                setError(err?.response?.data?.error || 'Failed to load chat replay');
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -85,7 +87,7 @@ const ChatReplay = (props) => {
                                     )
                                     : (!!comments
                                         ? <p className="text-center"><strong>No comments yet</strong></p>
-                                        : <p className="text-center"><strong>Failed to load</strong></p>
+                                        : <p className="text-center"><strong>{error}</strong></p>
                                     )}
                             </div >
                             <Button onClick={() => setVisible(false)} variant="none">Hide chat replay</Button>

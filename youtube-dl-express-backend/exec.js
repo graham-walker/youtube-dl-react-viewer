@@ -620,7 +620,8 @@ let debug;
         repostCount: infojsonData.repost_count,
         averageRating: infojsonData.average_rating,
         commentCount: infojsonData.comment_count,
-        comments: infojsonData.comments || [],
+        comments: [], // Unused now that comments are stored on the filesystem
+        downloadedCommentCount: infojsonData.comments?.length || null,
         ageLimit: infojsonData.age_limit,
         webpageUrl: infojsonData.webpage_url,
         categories: infojsonData.categories || [],
