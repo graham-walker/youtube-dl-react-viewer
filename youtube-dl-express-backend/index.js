@@ -63,7 +63,7 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     // Create the static folders
     for (let folder of staticFolders) {
         fs.ensureDirSync(path.join(outputDirectory, folder));
-        app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder)));
+        app.use('/static/' + folder, globalPasswordMiddleware, express.static(path.join(outputDirectory, folder), { dotfiles: 'allow' }));
     }
 
     // Admin files
