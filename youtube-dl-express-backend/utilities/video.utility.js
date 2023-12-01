@@ -265,8 +265,8 @@ export const detectShort = (video) => {
     // The shorts feature was introduced July 13th, 2021
     return (
         video.extractor === 'youtube' &&
-        video.duration > 14.9 &&
-        video.duration < 60.1 &&
+        video.duration > 14 &&
+        video.duration < 61 &&
         video.width <= video.height &&
         video.uploadDate.getTime() > new Date('2021-07-12').getTime()
     );
