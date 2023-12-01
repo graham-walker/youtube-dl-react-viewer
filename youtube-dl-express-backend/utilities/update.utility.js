@@ -8,11 +8,13 @@ import Tag from '../models/tag.model.js';
 
 import { incrementStatistics } from './statistic.utility.js';
 import { logLine, logStdout } from './logger.utility.js';
+import { detectShort } from './video.utility.js';
 
 const updateIds = {
     '1.3.0': 1,
     '1.3.1_comments': 2,
     '1.3.1_uploader_use_channel': 3,
+    '1.3.1_detect_shorts': 4,
 };
 
 const applyUpdates = async () => {
@@ -154,7 +156,7 @@ const applyUpdates = async () => {
                 { _id: doc._id },
                 { downloadedCommentCount: doc.downloadedCommentCount }
             );
-            printProgress(`Doing version 1.3.1 migrations 1/2... ${(((i + 1) / results.length) * 100).toFixed(2)}%`);
+            printProgress(`Doing version 1.3.1 migrations 1/3... ${(((i + 1) / results.length) * 100).toFixed(2)}%`);
         }
 
         // Remove comments from the database (they are now read from the filesystem)
@@ -205,10 +207,23 @@ const applyUpdates = async () => {
             video.uploaderDocument = uploader?._id;
             await video.save();
 
-            printProgress(`Doing version 1.3.1 migrations 2/2... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
+            printProgress(`Doing version 1.3.1 migrations 2/3... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
         }
 
         version.lastUpdateCompleted = updateIds['1.3.1_uploader_use_channel'];
+        await version.save();
+    }
+
+    if (updateIds['1.3.1_detect_shorts'] > version.lastUpdateCompleted) {
+        let videos = await Video.find({}, 'extractor duration uploadDate width height');
+        for (let i = 0; i < videos.length; i++) {
+            let video = videos[i];
+            video.isShort = detectShort(video);
+            await video.save();
+            printProgress(`Doing version 1.3.1 migrations 3/3... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
+        }
+
+        version.lastUpdateCompleted = updateIds['1.3.1_detect_shorts'];
         await version.save();
     }
 

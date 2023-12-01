@@ -16,6 +16,7 @@ import DownloadError from './models/error.model.js';
 
 import { parsedEnv } from './parse-env.js';
 import { incrementStatistics } from './utilities/statistic.utility.js';
+import { detectShort } from './utilities/video.utility.js';
 
 const program = commander.program;
 
@@ -695,6 +696,7 @@ let debug;
         } : undefined,
         subtitleFiles: subtitleFiles,
         unindexedFiles: files,
+        isShort: false,
         dateDownloaded: program.downloaded ? new Date(+program.downloaded) : program.isRepair ? error.dateDownloaded : new Date(),
         formatCode: program.isImport ? null : program.isRepair ? error.formatCode : job.formatCode,
         isAudioOnly: program.isImport ? null : program.isRepair ? error.isAudioOnly : job.isAudioOnly,
@@ -710,6 +712,7 @@ let debug;
         imported: program.isRepair ? error.imported : program.isImport,
         scriptVersion: program.version(),
     });
+    video.isShort = detectShort(video);
 
     try {
         await video.save();

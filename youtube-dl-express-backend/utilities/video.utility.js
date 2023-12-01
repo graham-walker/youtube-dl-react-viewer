@@ -258,3 +258,16 @@ const createVector = (allTags, tags) => {
 const dot = (vector1, vector2) => {
     return vector1.reduce((sum, element, index) => sum += element * vector2[index], 0);
 }
+
+export const detectShort = (video) => {
+    // yt-dlp does not tell if a video is a short from the metadata
+    // A short is always between 15 and 60 seconds, and is either a vertical or square video
+    // The shorts feature was introduced July 13th, 2021
+    return (
+        video.extractor === 'youtube' &&
+        video.duration > 14.9 &&
+        video.duration < 60.1 &&
+        video.width <= video.height &&
+        video.uploadDate.getTime() > new Date('2021-07-12').getTime()
+    );
+}
