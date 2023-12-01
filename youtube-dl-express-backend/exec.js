@@ -478,21 +478,16 @@ let debug;
     }
 
     let uploader;
-    if (infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id) {
+    if (infojsonData.channel_id || infojsonData.uploader_id || infojsonData.channel || infojsonData.uploader) {
         try {
             uploader = await Uploader.findOne({
                 extractor: infojsonData.extractor,
-                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.channel || infojsonData.uploader,
             });
-            if (uploader) {
-                uploader.name = infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id;
-                uploader.url = infojsonData.uploader_url;
-                await uploader.save();
-            }
             if (!uploader) uploader = await new Uploader({
                 extractor: infojsonData.extractor,
-                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.uploader,
-                name: infojsonData.uploader || infojsonData.uploader_id || infojsonData.channel_id,
+                id: infojsonData.channel_id || infojsonData.uploader_id || infojsonData.channel || infojsonData.uploader,
+                name: infojsonData.uploader || infojsonData.channel || infojsonData.uploader_id || infojsonData.channel_id,
                 url: infojsonData.uploader_url,
             }).save();
         } catch (err) {
@@ -511,7 +506,7 @@ let debug;
                 ytdlpPlaylistDescription = ytdlpPlaylistJson.description;
             }
         } catch (err) {
-            console.error('Failed to read yt-dlp playlist file (it probably does not exist or not using yt-dlp)');
+            console.warn('Failed to read yt-dlp playlist file (it probably does not exist or not using yt-dlp)');
             if (debug) console.error(err);
         }
     }
@@ -733,8 +728,9 @@ let debug;
     if (uploader) {
         uploader.statistics = await incrementStatistics(video, uploader);
 
-        if (video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
-            uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
+        if (!video.uploadDate || video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
+            uploader.name = video.uploader || video.channel || video.uploaderId || video.channelId || uploader.name;
+            uploader.url = video.uploaderUrl || uploader.url;
         }
 
         await uploader.save();
@@ -743,7 +739,7 @@ let debug;
     if (playlist) {
         playlist.statistics = await incrementStatistics(video, playlist);
 
-        if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
+        if (!video.uploadDate || video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
             playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
             playlist.description = video.playlistDescription || ytdlpPlaylistDescription || playlist.description;
             playlist.uploaderName = video.playlistUploader || video.playlistUploaderId || playlist.uploaderName;

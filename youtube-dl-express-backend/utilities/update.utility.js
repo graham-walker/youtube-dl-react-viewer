@@ -12,6 +12,7 @@ import { logLine, logStdout } from './logger.utility.js';
 const updateIds = {
     '1.3.0': 1,
     '1.3.1_comments': 2,
+    '1.3.1_uploader_use_channel': 3,
 };
 
 const applyUpdates = async () => {
@@ -153,13 +154,61 @@ const applyUpdates = async () => {
                 { _id: doc._id },
                 { downloadedCommentCount: doc.downloadedCommentCount }
             );
-            printProgress(`Doing version 1.3.1 migrations 1/1... ${(((i + 1) / results.length) * 100).toFixed(2)}%`);
+            printProgress(`Doing version 1.3.1 migrations 1/2... ${(((i + 1) / results.length) * 100).toFixed(2)}%`);
         }
 
         // Remove comments from the database (they are now read from the filesystem)
         await Video.updateMany({}, { $set: { comments: [] } });
 
         version.lastUpdateCompleted = updateIds['1.3.1_comments'];
+        await version.save();
+    }
+
+    if (updateIds['1.3.1_uploader_use_channel'] > version.lastUpdateCompleted) {
+        // Delete uploaders
+        await Uploader.deleteMany({});
+        await Uploader.syncIndexes({});
+
+        let videos = await Video.find({});
+        for (let i = 0; i < videos.length; i++) {
+            let video = videos[i];
+
+            // Recreate uploader
+            let uploader;
+            if (video.channelId || video.uploaderId || video.channel || video.uploader) {
+                uploader = await Uploader.findOne({
+                    extractor: video.extractor,
+                    id: video.channelId || video.uploaderId || video.channel || video.uploader,
+                });
+                if (!uploader) {
+                    uploader = await new Uploader({
+                        extractor: video.extractor,
+                        id: video.channelId || video.uploaderId || video.channel || video.uploader,
+                        name: video.uploader || video.channel || video.uploaderId || video.channelId,
+                        url: video.uploaderUrl,
+                    }).save();
+                }
+
+                // Update uploader name and URL
+                if (!video.uploadDate || video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
+                    uploader.name = video.uploader || video.channel || video.uploaderId || video.channelId || uploader.name;
+                    uploader.url = video.uploaderUrl || uploader.url;
+                    await uploader.save();
+                }
+
+                // Increment uploader statistics
+                uploader.statistics = await incrementStatistics(video, uploader);
+                await uploader.save();
+            }
+
+            // Set uploader document
+            video.uploaderDocument = uploader?._id;
+            await video.save();
+
+            printProgress(`Doing version 1.3.1 migrations 2/2... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
+        }
+
+        version.lastUpdateCompleted = updateIds['1.3.1_uploader_use_channel'];
         await version.save();
     }
 
@@ -208,23 +257,24 @@ const recalculateStatistics = async () => {
 
             // Recreate uploader
             let uploader;
-            if (video.uploader || video.uploaderId || video.channelId) {
+            if (video.channelId || video.uploaderId || video.channel || video.uploader) {
                 uploader = await Uploader.findOne({
                     extractor: video.extractor,
-                    id: video.channelId || video.uploaderId || video.uploader,
+                    id: video.channelId || video.uploaderId || video.channel || video.uploader,
                 });
                 if (!uploader) {
                     uploader = await new Uploader({
                         extractor: video.extractor,
-                        id: video.channelId || video.uploaderId || video.uploader,
-                        name: video.uploader || video.uploaderId || video.channelId,
+                        id: video.channelId || video.uploaderId || video.channel || video.uploader,
+                        name: video.uploader || video.channel || video.uploaderId || video.channelId,
                         url: video.uploaderUrl,
                     }).save();
                 }
 
-                // Update uploader name
-                if (video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
-                    uploader.name = video.uploader || video.uploaderId || video.channelId || uploader.name;
+                // Update uploader name and URL
+                if (!video.uploadDate || video.uploadDate === uploader.statistics.newestVideoDateUploaded) {
+                    uploader.name = video.uploader || video.channel || video.uploaderId || video.channelId || uploader.name;
+                    uploader.url = video.uploaderUrl || uploader.url;
                     await uploader.save();
                 }
 
@@ -254,7 +304,7 @@ const recalculateStatistics = async () => {
                 }
 
                 // Update playlist name and description
-                if (video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
+                if (!video.uploadDate || video.uploadDate === playlist.statistics.newestVideoDateUploaded) {
                     playlist.name = video.playlistTitle || video.playlist || video.playlistId || playlist.name;
                     playlist.description = video.playlistDescription || playlist.description;
                     playlist.uploaderName = video.playlistUploader || video.playlistUploaderId || playlist.uploaderName;
