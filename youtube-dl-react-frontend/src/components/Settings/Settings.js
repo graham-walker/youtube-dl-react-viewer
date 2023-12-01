@@ -214,7 +214,7 @@ class SettingsForm extends Component {
                             checked={this.state.reportBytesUsingIec}
                             type="checkbox"
                             name="reportBytesUsingIec"
-                            label="Use base 1024 when calculating filesize instead of base 1000"
+                            label="Use base 1024 (KiB, MiB, GiB) when calculating filesize instead of base 1000 (kB, MB, GB)"
                             id="reportBytesUsingIec"
                             onChange={this.handleInputChange}
                         />
