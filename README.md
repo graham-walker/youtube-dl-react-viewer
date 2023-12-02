@@ -400,7 +400,7 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [x] Display video chapters in the player
 - [x] Chat replay (YouTube only)
 
-**In future release:**
+**Planned for future releases:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
@@ -416,6 +416,7 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - Permission to mirror the videos in the live demo obtained from [Public Domain Films](https://www.youtube.com/channel/UCm0SxTO3_kulT6SE0AAeHOw)
 - Dockerfile created by [JamoDevNich](https://github.com/JamoDevNich)
 - SponsorBlock API from [SponsorBlock](https://sponsor.ajay.app/)
+- See packages for additional licenses
 
 ## Disclaimer
 **youtube-dl-react-viewer does not contain any code from [ytdl-org/youtube-dl](https://youtube-dl.org/). youtube-dl-react-viewer by itself does not have any capability to download videos.**
