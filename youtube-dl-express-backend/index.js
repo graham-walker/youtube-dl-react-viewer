@@ -50,9 +50,9 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     app.use('/api/auth', globalPasswordMiddleware, authRouter);
     app.use('/api/users', [globalPasswordMiddleware, authenticationMiddleware], userRouter);
     app.use('/api/videos', [globalPasswordMiddleware, userMiddleware], videoRouter);
-    app.use('/api/uploaders', globalPasswordMiddleware, uploaderRouter);
-    app.use('/api/playlists', globalPasswordMiddleware, playlistRouter);
-    app.use('/api/jobs', globalPasswordMiddleware, jobRouter);
+    app.use('/api/uploaders', [globalPasswordMiddleware, userMiddleware], uploaderRouter);
+    app.use('/api/playlists', [globalPasswordMiddleware, userMiddleware], playlistRouter);
+    app.use('/api/jobs', [globalPasswordMiddleware, userMiddleware], jobRouter);
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
     app.use('/api/activity', [globalPasswordMiddleware, authenticationMiddleware], activityRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);

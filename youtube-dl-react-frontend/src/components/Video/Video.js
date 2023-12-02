@@ -946,12 +946,17 @@ class VideoScroller extends Component {
     }
 
     componentDidMount() {
-        this.ref.current.parentNode.scrollTop = this.ref.current.offsetTop;
+        if (this.ref.current) this.ref.current.parentNode.scrollTop = this.ref.current.offsetTop;
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.activeVideo !== prevProps.activeVideo ||
-            this.props.activeTab !== prevProps.activeTab) {
+        if (
+            this.ref.current &&
+            (
+                this.props.activeVideo !== prevProps.activeVideo ||
+                this.props.activeTab !== prevProps.activeTab
+            )
+        ) {
             this.ref.current.parentNode.scrollTop = this.ref.current.offsetTop;
         }
     }

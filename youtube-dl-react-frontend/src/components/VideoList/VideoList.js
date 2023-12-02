@@ -119,12 +119,18 @@ export default class VideoList extends Component {
                             <h1>
                                 {this.state.totals.count.toLocaleString()} Video
                                 {this.state.totals.count !== 1 && 's'}
+                                {this.context.user?.hideShorts && this.state.totals.shorts > 0 && ` (${this.state.totals.shorts.toLocaleString()} hidden)`}
                             </h1>
                             <h5 className="mb-4">
                                 {bytesToSizeString(this.state.totals.filesize,
                                     this.context.user?.reportBytesUsingIec ?? true
                                 )} - {secondsToDetailedString(this.state.totals.duration)}
                             </h5>
+                        </>
+                    }
+                    {!!!this.props.stats && this.context.user?.hideShorts && this.state.totals.shorts > 0 &&
+                        <>
+                            <h5 className="mb-4">{this.state.totals.shorts.toLocaleString()} video{this.state.totals.shorts !== 1 && 's'} hidden</h5>
                         </>
                     }
                     <Accordion className="mb-4">
@@ -204,8 +210,8 @@ export default class VideoList extends Component {
                         <Row
                             className={
                                 (this.context.user?.useLargeLayout === undefined || this.context.user?.useLargeLayout)
-                                ? 'row-cols-xxxxl-5 row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1'
-                                : 'row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1'
+                                    ? 'row-cols-xxxxl-5 row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1'
+                                    : 'row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1'
                             }
                             style={{
                                 marginLeft: '-0.25rem',

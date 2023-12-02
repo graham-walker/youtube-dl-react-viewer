@@ -45,7 +45,7 @@ export const search = async (query, page, filter = {}, relevanceMeans = 'uploadD
         { $skip: page * parsedEnv.PAGE_SIZE },
         { $limit: parsedEnv.PAGE_SIZE },
     ];
-    if (query.search) pipeline.unshift({ $match: { $text: { $search: query.search } } });
+    if (query.search) pipeline.unshift({ $match: Object.assign({ $text: { $search: query.search } }, filter) });
 
     let videos = await Video.aggregate(pipeline);
     return await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
@@ -96,7 +96,7 @@ export const getTotals = async (query, filter = {}) => {
     let totals = (await Video.aggregate([
         {
             $match: query.search
-                ? { $text: { $search: query.search } }
+                ? Object.assign({ $text: { $search: query.search } }, filter)
                 : filter,
         },
         {
@@ -111,11 +111,25 @@ export const getTotals = async (query, filter = {}) => {
                 count: { $sum: 1 },
             }
         }]))[0];
-    if (!totals) totals = {
+    if (!totals) return {
         duration: 0,
         filesize: 0,
         count: 0,
+        shorts: 0,
     }
+
+    let shorts = (await Video.aggregate([
+        {
+            $match: query.search
+                ? Object.assign({ $text: { $search: query.search } }, { ...filter }, { isShort: true })
+                : Object.assign({ ...filter }, { isShort: true }),
+        },
+        {
+            $group: { _id: null, count: { $sum: 1 } }
+        }
+    ]))[0];
+    totals.shorts = shorts ? shorts.count : 0;
+
     return totals;
 }
 
@@ -158,7 +172,7 @@ const weightedFields = {
 
 export const fields = Object.keys(weightedFields).join(' ').replace('chapters.title', 'chapters');
 
-export const getSimilarVideos = async (video) => {
+export const getSimilarVideos = async (video, filter = {}) => {
     let aggregatedFields = {};
     let statistic = await Statistic.findOne({ accessKey: 'videos' });
     statistic = await applyTags(statistic);
@@ -180,7 +194,7 @@ export const getSimilarVideos = async (video) => {
 
     let videos = await Video
         .find(
-            {},
+            filter,
             'id extractor duration directory smallResizedThumbnailFile uploadDate videoFile viewCount width height uploaderDocument '
             + fields
         )

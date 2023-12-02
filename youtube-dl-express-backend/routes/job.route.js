@@ -36,13 +36,14 @@ router.get('/:_id/:page', async (req, res) => {
     }
     if (!job) return res.sendStatus(404);
 
-    const filter = { jobDocument: job._id };
+    const filter = req.user?.hideShorts ? { jobDocument: job._id, isShort: false } : { jobDocument: job._id };
 
     let videos;
     let totals = {};
     try {
         videos = await search(req.query, page, filter, 'dateDownloaded', -1);
         totals.count = (await Video.countDocuments(filter)) || 0;
+        totals.shorts = (await Video.countDocuments(Object.assign({ ...filter }, { isShort: true })) || 0)
     } catch (err) {
         return res.sendStatus(500);
     }

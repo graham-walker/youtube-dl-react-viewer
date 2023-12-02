@@ -69,6 +69,7 @@ class SettingsForm extends Component {
             reportBytesUsingIec: false,
             avatar: '',
             recordWatchHistory: false,
+            hideShorts: false,
         };
     }
 
@@ -172,6 +173,17 @@ class SettingsForm extends Component {
                             name="verifyPassword"
                             placeholder="Verify password"
                             value={this.state.verifyPassword}
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="hideShorts">
+                        <Form.Check
+                            custom
+                            checked={this.state.hideShorts}
+                            type="checkbox"
+                            name="hideShorts"
+                            label="Hide shorts on the search, channel, and playlist pages"
+                            id="hideShorts"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>

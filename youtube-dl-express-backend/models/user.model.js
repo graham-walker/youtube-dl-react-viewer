@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
     skipMusicOfftopic: { type: Boolean, default: true },
     useLargeLayout: { type: Boolean, default: true },
     fitThumbnails: { type: Boolean, default: true },
+    hideShorts: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

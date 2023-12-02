@@ -38,13 +38,14 @@ router.get('/:extractor/:id/:page', async (req, res) => {
     }
     if (!playlist) return res.sendStatus(404);
 
-    const filter = { playlistDocument: playlist._id };
+    const filter = req.user?.hideShorts ? { playlistDocument: playlist._id, isShort: false } : { playlistDocument: playlist._id };
 
     let videos;
     let totals = {};
     try {
         videos = await search(req.query, page, filter, 'playlistIndex', 1);
         totals.count = (await Video.countDocuments(filter)) || 0;
+        totals.shorts = (await Video.countDocuments(Object.assign({ ...filter }, { isShort: true })) || 0)
     } catch (err) {
         return res.sendStatus(500);
     }

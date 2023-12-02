@@ -23,9 +23,11 @@ const router = express.Router();
 router.get('/search/:page', async function (req, res) {
     const page = parseInt(req.params.page) || 0;
 
+    const filter = req.user?.hideShorts ? { isShort: false } : {}
+
     let videos;
     try {
-        videos = await search(req.query, page);
+        videos = await search(req.query, page, filter);
     }
     catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
@@ -36,13 +38,13 @@ router.get('/search/:page', async function (req, res) {
     let randomVideo;
     if (page === 0) {
         try {
-            totals = await getTotals(req.query);
+            totals = await getTotals(req.query, filter);
         } catch (err) {
             if (parsedEnv.VERBOSE) logError(err);
             return res.sendStatus(500);
         }
         try {
-            randomVideo = await getRandomVideo(req.query, totals.count);
+            randomVideo = await getRandomVideo(req.query, totals.count, filter);
         } catch (err) {
             if (parsedEnv.VERBOSE) logError(err);
             return res.sendStatus(500);
@@ -68,6 +70,8 @@ router.get('/:extractor/:id', async (req, res) => {
     let firstPlaylistVideo;
     let firstJobVideo;
 
+    const filter = req.user?.hideShorts ? { isShort: false } : {};
+
     try {
         video = (await Video.findOne({
             extractor: req.params.extractor,
@@ -85,7 +89,7 @@ router.get('/:extractor/:id', async (req, res) => {
         if (!video) return res.sendStatus(404);
 
         if (video.uploaderDocument) uploaderVideos = await Video.find(
-            { uploaderDocument: video.uploaderDocument },
+            Object.assign({ uploaderDocument: video.uploaderDocument }, filter),
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ uploadDate: -1 })
@@ -93,7 +97,7 @@ router.get('/:extractor/:id', async (req, res) => {
             .exec();
 
         if (video.playlistDocument) playlistVideos = await Video.find(
-            { playlistDocument: video.playlistDocument },
+            Object.assign({ playlistDocument: video.playlistDocument }, filter),
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ playlistIndex: 1 })
@@ -101,7 +105,7 @@ router.get('/:extractor/:id', async (req, res) => {
             .exec();
 
         jobVideos = await Video.find(
-            { jobDocument: video.jobDocument },
+            Object.assign({ jobDocument: video.jobDocument }, filter),
             '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ dateDownloaded: -1 })
@@ -123,7 +127,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
     let similarVideos;
     try {
-        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled') similarVideos = await getSimilarVideos(video);
+        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled') similarVideos = await getSimilarVideos(video, filter);
     } catch (err) {
         return res.sendStatus(500);
     }

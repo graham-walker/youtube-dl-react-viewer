@@ -84,13 +84,14 @@ router.get('/:extractor/:id/:page', async (req, res) => {
     }
     if (!uploader) return res.sendStatus(404);
 
-    const filter = { uploaderDocument: uploader._id };
+    const filter = req.user?.hideShorts ? { uploaderDocument: uploader._id, isShort: false } : { uploaderDocument: uploader._id };
 
     let videos;
     let totals = {};
     try {
         videos = await search(req.query, page, filter);
         totals.count = (await Video.countDocuments(filter)) || 0;
+        totals.shorts = (await Video.countDocuments(Object.assign({ ...filter }, { isShort: true })) || 0)
     } catch (err) {
         return res.sendStatus(500);
     }
