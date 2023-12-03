@@ -44,7 +44,13 @@
 
 ## Install
 
+> [!CAUTION]
+> Once updated, it is not recommended to downgrade an existing installation. Doing so will risk database corruption. If you plan on downgrading in the future, please backup your database before updating.
+
 ### Docker Installation
+
+> [!NOTE]  
+> If you are updating an existing Docker installation simply repeat these same steps for the latest version. Remember to make the same edits to `docker-compose.yaml` as environment variables will be reset otherwise.
 
 1. Clone the repository `git clone https://github.com/graham-walker/youtube-dl-react-viewer`
 
