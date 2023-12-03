@@ -37,7 +37,7 @@ export default class LoginForm extends Component {
         AuthService.login(this.state.username, this.state.password).then(() => {
             this.context.updateUser(AuthService.getCurrentUser());
             document.dispatchEvent(new MouseEvent('click'));
-            history.push('/');
+            window.location.pathname === '/login' ? history.push('/') : history.go(0);
         }).catch(err => {
             this.setState({ error: getErrorMessage(err), newuser: false })
         });
