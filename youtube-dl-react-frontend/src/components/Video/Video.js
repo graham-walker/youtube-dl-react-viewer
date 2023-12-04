@@ -252,8 +252,8 @@ export default class VideoPage extends Component {
                                                 if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
                                                 if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
                                                 if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
-                                                if (!this.context.user.skipFiller && sponsor.category === 'music_offtopic') continue;
-                                                if (!this.context.user.skipMusicOfftopic && sponsor.category === 'filler') continue;
+                                                if (!this.context.user.skipFiller && sponsor.category === 'filler') continue;
+                                                if (!this.context.user.skipMusicOfftopic && sponsor.category === 'music_offtopic') continue;
 
                                                 if (currentTime >= sponsor.segment[0] && currentTime < sponsor.segment[1]) {
                                                     currentTime = sponsor.segment[1];
