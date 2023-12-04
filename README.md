@@ -56,7 +56,7 @@
 
 2. Navigate to `cd ./youtube-dl-react-viewer`
 
-3. Select the release you want to install `git checkout tags/v1.3.0`
+3. Select the release you want to install `git checkout tags/v1.3.1`
     - Installing from main is not recommended as database breaking changes can be made between releases
 
 4. Set the environment variables by editing `docker-compose.yaml`
@@ -309,9 +309,10 @@ Override ext                        Sometimes the video file extension cannot
 If the web app was installed using Docker you will need to copy your existing downloads into the Docker volume before they can be imported.
 
 ```
+# 1. Copy the existing downloads to a temporary folder in the Docker container
 docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl/TEMP
 
-# Import this folder
+# 2. Import the temporary folder
 /youtube-dl/TEMP
 ```
 
