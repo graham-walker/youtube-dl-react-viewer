@@ -227,9 +227,8 @@ router.get('/:extractor/:id/comments', async (req, res) => {
                     }, infojsonData.comments[i]);
 
                     let comment = infojsonData.comments[i];
-
                     if (
-                        (!comment.hasOwnProperty('author') || typeof comment.author !== 'string' || !comment.author)
+                        (!comment.hasOwnProperty('author') || typeof comment.author !== 'string') // In the updated comment format author is sometimes an empty string
                         || (!comment.hasOwnProperty('author_id') || typeof comment.author_id !== 'string' || !comment.author_id)
                         || (!comment.hasOwnProperty('id') || typeof comment.id !== 'string' || !comment.id)
                         || (
