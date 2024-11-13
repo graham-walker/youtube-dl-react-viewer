@@ -10,19 +10,33 @@ const LogFileList = (props) => {
     const consoleOutputRef = useRef();
     const [adminFiles, setAdminFiles] = useState(props.adminFiles);
     const [consoleOutput, setConsoleOutput] = useState(props.consoleOutput);
+    const [autoConsoleRefresh, setAutoConsoleRefresh] = useState(localStorage.getItem('autoConsoleRefresh') === 'true');
+    const intervalRef = useRef();
 
     useEffect(() => {
         if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
     }, []);
 
-    const updateLogs = () => {
+    useEffect(() => {
+        if (autoConsoleRefresh) {
+            intervalRef.current = setInterval(() => {
+                updateLogs(true);
+            }, 1000);
+        } else {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        }
+    }, [autoConsoleRefresh]);
+
+    const updateLogs = (auto = false) => {
         axios
             .get(`/api/admin/logs`
             ).then(res => {
                 setAdminFiles(res.data.adminFiles);
                 setConsoleOutput(res.data.consoleOutput);
                 if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
-                scrollToElement('#logs-anchor');
+                if (!auto) scrollToElement('#logs-anchor');
             }).catch(err => {
                 alert(getErrorMessage(err));
             });
@@ -49,6 +63,21 @@ const LogFileList = (props) => {
                     >
                         Refresh
                     </Button>
+                    <Form.Check
+                        checked={autoConsoleRefresh}
+                        type="switch"
+                        name="autoConsoleRefresh"
+                        label="Auto-refresh"
+                        id="autoConsoleRefresh"
+                        onChange={(e) => {
+                            const checked = e.target.checked;
+                            setAutoConsoleRefresh(checked);
+                            localStorage.setItem('autoConsoleRefresh', checked.toString());
+                            if (checked) updateLogs();
+                        }}
+                        className="ms-2 mt-2"
+                        style={{ float: 'right' }}
+                    />
                 </Card.Body>
             </Card>
         </>
