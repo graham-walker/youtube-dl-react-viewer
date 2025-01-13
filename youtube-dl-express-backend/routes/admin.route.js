@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
             errors,
             extractors,
             adminFiles,
-            youtubeDlPath: process.env.YOUTUBE_DL_PATH,
+            youtubeDlPath: parsedEnv.YOUTUBE_DL_PATH,
             consoleOutput: history,
         });
     } catch (err) {
