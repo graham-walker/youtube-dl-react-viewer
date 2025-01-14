@@ -72,7 +72,7 @@ export default class Downloader {
                 path.join(parsedEnv.OUTPUT_DIRECTORY, '.cache'),
             ];
             if (parsedEnv.VERBOSE) jobArguments.push('--verbose');
-            if (process.platform === 'win32') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);
+            if (parsedEnv.FFMPEG_PATH !== 'ffmpeg') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);
             if (job.isAudioOnly) jobArguments.push('--extract-audio');
             if (job.downloadComments) jobArguments.push('--write-comments');
             if (!job.isAudioOnly && job.recodeVideo) jobArguments.push('--recode-video', 'mp4');
