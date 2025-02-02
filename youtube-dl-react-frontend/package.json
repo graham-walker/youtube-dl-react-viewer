@@ -12,6 +12,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.3.0-alpha3",
     "chart.js": "^2.9.4",
+    "copyfiles": "^2.4.1",
     "iso-639-1": "^2.1.4",
     "query-string": "^6.13.1",
     "react": "^16.13.1",
@@ -27,10 +28,11 @@
     "videojs-hotkeys": "^0.2.27"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run copy-env && react-scripts start",
+    "build": "npm run copy-env && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "copy-env": "copyfiles -f ../.env ./"
   },
   "proxy": "http://localhost:5000/",
   "eslintConfig": {

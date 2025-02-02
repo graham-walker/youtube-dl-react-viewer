@@ -1,5 +1,8 @@
 import path from 'path';
 import fs from 'fs-extra';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '../.env' });
 
 const expected = {
     'MONGOOSE_URL': {
@@ -98,7 +101,11 @@ const expected = {
     'NODE_ENV': {
         type: String,
         default: 'production',
-    }
+    },
+    'RUNNING_IN_DOCKER': {
+        type: Boolean,
+        default: false,
+    },
 }
 
 let env = {};
@@ -148,6 +155,12 @@ try {
                     break;
             }
         }
+    }
+
+    // Update values if running in Docker
+    if (env.RUNNING_IN_DOCKER) {
+        env.MONGOOSE_URL = env.MONGOOSE_URL.replace('127.0.0.1', 'db');
+        env.OUTPUT_DIRECTORY = '/youtube-dl'; // Set to the bind mount
     }
 
     // Additional validation

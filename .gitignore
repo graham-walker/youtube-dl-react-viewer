@@ -1,8 +1,3 @@
-TODO.txt
-TODO.odt
-.~lock.TODO.odt#
-CHECKS.txt
-
 #releases
 /releases
 
@@ -24,6 +19,8 @@ CHECKS.txt
 .env.development.local
 .env.test.local
 .env.production.local
+.env.manual
+.env.docker
 .env
 
 npm-debug.log*
