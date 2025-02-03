@@ -3,6 +3,7 @@ import path from 'path';
 import slash from 'slash';
 import axios from 'axios';
 import fs from 'fs-extra';
+import crypto from 'crypto';
 
 import Video from '../models/video.model.js';
 import Activity from '../models/activity.model.js';
@@ -157,8 +158,15 @@ router.get('/:extractor/:id', async (req, res) => {
     let sponsorSegments = null;
     if (parsedEnv.SPONSORBLOCK_API_URL && video.extractor === 'youtube' && (req.user?.enableSponsorblock || req.query?.metadata === 'true')) {
         try {
-            const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/?videoID=${video.id}&categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
-            sponsorSegments = sponsorRes.data;
+            if (parsedEnv.SPONSORBLOCK_K_ANONYMITY) {
+                const partialHash = crypto.createHash('sha256').update(video.id).digest('hex').slice(0, 4);
+                console.log(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/${partialHash}?categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`)
+                const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/${partialHash}?categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
+                sponsorSegments = sponsorRes.data.find(sponsorVideo => sponsorVideo.videoID === video.id)?.segments || null;
+            } else {
+                const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/?videoID=${video.id}&categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
+                sponsorSegments = sponsorRes.data;
+            }
         } catch (err) {
             if (err?.response?.status !== 404) {
                 logError('Failed to get sponsor segments');

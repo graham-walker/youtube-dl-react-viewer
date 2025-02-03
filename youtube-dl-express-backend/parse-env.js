@@ -90,6 +90,10 @@ const expected = {
         type: String,
         default: 'https://sponsor.ajay.app/',
     },
+    'SPONSORBLOCK_K_ANONYMITY': {
+        type: Boolean,
+        default: true,
+    },
     'EXPOSE_LOCAL_VIDEO_PATH': {
         type: Boolean,
         default: false,
@@ -164,6 +168,8 @@ try {
     }
 
     // Additional validation
+    if (env.SPONSORBLOCK_API_URL.endsWith('/')) env.SPONSORBLOCK_API_URL = env.SPONSORBLOCK_API_URL.slice(0, -1);
+
     env.OUTPUT_DIRECTORY = path.resolve(env.OUTPUT_DIRECTORY);
     if (env.OUTPUT_DIRECTORY.endsWith('/')
         || env.OUTPUT_DIRECTORY.endsWith('\\')
