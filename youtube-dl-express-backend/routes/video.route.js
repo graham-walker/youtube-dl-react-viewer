@@ -160,7 +160,6 @@ router.get('/:extractor/:id', async (req, res) => {
         try {
             if (parsedEnv.SPONSORBLOCK_K_ANONYMITY) {
                 const partialHash = crypto.createHash('sha256').update(video.id).digest('hex').slice(0, 4);
-                console.log(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/${partialHash}?categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`)
                 const sponsorRes = await axios.get(`${parsedEnv.SPONSORBLOCK_API_URL}/api/skipSegments/${partialHash}?categories=["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic","filler"]`);
                 sponsorSegments = sponsorRes.data.find(sponsorVideo => sponsorVideo.videoID === video.id)?.segments || null;
             } else {
