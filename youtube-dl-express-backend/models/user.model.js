@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     isSuperuser: { type: Boolean, default: false },
     resumeVideos: { type: Boolean, default: true },
     enableSponsorblock: { type: Boolean, default: true },
+    enableReturnYouTubeDislike: { type: Boolean, default: false },
     reportBytesUsingIec: { type: Boolean, default: true },
     useCircularAvatars: { type: Boolean, default: true },
     avatar: { type: String, default: null },

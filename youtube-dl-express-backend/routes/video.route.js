@@ -155,8 +155,9 @@ router.get('/:extractor/:id', async (req, res) => {
 
     delete video._id;
 
+    // Get sponsor segments
     let sponsorSegments = null;
-    if (parsedEnv.SPONSORBLOCK_API_URL && video.extractor === 'youtube' && (req.user?.enableSponsorblock || req.query?.metadata === 'true')) {
+    if ((req.user?.enableSponsorblock || req.query?.metadata === 'true') && parsedEnv.SPONSORBLOCK_API_URL && video.extractor === 'youtube') {
         try {
             if (parsedEnv.SPONSORBLOCK_K_ANONYMITY) {
                 const partialHash = crypto.createHash('sha256').update(video.id).digest('hex').slice(0, 4);
@@ -169,6 +170,20 @@ router.get('/:extractor/:id', async (req, res) => {
         } catch (err) {
             if (err?.response?.status !== 404) {
                 logError('Failed to get sponsor segments');
+                if (parsedEnv.VERBOSE) logError(err);
+            }
+        }
+    }
+
+    // Get dislikes
+    let returnYouTubeDislikeVotes = null;
+    if ((req.user?.enableReturnYouTubeDislike || req.query?.metadata === 'true') && parsedEnv.RETURN_YOUTUBE_DISLIKE_API_URL && video.extractor === 'youtube') {
+        try {
+            const dislikeRes = await axios.get(`${parsedEnv.RETURN_YOUTUBE_DISLIKE_API_URL}/votes?videoId=${video.id}`);
+            returnYouTubeDislikeVotes = dislikeRes.data;
+        } catch (err) {
+            if (err?.response?.status !== 404) {
+                logError('Failed to get dislikes');
                 if (parsedEnv.VERBOSE) logError(err);
             }
         }
@@ -192,6 +207,7 @@ router.get('/:extractor/:id', async (req, res) => {
         resumeTime,
         activityDocument: activity?._id,
         sponsorSegments,
+        returnYouTubeDislikeVotes,
     });
 });
 

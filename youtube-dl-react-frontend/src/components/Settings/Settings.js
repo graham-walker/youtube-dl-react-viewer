@@ -65,6 +65,7 @@ class SettingsForm extends Component {
             verifyPassword: '',
             resumeVideos: false,
             enableSponsorblock: false,
+            enableReturnYouTubeDislike: false,
             useCircularAvatars: false,
             reportBytesUsingIec: false,
             avatar: '',
@@ -178,7 +179,6 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="hideShorts">
                         <Form.Check
-                            custom
                             checked={this.state.hideShorts}
                             type="checkbox"
                             name="hideShorts"
@@ -189,7 +189,6 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="useLargeLayout">
                         <Form.Check
-                            custom
                             checked={this.state.useLargeLayout}
                             type="checkbox"
                             name="useLargeLayout"
@@ -200,7 +199,6 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="fitThumbnails">
                         <Form.Check
-                            custom
                             checked={this.state.fitThumbnails}
                             type="checkbox"
                             name="fitThumbnails"
@@ -211,7 +209,6 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="useCircularAvatars">
                         <Form.Check
-                            custom
                             checked={this.state.useCircularAvatars}
                             type="checkbox"
                             name="useCircularAvatars"
@@ -222,18 +219,16 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="reportBytesUsingIec">
                         <Form.Check
-                            custom
                             checked={this.state.reportBytesUsingIec}
                             type="checkbox"
                             name="reportBytesUsingIec"
-                            label="Use base 1024 (KiB, MiB, GiB) when calculating filesize instead of base 1000 (kB, MB, GB)"
+                            label="Use base 1024 (KiB, MiB, GiB) when displaying file sizes instead of base 1000 (kB, MB, GB)"
                             id="reportBytesUsingIec"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="recordWatchHistory">
                         <Form.Check
-                            custom
                             checked={this.state.recordWatchHistory}
                             type="checkbox"
                             name="recordWatchHistory"
@@ -244,7 +239,6 @@ class SettingsForm extends Component {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="resumeVideos">
                         <Form.Check
-                            custom
                             checked={this.state.resumeVideos}
                             type="checkbox"
                             name="resumeVideos"
@@ -258,9 +252,8 @@ class SettingsForm extends Component {
                         controlId="enableSponsorblock"
                         className="mb-3"
                     >
-                        <Form.Label>SponsorBlock</Form.Label>
+                        <Form.Label className='fw-bold'>SponsorBlock</Form.Label>
                         <Form.Check
-                            custom
                             checked={this.state.enableSponsorblock}
                             type="checkbox"
                             name="enableSponsorblock"
@@ -274,7 +267,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.onlySkipLocked}
                             type="checkbox"
                             name="onlySkipLocked"
@@ -289,7 +281,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipSponsor}
                             type="checkbox"
                             name="skipSponsor"
@@ -304,7 +295,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipSelfpromo}
                             type="checkbox"
                             name="skipSelfpromo"
@@ -319,7 +309,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipInteraction}
                             type="checkbox"
                             name="skipInteraction"
@@ -334,7 +323,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipIntro}
                             type="checkbox"
                             name="skipIntro"
@@ -349,7 +337,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipOutro}
                             type="checkbox"
                             name="skipOutro"
@@ -364,7 +351,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipPreview}
                             type="checkbox"
                             name="skipPreview"
@@ -379,7 +365,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipFiller}
                             type="checkbox"
                             name="skipFiller"
@@ -394,7 +379,6 @@ class SettingsForm extends Component {
                         className="mb-3"
                     >
                         <Form.Check
-                            custom
                             checked={this.state.skipMusicOfftopic}
                             type="checkbox"
                             name="skipMusicOfftopic"
@@ -402,6 +386,20 @@ class SettingsForm extends Component {
                             id="skipMusicOfftopic"
                             onChange={this.handleInputChange}
                             disabled={!this.state.enableSponsorblock}
+                        />
+                    </Form.Group>
+                    <Form.Group
+                        controlId="enableReturnYouTubeDislike"
+                        className="mb-3"
+                    >
+                        <Form.Label className='fw-bold'>Return YouTube Dislike</Form.Label>
+                        <Form.Check
+                            checked={this.state.enableReturnYouTubeDislike}
+                            type="checkbox"
+                            name="enableReturnYouTubeDislike"
+                            label="Fetch views, likes, and dislikes from Return YouTube Dislike"
+                            id="enableReturnYouTubeDislike"
+                            onChange={this.handleInputChange}
                         />
                     </Form.Group>
                     <Button type="submit">Save</Button>

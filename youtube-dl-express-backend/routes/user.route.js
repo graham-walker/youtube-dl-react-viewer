@@ -13,7 +13,7 @@ import Activity from '../models/activity.model.js';
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
 
-export const settingsFields = 'hideShorts resumeVideos enableSponsorblock useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout fitThumbnails';
+export const settingsFields = 'hideShorts resumeVideos enableSponsorblock enableReturnYouTubeDislike useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout fitThumbnails';
 
 router.get('/settings', async (req, res) => {
     let user;
@@ -61,6 +61,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user.resumeVideos = req.body.resumeVideos;
     user.hideShorts = req.body.hideShorts;
     user.enableSponsorblock = req.body.enableSponsorblock;
+    user.enableReturnYouTubeDislike = req.body.enableReturnYouTubeDislike;
     user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.useCircularAvatars = req.body.useCircularAvatars;
     user.recordWatchHistory = req.body.recordWatchHistory;

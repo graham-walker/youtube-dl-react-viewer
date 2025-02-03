@@ -94,6 +94,10 @@ const expected = {
         type: Boolean,
         default: true,
     },
+    'RETURN_YOUTUBE_DISLIKE_API_URL': {
+        type: String,
+        default: 'https://returnyoutubedislikeapi.com/',
+    },
     'EXPOSE_LOCAL_VIDEO_PATH': {
         type: Boolean,
         default: false,
@@ -169,6 +173,8 @@ try {
 
     // Additional validation
     if (env.SPONSORBLOCK_API_URL.endsWith('/')) env.SPONSORBLOCK_API_URL = env.SPONSORBLOCK_API_URL.slice(0, -1);
+
+    if (env.RETURN_YOUTUBE_DISLIKE_API_URL.endsWith('/')) env.RETURN_YOUTUBE_DISLIKE_API_URL = env.RETURN_YOUTUBE_DISLIKE_API_URL.slice(0, -1);
 
     env.OUTPUT_DIRECTORY = path.resolve(env.OUTPUT_DIRECTORY);
     if (env.OUTPUT_DIRECTORY.endsWith('/')

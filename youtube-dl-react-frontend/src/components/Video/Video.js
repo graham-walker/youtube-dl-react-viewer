@@ -112,6 +112,12 @@ export default class VideoPage extends Component {
                         && res.data.sponsorSegments
                     ) this.sponsorRef.current = res.data.sponsorSegments;
 
+                    if (this.context.user?.enableReturnYouTubeDislike && res.data.returnYouTubeDislikeVotes !== null) {
+                        res.data.video.viewCount = res.data.returnYouTubeDislikeVotes.viewCount;
+                        res.data.video.likeCount = res.data.returnYouTubeDislikeVotes.likes;
+                        res.data.video.dislikeCount = res.data.returnYouTubeDislikeVotes.dislikes;
+                    }
+
                     this.setState({
                         loading: false,
                         video: res.data.video,
