@@ -15,6 +15,10 @@ const LogFileList = (props) => {
 
     useEffect(() => {
         if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
+
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
     }, []);
 
     useEffect(() => {
@@ -23,9 +27,7 @@ const LogFileList = (props) => {
                 updateLogs(true);
             }, 1000);
         } else {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            if (intervalRef.current) clearInterval(intervalRef.current);
         }
     }, [autoConsoleRefresh]);
 
