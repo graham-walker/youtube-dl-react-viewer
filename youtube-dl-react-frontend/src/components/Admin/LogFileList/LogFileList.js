@@ -10,7 +10,7 @@ const LogFileList = (props) => {
     const consoleOutputRef = useRef();
     const [adminFiles, setAdminFiles] = useState(props.adminFiles);
     const [consoleOutput, setConsoleOutput] = useState(props.consoleOutput);
-    const [autoConsoleRefresh, setAutoConsoleRefresh] = useState(localStorage.getItem('autoConsoleRefresh') === 'true');
+    const [autoConsoleRefresh, setAutoConsoleRefresh] = useState(localStorage.getItem('autoConsoleRefresh') === null ? true : localStorage.getItem('autoConsoleRefresh') === 'true');
     const intervalRef = useRef();
 
     useEffect(() => {
