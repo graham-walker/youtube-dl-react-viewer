@@ -7,10 +7,7 @@ import App from './App';
 import parsedEnv from './parse-env';
 
 document.title = parsedEnv.REACT_APP_BRAND;
-window.gitHubLink = 'https://github.com/graham-walker/youtube-dl-react-viewer';
-window.githubApiLink = 'https://api.github.com/repos/graham-walker/youtube-dl-react-viewer/releases/latest';
-window.gitHubLatestReleaseLink = 'https://github.com/graham-walker/youtube-dl-react-viewer/releases/latest';
-window.scriptVersion = '1.3.1';
+window.appVersion = '1.3.1';
 
 ReactDOM.render(
   <React.StrictMode>

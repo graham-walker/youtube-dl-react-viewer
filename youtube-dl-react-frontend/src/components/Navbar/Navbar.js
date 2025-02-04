@@ -193,7 +193,7 @@ class AppNavbar extends Component {
                                     </>
                                 }
                                 <ThemeController onThemeChange={(theme) => { this.setState({ theme }) }} />
-                                {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.scriptVersion}</Badge></small>}
+                                {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.appVersion}</Badge></small>}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>

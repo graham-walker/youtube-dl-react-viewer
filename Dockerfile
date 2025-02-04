@@ -26,6 +26,7 @@ RUN [ "$(tail -c1 < .env)" != "" ] && echo "" >> .env || true
 
 # Inform the web app that it is running in a Docker container
 RUN echo 'RUNNING_IN_DOCKER=true' >> .env
+RUN echo 'REACT_APP_RUNNING_IN_DOCKER=true' >> .env
 
 # Fetch dependencies and build frontend
 WORKDIR /opt/youtube-dl-react-viewer/youtube-dl-express-backend

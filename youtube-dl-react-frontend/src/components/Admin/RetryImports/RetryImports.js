@@ -2,6 +2,7 @@ import { Button, Accordion, Alert } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
+import parsedEnv from '../../../parse-env';
 
 const RetryImports = (props) => {
 
@@ -42,7 +43,7 @@ const RetryImports = (props) => {
                                     {!!error.success && <Alert variant="success">{error.success}</Alert>}
                                     {!!error.error && <Alert variant="danger">{error.error}</Alert>}
                                     <Button
-                                        href={window.gitHubLink + '/issues'}
+                                        href={parsedEnv.REACT_APP_REPO_URL + '/issues'}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         variant="danger"
