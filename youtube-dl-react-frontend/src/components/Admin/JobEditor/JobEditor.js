@@ -92,7 +92,7 @@ class JobForm extends Component {
             name: '',
             formatCode: defaultFormatCode,
             isAudioOnly: false,
-            downloadComments: false,
+            downloadComments: true,
             recodeVideo: false,
             urls: '',
             arguments: defaultArguments,
@@ -188,21 +188,12 @@ class JobForm extends Component {
                             required
                         />
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId={'isAudioOnly' + (this.props.job?._id || 'new')}>
-                        <Form.Check
-                            checked={this.state.isAudioOnly}
-                            type="checkbox"
-                            name="isAudioOnly"
-                            label="Download audio only"
-                            onChange={this.handleInputChange}
-                        />
-                    </Form.Group>
                     <Form.Group className="mb-3" controlId={'downloadComments' + (this.props.job?._id || 'new')}>
                         <Form.Check
                             checked={this.state.downloadComments}
                             type="checkbox"
                             name="downloadComments"
-                            label="Download comments (yt-dlp only)"
+                            label="Download comments"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
@@ -212,6 +203,15 @@ class JobForm extends Component {
                             type="checkbox"
                             name="recodeVideo"
                             label="Recode video to mp4 to improve browser playback compatibility (may reduce quality)"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId={'isAudioOnly' + (this.props.job?._id || 'new')}>
+                        <Form.Check
+                            checked={this.state.isAudioOnly}
+                            type="checkbox"
+                            name="isAudioOnly"
+                            label="Download audio only"
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
