@@ -12,6 +12,7 @@ const LogFileList = (props) => {
     const [consoleOutput, setConsoleOutput] = useState(props.consoleOutput);
     const [autoConsoleRefresh, setAutoConsoleRefresh] = useState(localStorage.getItem('autoConsoleRefresh') === null ? true : localStorage.getItem('autoConsoleRefresh') === 'true');
     const intervalRef = useRef();
+    const historyUpdatedRef = useRef(props.historyUpdated);
 
     useEffect(() => {
         if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
@@ -36,8 +37,13 @@ const LogFileList = (props) => {
             .get(`/api/admin/logs`
             ).then(res => {
                 setAdminFiles(res.data.adminFiles);
-                setConsoleOutput(res.data.consoleOutput);
-                if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
+
+                if (!auto || historyUpdatedRef.current < res.data.historyUpdated) {
+                    setConsoleOutput(res.data.consoleOutput);
+                    if (consoleOutputRef.current) consoleOutputRef.current.scrollTop = consoleOutputRef.current.scrollHeight;
+                }
+                historyUpdatedRef.current = res.data.historyUpdated;
+
                 if (!auto) scrollToElement('#logs-anchor');
             }).catch(err => {
                 alert(getErrorMessage(err));

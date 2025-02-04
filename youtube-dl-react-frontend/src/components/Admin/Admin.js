@@ -32,6 +32,7 @@ export default class AdminPage extends Component {
             youtubeDlPath: undefined,
             defaultActivejobId: undefined,
             consoleOutput: [],
+            historyUpdated: 0,
         };
     }
 
@@ -48,7 +49,8 @@ export default class AdminPage extends Component {
                     adminFiles: res.data.adminFiles,
                     youtubeDlPath: res.data.youtubeDlPath,
                     defaultActivejobId: res.data.jobs[0]?._id,
-                    consoleOutput: res.data.consoleOutput
+                    consoleOutput: res.data.consoleOutput,
+                    historyUpdated: res.data.historyUpdated,
                 });
             }).catch(err => {
                 this.setState({ error: err });
@@ -68,7 +70,7 @@ export default class AdminPage extends Component {
                     >
                         <h1 className="mb-4">Admin</h1>
                         {parsedEnv.REACT_APP_CHECK_FOR_UPDATES && <UpdateChecker />}
-                        <LogFileList adminFiles={this.state.adminFiles} consoleOutput={this.state.consoleOutput} />
+                        <LogFileList adminFiles={this.state.adminFiles} consoleOutput={this.state.consoleOutput} historyUpdated={this.state.historyUpdated} />
                         <YtdlUpdater youtubeDlPath={this.state.youtubeDlPath} />
                         <JobDownloader jobs={this.state.jobs} />
                         <JobEditor jobs={this.state.jobs} defaultActivejobId={this.state.defaultActivejobId} onJobsChange={(jobs) => this.setState({ jobs })} />

@@ -7,6 +7,7 @@ const logFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'console_output.txt');
 fs.removeSync(logFile);
 
 let history = [];
+let historyUpdated = new Date().getTime();
 const historyLimit = 1000;
 
 const logLine = (msg) => {
@@ -89,10 +90,11 @@ const pushHistory = (msg, level = 'log', progress = false, stdout = false) => {
         progress,
     });
     if (history.length > historyLimit) history.splice(0, 1);
+    historyUpdated = new Date().getTime();
 }
 
 const writeLine = (msg, stdout = false) => {
     fs.appendFileSync(logFile, stdout ? msg : msg + '\r\n');
 }
 
-export { logLine, logWarn, logInfo, logError, logStdout, history };
+export { logLine, logWarn, logInfo, logError, logStdout, history, historyUpdated };

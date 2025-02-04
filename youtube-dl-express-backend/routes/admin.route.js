@@ -19,7 +19,7 @@ import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
 import { decrementStatistics } from '../utilities/statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
-import { logLine, logWarn, logError, history, logStdout } from '../utilities/logger.utility.js';
+import { logLine, logWarn, logError, history, historyUpdated, logStdout } from '../utilities/logger.utility.js';
 
 const router = express.Router();
 
@@ -46,6 +46,7 @@ router.get('/', async (req, res) => {
             adminFiles,
             youtubeDlPath: parsedEnv.YOUTUBE_DL_PATH,
             consoleOutput: history,
+            historyUpdated,
         });
     } catch (err) {
         res.sendStatus(500);
@@ -59,6 +60,7 @@ router.get('/logs', async (req, res) => {
         res.json({
             adminFiles,
             consoleOutput: history,
+            historyUpdated,
         });
     } catch (err) {
         res.sendStatus(500);
