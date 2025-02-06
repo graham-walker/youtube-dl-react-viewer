@@ -1,11 +1,9 @@
 import express from 'express';
-import os from 'os';
-import { spawn, spawnSync, execSync } from 'child_process';
+import { spawn } from 'child_process';
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
-import mongoose from 'mongoose';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
@@ -20,6 +18,7 @@ import ErrorManager from '../utilities/error.utility.js';
 import { decrementStatistics } from '../utilities/statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
 import { logLine, logWarn, logError, history, historyUpdated, logStdout } from '../utilities/logger.utility.js';
+import { updateYoutubeDl } from '../utilities/job.utility.js';
 
 const router = express.Router();
 
@@ -168,32 +167,10 @@ router.post('/youtube-dl/update', async (req, res) => {
 
     updating = true;
     try {
-        if (parsedEnv.YOUTUBE_DL_UPDATE_COMMAND) {
-            try {
-                let output = execSync(parsedEnv.YOUTUBE_DL_UPDATE_COMMAND);
-                updating = false;
-                logStdout(output);
-                return res.json({ success: output.toString() });
-            } catch (err) {
-                if (parsedEnv.VERBOSE) logError(err.toString());
-                updating = false;
-                return res.status(500).json({ error: `Command failed YOUTUBE_DL_UPDATE_COMMAND=${parsedEnv.YOUTUBE_DL_UPDATE_COMMAND}` });
-            }
-        } else {
-            let updateProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
-            if (updateProcess.status === 0) {
-                logStdout(updateProcess.stdout);
-                let message = updateProcess.stdout.split(os.EOL);
-                if (message[message.length - 1] === '') message.pop();
-                message = message.pop();
-                updating = false;
-                if (message.startsWith('ERROR')) return res.status(500).json({ error: message });
-                return res.json({ success: message });
-            } else {
-                updating = false;
-                return res.status(500).json({ error: 'Failed to check for updates' });
-            }
-        }
+        const message = updateYoutubeDl();
+        updating = false;
+        if (message.hasOwnProperty('success')) return res.json(message);
+        return res.status(500).json(message);
     } catch (err) {
         updating = false;
         return res.sendStatus(500);

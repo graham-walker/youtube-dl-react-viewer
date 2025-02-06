@@ -106,6 +106,10 @@ const expected = {
         type: String,
         default: '',
     },
+    'UPDATE_YOUTUBE_DL_ON_JOB_START': {
+        type: Boolean,
+        default: true,
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',

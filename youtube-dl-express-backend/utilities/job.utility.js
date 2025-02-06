@@ -1,10 +1,10 @@
-import { spawn, spawnSync } from 'child_process';
+import { spawn, spawnSync, execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs-extra';
 
 import Job from '../models/job.model.js';
 import { parsedEnv } from '../parse-env.js';
-import { logLine, logStdout } from './logger.utility.js';
+import { logLine, logStdout, logError } from './logger.utility.js';
 
 export default class Downloader {
     constructor() {
@@ -25,6 +25,8 @@ export default class Downloader {
     async download(chained = false) {
         if (!this.downloading || chained) {
             this.downloading = true;
+
+            if (parsedEnv.UPDATE_YOUTUBE_DL_ON_JOB_START && !chained) updateYoutubeDl();
 
             let job;
             try {
@@ -215,4 +217,35 @@ const downloadVideos = (jobArguments) => {
     });
 
     return youtubeDlProcess;
+}
+
+export const updateYoutubeDl = () => {
+    const successMessage = { success: 'Updated to the latest version' };
+    const errorMessage = { error: `Update failed, check the console for details` };
+
+    if (parsedEnv.YOUTUBE_DL_UPDATE_COMMAND) {
+        try {
+            let output = execSync(parsedEnv.YOUTUBE_DL_UPDATE_COMMAND);
+            logStdout(output);
+            return successMessage;
+        } catch (err) {
+            logError(err.toString());
+            return errorMessage;
+        }
+    } else {
+        let result = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['-U'], { encoding: 'utf-8' });
+        if (result.error) {
+            logError(result.error.toString());
+            return errorMessage;
+        }
+
+        logStdout(result.stdout);
+        logStdout(result.stderr);
+
+        if (result.status === 0) {
+            return successMessage;
+        } else {
+            return errorMessage;
+        }
+    }
 }
