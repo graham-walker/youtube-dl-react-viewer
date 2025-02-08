@@ -22,29 +22,28 @@ class UpdateChecker extends Component {
                 if (res?.data?.tag_name) {
                     if (this.getVersionScore(res.data.tag_name) > this.getVersionScore(window.appVersion)) {
                         this.setState({
-                            message: <>A <a
+                            message: <>A new version of <a
                                 href={parsedEnv.REACT_APP_LATEST_RELEASE_LINK}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                            >
-                                new release is available
-                            </a> ({res.data.tag_name.slice(1)} &gt; {window.appVersion})</>,
+                            >{parsedEnv.REACT_APP_REPO_NAME}</a> is available
+                                ({res.data.tag_name.slice(1)} &gt; {window.appVersion})</>,
                             variant: 'info',
                         });
                     } else if (this.getVersionScore(res.data.tag_name) === this.getVersionScore(window.appVersion)) {
-                        this.setState({ message: `You are using the latest version (${window.appVersion})`, variant: 'success' });
+                        this.setState({ message: `You are using the latest version of ${parsedEnv.REACT_APP_REPO_NAME} (${window.appVersion})`, variant: 'success' });
                     } else {
                         this.setState({
-                            message: `You are using a development version (${window.appVersion}).
-                        Features may not be complete or may cause irreversible damage to the database`, variant: 'warning'
+                            message: `You are using a development version of ${parsedEnv.REACT_APP_REPO_NAME} (${window.appVersion})`, variant: 'warning'
                         });
                     }
                 } else {
-                    this.setState({ message: 'Failed to check for updates', variant: 'danger' });
+                    this.setState({ message: `Failed to check for updates to ${parsedEnv.REACT_APP_REPO_NAME}`, variant: 'danger' });
                 }
             }
         }).catch(err => {
-            this.setState({ message: 'Failed to check for updates', variant: 'danger' });
+            console.error(err);
+            this.setState({ message: `Failed to check for updates to ${parsedEnv.REACT_APP_REPO_NAME}`, variant: 'danger' });
         });
     }
 
