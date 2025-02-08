@@ -28,10 +28,13 @@ class YtdlUpdater extends Component {
                 .post(
                     `/api/admin/youtube-dl/update`
                 ).then(res => {
-                    if (res.status === 200) this.setState({
-                        success: res.data.success,
-                        error: res.data.error
-                    });
+                    if (res.status === 200) {
+                        this.setState({
+                            success: res.data.success,
+                            error: res.data.error
+                        });
+                        if (res.data.youtubeDlVersion) this.props.onYoutubeDlVersionChange(res.data.youtubeDlVersion);
+                    }
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
                 }).finally(() => {
@@ -43,12 +46,12 @@ class YtdlUpdater extends Component {
     render() {
         return (
             <>
-                <h5 className="mb-4" id="youtube-dl-anchor">youtube-dl</h5>
+                <h5 className="mb-4" id="youtube-dl-anchor">yt-dlp</h5>
                 <Card className="mb-4">
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
-                        <p>Using <code><span style={{ color: '#569CD6' }}>YOUTUBE_DL_PATH</span>=<span style={{ color: '#CE9178' }}>{this.props.youtubeDlPath}</span></code></p>
+                        <p>Using: {this.props.youtubeDlPath.replaceAll('\\', '/').split('/').pop()} {this.props.youtubeDlVersion}</p>
                         <Button
                             name="update"
                             type="submit"

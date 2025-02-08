@@ -18,7 +18,7 @@ import ErrorManager from '../utilities/error.utility.js';
 import { decrementStatistics } from '../utilities/statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
 import { logLine, logWarn, logError, history, historyUpdated, logStdout } from '../utilities/logger.utility.js';
-import { updateYoutubeDl } from '../utilities/job.utility.js';
+import { updateYoutubeDl, getYoutubeDlVersion } from '../utilities/job.utility.js';
 
 const router = express.Router();
 
@@ -30,6 +30,8 @@ let deleting = false;
 let importing = false;
 
 const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
+
+let youtubeDlVersion = getYoutubeDlVersion();
 
 router.get('/', async (req, res) => {
     try {
@@ -44,6 +46,7 @@ router.get('/', async (req, res) => {
             extractors,
             adminFiles,
             youtubeDlPath: parsedEnv.YOUTUBE_DL_PATH,
+            youtubeDlVersion,
             consoleOutput: history,
             historyUpdated,
         });
@@ -119,15 +122,20 @@ router.post('/jobs/download/', async (req, res) => {
         return res.sendStatus(500);
     }
     const jobsAdded = downloader.queue(req.body);
-    switch (await downloader.download()) {
+
+    const result = await downloader.download();
+    if (result === 'updated-started') youtubeDlVersion = getYoutubeDlVersion();
+
+    switch (result) {
         case 'not-started':
             if (jobsAdded > 0) {
                 return res.json({ success: 'Job started, check the console for progress' });
             } else {
                 return res.json({ error: 'Job already started' });
             }
+        case 'updated-started':
         case 'started':
-            return res.json({ success: 'Job started, check the console for progress' });
+            return res.json({ success: 'Job started, check the console for progress', youtubeDlVersion });
         case 'failed':
             return res.status(500).json({ error: 'Failed to start' });
         default:
@@ -169,7 +177,10 @@ router.post('/youtube-dl/update', async (req, res) => {
     try {
         const message = updateYoutubeDl();
         updating = false;
-        if (message.hasOwnProperty('success')) return res.json(message);
+        if (message.hasOwnProperty('success')) {
+            youtubeDlVersion = getYoutubeDlVersion();
+            return res.json({ ...message, youtubeDlVersion });
+        }
         return res.status(500).json(message);
     } catch (err) {
         updating = false;

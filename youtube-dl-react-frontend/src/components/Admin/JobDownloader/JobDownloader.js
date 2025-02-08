@@ -47,6 +47,7 @@ class JobDownloader extends Component {
                         success: res.data.success,
                         error: res.data.error
                     });
+                    if (res.data.youtubeDlVersion) this.props.onYoutubeDlVersionChange(res.data.youtubeDlVersion);
                 }).catch(err => {
                     this.setState({ error: getErrorMessage(err) });
                 }).finally(() => {

@@ -30,6 +30,7 @@ export default class AdminPage extends Component {
             extractors: [],
             adminFiles: [],
             youtubeDlPath: undefined,
+            youtubeDlVersion: undefined,
             defaultActivejobId: undefined,
             consoleOutput: [],
             historyUpdated: 0,
@@ -48,6 +49,7 @@ export default class AdminPage extends Component {
                     extractors: res.data.extractors,
                     adminFiles: res.data.adminFiles,
                     youtubeDlPath: res.data.youtubeDlPath,
+                    youtubeDlVersion: res.data.youtubeDlVersion,
                     defaultActivejobId: res.data.jobs[0]?._id,
                     consoleOutput: res.data.consoleOutput,
                     historyUpdated: res.data.historyUpdated,
@@ -71,8 +73,15 @@ export default class AdminPage extends Component {
                         <h1 className="mb-4">Admin</h1>
                         {parsedEnv.REACT_APP_CHECK_FOR_UPDATES && <UpdateChecker />}
                         <LogFileList adminFiles={this.state.adminFiles} consoleOutput={this.state.consoleOutput} historyUpdated={this.state.historyUpdated} />
-                        <YtdlUpdater youtubeDlPath={this.state.youtubeDlPath} />
-                        <JobDownloader jobs={this.state.jobs} />
+                        <YtdlUpdater
+                            youtubeDlPath={this.state.youtubeDlPath}
+                            youtubeDlVersion={this.state.youtubeDlVersion}
+                            onYoutubeDlVersionChange={(version) => this.setState({ youtubeDlVersion: version })}
+                        />
+                        <JobDownloader
+                            jobs={this.state.jobs}
+                            onYoutubeDlVersionChange={(version) => this.setState({ youtubeDlVersion: version })}
+                        />
                         <JobEditor jobs={this.state.jobs} defaultActivejobId={this.state.defaultActivejobId} onJobsChange={(jobs) => this.setState({ jobs })} />
                         <VideoImporter jobs={this.state.jobs} />
                         <VideoDeleter extractors={this.state.extractors} />

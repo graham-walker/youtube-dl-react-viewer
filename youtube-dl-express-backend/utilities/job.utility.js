@@ -26,8 +26,14 @@ export default class Downloader {
         if (!this.downloading || chained) {
             this.downloading = true;
 
-            if (parsedEnv.UPDATE_YOUTUBE_DL_ON_JOB_START && !chained) updateYoutubeDl();
+            // Update yt-dlp
+            let updated = false;
+            if (parsedEnv.UPDATE_YOUTUBE_DL_ON_JOB_START && !chained) {
+                let message = updateYoutubeDl();
+                if (message.success) updated = true;
+            }
 
+            // Get the next job in the queue
             let job;
             try {
                 job = await Job.findOne({ _id: this.queued[0] });
@@ -47,7 +53,7 @@ export default class Downloader {
             try {
                 parsedArguments = parseArguments(job.arguments);
                 parsedUrls = parseUrls(job.urls);
-                youtubeDlVersion = await getYoutubeDlVersion();
+                youtubeDlVersion = getYoutubeDlVersion();
             } catch (err) {
                 this.stop();
                 return 'failed';
@@ -89,7 +95,7 @@ export default class Downloader {
                 job.lastCompleted = new Date();
                 await job.save();
                 logLine(`youtube-dl exited with code ${code} (${code === 0 ? 'success' : 'failure'})`);
-                logLine(`Job ${job.name} finished`);
+                logLine(`Finished downloading job ${job.name}`);
 
                 this.queued.shift();
                 if (this.queued.length > 0) {
@@ -98,6 +104,8 @@ export default class Downloader {
                     this.downloading = false;
                 }
             });
+
+            if (updated) return 'updated-started';
             return 'started';
         } else {
             return 'not-started';
@@ -196,8 +204,8 @@ const parseUrls = (text) => {
         .filter((i) => i != '');
 }
 
-const getYoutubeDlVersion = async () => {
-    const versionProcess = await spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['--version'], { windowsHide: true });
+export const getYoutubeDlVersion = () => {
+    const versionProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['--version'], { windowsHide: true });
     if (versionProcess.status === 0) {
         return versionProcess.stdout.toString().trim();
     } else {
@@ -220,6 +228,8 @@ const downloadVideos = (jobArguments) => {
 }
 
 export const updateYoutubeDl = () => {
+    logLine('Checking for updates to yt-dlp');
+
     const successMessage = { success: 'Updated to the latest version' };
     const errorMessage = { error: `Update failed, check the console for details` };
 
