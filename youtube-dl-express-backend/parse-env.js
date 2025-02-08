@@ -108,7 +108,7 @@ const expected = {
     },
     'UPDATE_YOUTUBE_DL_ON_JOB_START': {
         type: Boolean,
-        default: true,
+        default: false,
     },
     'NODE_ENV': {
         type: String,
