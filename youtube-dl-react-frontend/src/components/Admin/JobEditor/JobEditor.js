@@ -6,6 +6,7 @@ import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
 import { scrollToElement } from '../../../utilities/scroll.utility';
+import ImportSubscriptionsButton from '../../ImportSubscriptionsButton/ImportSubscriptionsButton';
 
 const JobEditor = (props) => {
 
@@ -226,6 +227,15 @@ class JobForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <ImportSubscriptionsButton
+                        className="mb-3"
+                        emit={(subscriptions) => this.setState({
+                            urls:
+                                this.state.urls.trim() === ''
+                                    ? subscriptions
+                                    : this.state.urls.replace(/\n*$/, '\n\n') + subscriptions
+                        })}
+                    />
                     <Accordion>
                         <AccordionButton
                             variant="link"
