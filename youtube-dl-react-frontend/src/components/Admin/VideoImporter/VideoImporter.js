@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Form, Button, Accordion, Card, Alert, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
 import { scrollToElement } from '../../../utilities/scroll.utility';
+import parsedEnv from '../../../parse-env';
 
 class VideoImporter extends Component {
     static contextType = UserContext;
@@ -68,9 +70,10 @@ class VideoImporter extends Component {
                         <Form onSubmit={this.onSubmit}>
                             <Form.Group className="mb-3" controlId="folder">
                                 <Form.Label>Folder to import</Form.Label>
+                                {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker videos must be copied into the container before they can be imported. <a href={parsedEnv.REACT_APP_REPO_URL + '#importing-already-downloaded-videos'} target='_blank'>Learn more</a></Alert>}
                                 <Form.Control
                                     type="text"
-                                    placeholder="/Path/To/Folder/On/Server/Computer"
+                                    placeholder={parsedEnv.REACT_APP_RUNNING_IN_DOCKER ? '/youtube-dl/TEMP' : 'C:\\Your\\Existing\\Downloads'}
                                     name="folder"
                                     value={this.state.folder}
                                     onChange={this.handleInputChange}
@@ -78,8 +81,8 @@ class VideoImporter extends Component {
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="jobName">
-                                <OverlayTrigger overlay={<Tooltip>Imported videos will appear in the web app as if they were downloaded by this job</Tooltip>}>
-                                    <Form.Label>Job</Form.Label>
+                                <OverlayTrigger overlay={<Tooltip>Imported videos will appear in the web app as if they were downloaded by the specified job</Tooltip>}>
+                                    <Form.Label>Add imported videos to job <FontAwesomeIcon icon="circle-info" /></Form.Label>
                                 </OverlayTrigger>
                                 <Form.Select
                                     name="jobName"
@@ -115,7 +118,11 @@ class VideoImporter extends Component {
                                     checked={this.state.continueOnFailed}
                                     type="checkbox"
                                     name="continueOnFailed"
-                                    label="Continue on failed"
+                                    label={
+                                        <OverlayTrigger overlay={<Tooltip>If a video fails to import, continue to the next video instead of stopping</Tooltip>}>
+                                            <Form.Label>Continue on failed <FontAwesomeIcon icon="circle-info" /></Form.Label>
+                                        </OverlayTrigger>
+                                    }
                                     onChange={this.handleInputChange}
                                 />
                             </Form.Group>
@@ -130,8 +137,8 @@ class VideoImporter extends Component {
                                 <Accordion.Collapse eventKey="0">
                                     <>
                                         <Form.Group className="mb-3" controlId="overrideExt">
-                                            <OverlayTrigger overlay={<Tooltip>Set the video file extension instead of getting it from the metadata file. Sometimes when importing the extension cannot be determined automatically</Tooltip>}>
-                                                <Form.Label>Override ext</Form.Label>
+                                            <OverlayTrigger overlay={<Tooltip>Specify a video extention for the importer to look for if it cannot be determined automatically</Tooltip>}>
+                                                <Form.Label>Override ext <FontAwesomeIcon icon="circle-info" /></Form.Label>
                                             </OverlayTrigger>
                                             <Form.Control
                                                 type="text"
