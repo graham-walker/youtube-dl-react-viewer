@@ -82,7 +82,7 @@ const ImportSubscriptionsButton = ({ emit, className }) => {
         <div className={className}>
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
             <Dropdown>
-                <Dropdown.Toggle variant="primary">Import Subscriptions From</Dropdown.Toggle>
+                <Dropdown.Toggle variant="primary">Import Subscriptions</Dropdown.Toggle>
                 <Dropdown.Menu>
                     <Dropdown.Item onClick={() => handleSelect('youtube_subscriptions_csv')}>
                         YouTube subscriptions.csv

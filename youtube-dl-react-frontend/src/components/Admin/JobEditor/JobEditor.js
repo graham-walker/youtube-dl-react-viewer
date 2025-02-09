@@ -7,6 +7,7 @@ import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
 import { scrollToElement } from '../../../utilities/scroll.utility';
 import ImportSubscriptionsButton from '../../ImportSubscriptionsButton/ImportSubscriptionsButton';
+import parsedEnv from '../../../parse-env';
 
 const JobEditor = (props) => {
 
@@ -96,7 +97,7 @@ class JobForm extends Component {
             downloadComments: true,
             recodeVideo: false,
             urls: '',
-            arguments: defaultArguments,
+            arguments: parsedEnv.REACT_APP_RUNNING_IN_DOCKER ? dockerDefaultArguments : manualDefaultArguments,
             overrideUploader: '',
         }
         this.initialState = { ...this.state };
@@ -177,9 +178,7 @@ class JobForm extends Component {
                         />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId={'formatCode' + (this.props.job?._id || 'new')}>
-                        <OverlayTrigger overlay={<Tooltip>Same as --format</Tooltip>}>
-                            <Form.Label>Format code</Form.Label>
-                        </OverlayTrigger>
+                        <Form.Label>Format code</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Format code"
@@ -247,9 +246,10 @@ class JobForm extends Component {
                         <Accordion.Collapse eventKey="0">
                             <>
                                 <Form.Group className="mb-3" controlId={'arguments' + (this.props.job?._id || 'new')}>
-                                    <OverlayTrigger overlay={<Tooltip>Set the arguments used when executing youtube-dl</Tooltip>}>
-                                        <Form.Label>Override config</Form.Label>
+                                    <OverlayTrigger overlay={<Tooltip>Command line arguments passed to yt-dlp</Tooltip>}>
+                                        <Form.Label>Arguments <FontAwesomeIcon icon="circle-info" /></Form.Label>
                                     </OverlayTrigger>
+                                    {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker --cookies-from-browser will not work and --cookies must be set inside the container. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-download-from-websites-that-require-a-login'} target='_blank'>Learn more</a></Alert>}
                                     <Form.Control
                                         as="textarea"
                                         rows="10"
@@ -257,14 +257,15 @@ class JobForm extends Component {
                                         name="arguments"
                                         value={this.state.arguments}
                                         onChange={this.handleInputChange}
+                                        spellcheck="false"
                                         required
                                     >
                                         {defaultArguments}
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId={'overrideUploader' + (this.props.job?._id || 'new')}>
-                                    <OverlayTrigger overlay={<Tooltip>Set the uploader. Useful when downloading from websites that do not return uploader in their metadata</Tooltip>}>
-                                        <Form.Label>Override uploader</Form.Label>
+                                    <OverlayTrigger overlay={<Tooltip>Treat all videos downloaded by this job as if they were uploaded by the specified uploader</Tooltip>}>
+                                        <Form.Label>Override uploader <FontAwesomeIcon icon="circle-info" /></Form.Label>
                                     </OverlayTrigger>
                                     <Form.Control
                                         type="text"
@@ -284,17 +285,20 @@ class JobForm extends Component {
     }
 }
 
-const defaultArguments = `# Replace with your cookie file to sign in to websites
-#--cookies "/Path/To/cookies.txt"
+const defaultArguments = `# Uncomment and replace with the path to your Netscape cookie file to login to websites
+$COOKIES
 
-# Uncomment this line to prevent yt-dlp from downloading playlist metafiles every time
+# Uncomment to prevent yt-dlp from downloading playlist metafiles every time a channel is downloaded
 #--no-write-playlist-metafiles
 
-# These options will BREAK the script, do not set them:
+# Uncomment to prevent downloading livestreams
+#--match-filter "!is_live & !live"
+
+# These options will cause downloads to fail, do not set them:
 #--batch-file
 #--keep-fragments
 
-# These options are set by the script, they will be overridden:
+# These options are controlled by the web app, any value set here will be overridden:
 #--exec
 #--write-info-json
 #--prefer-ffmpeg
@@ -307,13 +311,10 @@ const defaultArguments = `# Replace with your cookie file to sign in to websites
 #--write-comments
 #--recode-video
 
-# These options are set by the script if using the yt-dlp, they will be overridden:
-#--compat-options youtube-dl
-
-# These options are not required, but are used by default:
+# These options are used by default, but are not required:
 #--write-thumbnail can be replaced with --write-all-thumbnails
 #--all-subs can be replaced with --write-sub or --write-auto-sub
-#--merge-output-format can cause downloads to fail depending on the format code used
+#--merge-output-format can cause downloads to fail depending on the format code combination used
 --write-description
 --write-annotations
 --write-thumbnail
@@ -325,19 +326,16 @@ const defaultArguments = `# Replace with your cookie file to sign in to websites
 --no-continue
 --ignore-errors
 
-# These options may help the script, but are not necessary:
+# These options may improve download stability, but are not required:
 #--geo-bypass
 #--force-ipv4
-#--match-filter "!is_live & !live"
-
-# Prevent 429 errors:
 #--sleep-interval 5
 #--max-sleep-interval 30
-
-# These options are recommended if using yt-dlp:
 #--sleep-requests 1
 #--datebefore "$(date --date="30 days ago" +%Y%m%d)"
 `;
+const manualDefaultArguments = defaultArguments.replace('$COOKIES', '#--cookies "C:\\Path\\To\\cookies.txt"');
+const dockerDefaultArguments = defaultArguments.replace('$COOKIES', '#--cookies /youtube-dl/cookies.txt');
 const defaultFormatCode = 'bestvideo*+bestaudio/best';
 const defaultFormatCodeAudioOnly = 'bestaudio/best';
 
