@@ -4,6 +4,7 @@ import { getErrorMessage } from '../../../utilities/format.utility';
 import axios from '../../../utilities/axios.utility';
 import AccordionButton from '../../AccordionButton/AccordionButton';
 import parsedEnv from '../../../parse-env';
+import { scrollToElement } from '../../../utilities/scroll.utility';
 
 const RetryImports = (props) => {
     const [successMessage, setSuccessMessage] = useState(undefined);
@@ -23,6 +24,8 @@ const RetryImports = (props) => {
                 }
             }).catch(err => {
                 setErrorMessage(getErrorMessage(err));
+            }).finally(() => {
+                scrollToElement('#failed-to-parse-anchor');
             });
     }
 
@@ -39,6 +42,8 @@ const RetryImports = (props) => {
                 }
             }).catch(err => {
                 setErrorMessage(getErrorMessage(err));
+            }).finally(() => {
+                scrollToElement('#failed-to-parse-anchor');
             });
     }
 
