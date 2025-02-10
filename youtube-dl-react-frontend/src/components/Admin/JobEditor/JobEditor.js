@@ -257,7 +257,7 @@ class JobForm extends Component {
                                         name="arguments"
                                         value={this.state.arguments}
                                         onChange={this.handleInputChange}
-                                        spellcheck="false"
+                                        spellCheck="false"
                                         required
                                     >
                                         {defaultArguments}
