@@ -261,7 +261,7 @@ router.post('/verify_hashes', async (req, res) => {
 
     verifying = true;
     verifyingStopRequested = false;
-    res.json({ success: 'Started verifying hashes, results will be saved to verified_hashes.txt' });
+    res.json({ success: 'Started verifying hashes, check the console for progress. Results will be saved to verified_hashes.txt' });
 
     try {
         let videos = await Video.find({},
