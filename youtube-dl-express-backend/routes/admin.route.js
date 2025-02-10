@@ -158,7 +158,7 @@ router.post('/jobs/stop', async (req, res) => {
 });
 
 router.post('/errors/repair', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'repairing', 'deleting', 'importing', 'downloading']);
+    const [busy, reason] = isBusy(['updating', 'deleting', 'importing', 'downloading']);
     if (busy) return res.status(500).json({ error: (reason === 'repairing errors' ? 'Already ' : 'Cannot repair while ') + reason });
 
     const errorId = req.body?.errorId;

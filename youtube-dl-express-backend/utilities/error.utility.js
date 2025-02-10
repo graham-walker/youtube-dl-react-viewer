@@ -22,10 +22,14 @@ export default class ErrorManager {
 
         const errorList = errorIds.map(errorId => ({ errorId, resolveBy }));
 
-        const length = this.queued.length;
-        this.queued = this.queued.concat(errorList);
-        this.queued = Array.from(new Set(this.queued));
-        return this.queued.length - length;
+        let added = 0;
+        for (const error of errorList) {
+            if (this.queued.findIndex(queuedError => queuedError.errorId === error.errorId) === -1) {
+                this.queued.push(error);
+                added++;
+            }
+        }
+        return added;
     }
 
     async repair(chained = false) {
