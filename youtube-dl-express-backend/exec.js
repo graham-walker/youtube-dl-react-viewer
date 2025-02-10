@@ -148,7 +148,14 @@ let debug;
     // Make sure the video doesn't already exist in the database
     let video = await Video.findOne({ extractor: infojsonData.extractor, id: infojsonData.id });
     if (video) {
-        console.warn(`Document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} already exists in the database`);
+        try {
+            let files = await fs.readdir(videoDirectory, { withFileTypes: true });
+            for (let file of files) {
+                if (file.isFile()) await fs.unlink(path.join(videoDirectory, file.name));
+            }
+        } catch (err) { }
+
+        console.error(`Document with extractor: ${infojsonData.extractor} and id: ${infojsonData.id} already exists in the database`);
         mongoose.disconnect();
         process.exit(0);
     }
