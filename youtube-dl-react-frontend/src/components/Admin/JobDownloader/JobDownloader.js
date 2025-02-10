@@ -101,6 +101,7 @@ class JobDownloader extends Component {
                                 type="submit"
                                 onClick={this.onSubmit}
                                 disabled={this.props.jobs.length === 0}
+                                variant="danger"
                             >
                                 Stop
                             </Button>
