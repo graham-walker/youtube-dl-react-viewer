@@ -4,6 +4,7 @@ import { getErrorMessage } from '../../../utilities/format.utility';
 import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import { scrollToElement } from '../../../utilities/scroll.utility';
+import parsedEnv from '../../../parse-env';
 
 class ChannelIconDownloader extends Component {
     static contextType = UserContext;
@@ -41,6 +42,7 @@ class ChannelIconDownloader extends Component {
                 <h5 id="uploader-icons-anchor" className="mb-4">Uploader icons</h5>
                 <Card className="mb-4">
                     <Card.Body>
+                        <Alert variant='info'>Uploader icons are downloaded using the third-party service <a href="https://unavatar.io" target='_blank'>unavatar.io</a>. The uploader icon downloader currently only supports YouTube and SoundCloud, other uploader icons must be added manually. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-can-i-add-channeluploader-icons-to-the-web-app'} target='_blank'>Learn more</a></Alert>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                         <Button

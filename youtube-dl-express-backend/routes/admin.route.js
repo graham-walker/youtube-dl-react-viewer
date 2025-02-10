@@ -235,7 +235,7 @@ router.post('/download_uploader_icons', async (req, res) => {
             }
         }
         if (!sentResponse) {
-            return res.json({ success: 'All uploader icons downloaded' });
+            return res.json({ success: 'All uploader icons already downloaded' });
         } else {
             logLine('Finished downloading uploader icons');
         }
