@@ -16,11 +16,11 @@ class HashVerifier extends Component {
         };
     }
 
-    post() {
+    post(stop = false) {
         this.setState({ success: undefined, error: undefined }, () => {
             axios
                 .post(
-                    '/api/admin/verify_hashes'
+                    `/api/admin/verify_hashes?stop=${stop.toString()}`
                 ).then(res => {
                     if (res.status === 200) this.setState({
                         success: res.data.success,
@@ -43,12 +43,17 @@ class HashVerifier extends Component {
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                         <Button
-                            name="update"
-                            type="submit"
                             onClick={this.post.bind(this)}
                             className="me-2"
                         >
                             Verify file hashes
+                        </Button>
+                        <Button
+                            onClick={() => this.post(true)}
+                            className="me-2"
+                            variant="danger"
+                        >
+                            Stop
                         </Button>
                     </Card.Body>
                 </Card>

@@ -28,6 +28,7 @@ let updating = false;
 let verifying = false;
 let deleting = false;
 let importing = false;
+let verifyingStopRequested = false;
 
 const verifiedHashesFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'verified_hashes.txt');
 
@@ -246,10 +247,20 @@ router.post('/download_uploader_icons', async (req, res) => {
 });
 
 router.post('/verify_hashes', async (req, res) => {
+    if (req.query.stop === 'true') {
+        if (verifying) {
+            verifyingStopRequested = true;
+            return res.json({ success: 'Stop requested' });
+        } else {
+            return res.json({ error: 'Not verifying hashes' });
+        }
+    }
+
     const [busy, reason] = isBusy(['deleting', 'verifying']);
     if (busy) return res.status(500).json({ error: (reason === 'verifying hashes' ? 'Already ' : 'Cannot verify hashes while ') + reason });
 
     verifying = true;
+    verifyingStopRequested = false;
     res.json({ success: 'Started verifying hashes, results will be saved to verified_hashes.txt' });
 
     try {
@@ -273,6 +284,14 @@ router.post('/verify_hashes', async (req, res) => {
             mismatches += await verifyFileHash(video.annotationsFile, directory);
             for (let thumbnailFile of video.thumbnailFiles) mismatches += await verifyFileHash(thumbnailFile, directory);
             for (let subtitleFile of video.subtitleFiles) mismatches += await verifyFileHash(subtitleFile, directory);
+            
+            if (verifyingStopRequested) {
+                await fs.appendFile(verifiedHashesFile, 'STOP REQUESTED ' + new Date().toISOString() + '\r\n');
+                await fs.appendFile(verifiedHashesFile, mismatches + ' MISMATCHES');
+                logLine(`Stopped verifying hashes, ${mismatches} mismatches`);
+                verifying = false;
+                return;
+            }
         }
 
         await fs.appendFile(verifiedHashesFile, 'FINISHED HASH VERIFICATION ' + new Date().toISOString() + '\r\n');
@@ -622,6 +641,7 @@ const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'imp
 
 const verifyFileHash = async (file, directory) => {
     if (file === null) return 0;
+    if (verifyingStopRequested) return 0; 
 
     const md5 = file.md5;
     const filename = path.join(directory, file.name);
@@ -634,6 +654,7 @@ const verifyFileHash = async (file, directory) => {
         }
 
         let currentMd5 = await generateFileHash(filename);
+        if (verifyingStopRequested) return 0; 
 
         if (md5 === currentMd5 || file.filesize === 0) {
             await logHashResult('OK', filename);
@@ -664,7 +685,11 @@ const generateFileHash = async (filename) => {
         let shasum = crypto.createHash('md5');
         let readStream = fs.createReadStream(filename);
         readStream.on('data', (data) => {
-            shasum.update(data);
+            if (verifyingStopRequested) {
+                resolve(undefined);
+            } else {
+                shasum.update(data);
+            }
         }).on('end', () => {
             resolve(shasum.digest('hex'));
         }).on('error', (err) => {
