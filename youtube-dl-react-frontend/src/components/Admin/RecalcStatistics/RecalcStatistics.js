@@ -9,6 +9,8 @@ const RecalcStatistics = (props) => {
     const [error, setError] = useState(undefined);
 
     const post = (cancel = false) => {
+        setSuccess(undefined);
+        setError(undefined);
         axios
             .post(
                 `/api/admin/statistics/recalculate/?cancel=${cancel}`
