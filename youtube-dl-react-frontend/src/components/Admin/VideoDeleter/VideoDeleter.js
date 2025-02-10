@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { Form, Button, Card, Alert, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
-import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import { scrollToElement } from '../../../utilities/scroll.utility';
+import ConfirmModal from '../../ConfirmModal/ConfirmModal';
 
 class VideoDeleter extends Component {
-    static contextType = UserContext;
-
     constructor(props) {
         super(props);
         this.state = {
@@ -21,6 +19,7 @@ class VideoDeleter extends Component {
             uploadStart: '',
             uploadEnd: '',
             preventRedownload: false,
+            showConfirm: false,
         };
     }
 
@@ -141,11 +140,7 @@ class VideoDeleter extends Component {
                                 checked={this.state.preventRedownload}
                                 type="checkbox"
                                 name="preventRedownload"
-                                label={
-                                    <OverlayTrigger overlay={<Tooltip>Video IDs will not be deleted from archive.txt</Tooltip>}>
-                                        <Form.Label>Prevent videos from being redownloaded</Form.Label>
-                                    </OverlayTrigger>
-                                }
+                                label="Prevent videos from being redownloaded"
                                 id="preventRedownload"
                                 onChange={this.handleInputChange}
                             />
@@ -157,14 +152,20 @@ class VideoDeleter extends Component {
                             Preview
                         </Button>
                         <Button
-                            onClick={() => {
-                                let ok = window.confirm('Are you sure?');
-                                if (ok) this.post();
-                            }}
+                            onClick={() => this.setState({ showConfirm: true })}
                             variant="danger"
                         >
                             Delete
                         </Button>
+                        <ConfirmModal
+                            show={this.state.showConfirm}
+                            onHide={() => this.setState({ showConfirm: false })}
+                            onConfirm={() => {
+                                this.setState({ showConfirm: false });
+                                this.post();
+                            }}
+                            title="Delete videos"
+                        />
                     </Card.Body>
                 </Card>
             </>

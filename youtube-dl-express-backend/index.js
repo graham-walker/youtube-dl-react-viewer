@@ -76,7 +76,7 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     const deleteQueueFile = path.join(outputDirectory, 'delete_queue.txt');
     try {
         if (fs.existsSync(deleteQueueFile)) {
-            logLine('Removing files for previously deleted videos...');
+            logLine('Removing files for deleted videos...');
             let folders = fs.readFileSync(deleteQueueFile).toString().replaceAll('\r\n', '\n').split('\n').filter(video => video !== '');
             for (let folder of folders) {
                 if (fs.existsSync(folder)) {

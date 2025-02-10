@@ -46,6 +46,11 @@ html {
     overflow-x: hidden;
 }
 
+body {
+    overflow: initial !important;
+    padding-right: 0 !important;
+}
+
 a:not(.nav-link):not(.dropdown-item):not(.btn):not(.navbar-brand):not(.page-link) {
     text-decoration: none;
 

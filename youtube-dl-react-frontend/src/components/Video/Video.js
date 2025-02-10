@@ -17,6 +17,7 @@ import axios from '../../utilities/axios.utility';
 import { CommentsLoader } from './Comments/Comments';
 import parsedEnv from '../../parse-env';
 import ChatReplay from './ChatReplay/ChatReplay';
+import ConfirmModal from '../ConfirmModal/ConfirmModal';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -46,6 +47,7 @@ export default class VideoPage extends Component {
             keepPlayerControlsVisible: localStorage.getItem('keepPlayerControlsVisible') || 'never', // never, windowed, fullscreen, always
             redirect: false,
             playerTime: 0,
+            showConfirm: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -716,30 +718,33 @@ export default class VideoPage extends Component {
                                 </Button>
                             }
                             {this.context?.user?.isSuperuser && <Button
-                                onClick={() => {
-                                    let ok = window.confirm('Delete video?');
-                                    if (ok) {
-                                        const preventRedownload = !window.confirm('Allow the video to be redownloaded?');
-                                        axios
-                                            .post(
-                                                '/api/admin/delete/', {
-                                                extractor: this.state.video.extractor,
-                                                id: this.state.video.id,
-                                                preventRedownload,
-                                            }
-                                            ).then(res => {
-                                                alert('Video deleted');
-                                                this.setState({ redirect: true });
-                                            }).catch(err => {
-                                                alert(getErrorMessage(err, 'Failed to delete video'));
-                                            });
-                                    }
-                                }}
+                                onClick={() => this.setState({ showConfirm: true })}
                                 variant="danger"
                                 className="mb-2 me-2"
                             >
                                 <FontAwesomeIcon icon="trash" /> Delete
                             </Button>}
+                            <ConfirmModal
+                                show={this.state.showConfirm}
+                                onHide={() => this.setState({ showConfirm: false })}
+                                onConfirm={(preventRedownload) => {
+                                    this.setState({ showConfirm: false });
+                                    axios
+                                        .post(
+                                            '/api/admin/delete/', {
+                                            extractor: this.state.video.extractor,
+                                            id: this.state.video.id,
+                                            preventRedownload,
+                                        }
+                                        ).then(res => {
+                                            this.setState({ redirect: true });
+                                        }).catch(err => {
+                                            console.error(err);
+                                        });
+                                }}
+                                title="Delete video"
+                                checkboxText="Prevent the video from being redownloaded"
+                            />
                             {!!video.downloadedCommentCount &&
                                 <>
                                     <hr />
