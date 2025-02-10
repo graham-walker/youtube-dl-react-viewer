@@ -585,7 +585,7 @@ router.post('/import', async (req, res) => {
                         downloaded,
                         '--is-import',
                         '--video',
-                        path.join(outputPath, videoFileName),
+                        `"${path.join(outputPath, videoFileName)}"`,
                     ];
                     if (process.platform === 'win32') {
                         execArguments.unshift('--');
@@ -596,7 +596,7 @@ router.post('/import', async (req, res) => {
                         execArguments.unshift('dotenv/config');
                         execArguments.unshift('--require');
                     }
-                    const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true });
+                    const execProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'node', execArguments, { windowsHide: true, shell: true });
                     execProcess.stdout.on('data', (data) => logStdout(data));
                     execProcess.stderr.on('data', (data) => logStdout(data));
                     const exitCode = await new Promise((resolve, reject) => execProcess.on('close', resolve));
