@@ -602,7 +602,7 @@ router.post('/statistics/recalculate', async (req, res) => {
 
         await version.save();
 
-        return res.json({ success: cancel ? 'Canceled' : 'Statistics will be recalculated the next time the web app is restarted. During that time the web app will not be accessible' });
+        return res.json({ success: cancel ? 'Statistics will not be recalculated the next time the web app is restarted' : 'Statistics will be recalculated the next time the web app is restarted. During that time the web app will not be accessible' });
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
         return res.sendStatus(500);
