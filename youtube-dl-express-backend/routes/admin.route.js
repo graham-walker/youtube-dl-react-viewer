@@ -113,7 +113,7 @@ router.post('/jobs/save/:jobId', async (req, res) => {
 });
 
 router.post('/jobs/download/', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'importing'], req.params.jobId);
+    const [busy, reason] = isBusy(['updating', 'repairing', 'deleting', 'importing'], req.params.jobId);
     if (busy) return res.status(500).json({ error: 'Cannot start download while ' + reason });
 
     if (!Array.isArray(req.body)
@@ -157,21 +157,51 @@ router.post('/jobs/stop', async (req, res) => {
     }
 });
 
-router.post('/errors/repair/:errorId', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'importing', 'downloading']);
-    if (busy) return res.status(500).json({ error: (reason === 'retrying import' ? 'Already ' : 'Cannot retry import while ') + reason });
+router.post('/errors/repair', async (req, res) => {
+    const [busy, reason] = isBusy(['updating', 'repairing', 'deleting', 'importing', 'downloading']);
+    if (busy) return res.status(500).json({ error: (reason === 'repairing errors' ? 'Already ' : 'Cannot repair while ') + reason });
 
-    try {
-        let result = await errorManager.repair(req.params.errorId);
-        res.json(result);
-    } catch (err) {
-        if (parsedEnv.VERBOSE) logError(err);
-        res.sendStatus(500);
+    const errorId = req.body?.errorId;
+    const resolveBy = req.body?.resolveBy;
+
+    const resolveMessage = !!errorId ? (resolveBy === 'retry' ? 'Retry' : 'Deletion') : (resolveBy === 'retry' ? 'Retries' : 'Deletions');
+
+    const errorsAdded = await errorManager.queue(resolveBy, errorId ? [errorId] : undefined);
+
+    const result = await errorManager.repair();
+    switch (result) {
+        case 'nothing-to-do':
+            return res.json({ error: `No errors to repair` });
+        case 'not-started':
+            if (errorsAdded > 0) {
+                return res.json({ success: `${resolveMessage} started, check the console for progress` });
+            } else {
+                return res.json({ error: `${resolveMessage} already started` });
+            }
+        case 'started':
+            return res.json({ success: `${resolveMessage} started, check the console for progress` });
+        case 'failed':
+            return res.status(500).json({ error: 'Failed to start' });
+        default:
+            return res.sendStatus(500);
+    }
+});
+
+router.post('/errors/stop', async (req, res) => {
+    switch (await errorManager.stop()) {
+        case 'stopped':
+            return res.json({ success: 'Stopped' });
+        case 'failed':
+            return res.json({ error: 'Failed to stop' });
+        case 'none':
+            return res.json({ error: 'No repairs are running' });
+        default:
+            return res.sendStatus(500);
     }
 });
 
 router.post('/youtube-dl/update', async (req, res) => {
-    const [busy, reason] = isBusy(['updating', 'retrying', 'importing', 'downloading']);
+    const [busy, reason] = isBusy(['updating', 'repairing', 'importing', 'downloading']);
     if (busy) return res.status(500).json({ error: (reason === 'updating youtube-dl' ? 'Already ' : 'Cannot update youtube-dl while ') + reason });
 
     updating = true;
@@ -284,7 +314,7 @@ router.post('/verify_hashes', async (req, res) => {
             mismatches += await verifyFileHash(video.annotationsFile, directory);
             for (let thumbnailFile of video.thumbnailFiles) mismatches += await verifyFileHash(thumbnailFile, directory);
             for (let subtitleFile of video.subtitleFiles) mismatches += await verifyFileHash(subtitleFile, directory);
-            
+
             if (verifyingStopRequested) {
                 await fs.appendFile(verifiedHashesFile, 'STOP REQUESTED ' + new Date().toISOString() + '\r\n');
                 await fs.appendFile(verifiedHashesFile, mismatches + ' MISMATCHES');
@@ -350,7 +380,7 @@ router.post('/delete', async (req, res) => {
         if (req.query.preview === 'true') return res.json({ success: `${videos.length} video${videos.length !== 1 ? 's' : ''} will be deleted` });
 
         // Delete videos
-        const [busy, reason] = isBusy(['retrying', 'deleting', 'downloading', 'importing', 'verifying']);
+        const [busy, reason] = isBusy(['repairing', 'deleting', 'downloading', 'importing', 'verifying']);
         if (busy) return res.status(500).json({ error: (reason === 'deleting videos' ? 'Already ' : 'Cannot delete videos while ') + reason });
 
         res.json({ success: `Deleting ${videos.length} video${videos.length !== 1 ? 's' : ''}, check the console for progress` });
@@ -449,7 +479,7 @@ router.post('/import', async (req, res) => {
         let job = await Job.findOne({ name: jobName });
         if (!job) return res.status(500).json({ error: 'Job does not exist' });
 
-        const [busy, reason] = isBusy(['updating', 'retrying', 'deleting', 'downloading', 'importing'], req.params.jobId);
+        const [busy, reason] = isBusy(['updating', 'repairing', 'deleting', 'downloading', 'importing'], req.params.jobId);
         if (busy) return res.status(500).json({ error: (reason === 'importing videos' ? 'Already ' : 'Cannot import videos while ') + reason });
 
         importing = true;
@@ -628,10 +658,10 @@ router.post('/statistics/recalculate', async (req, res) => {
     }
 });
 
-const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'importing', 'verifying'], jobId = null) => {
+const isBusy = (check = ['updating', 'repairing', 'deleting', 'downloading', 'importing', 'verifying'], jobId = null) => {
     // Ordered by shortest expected operation
     if (updating && check.includes('updating')) return [true, 'updating youtube-dl'];
-    if (errorManager.isBusy() && check.includes('retrying')) return [true, 'retrying import'];
+    if (errorManager.isBusy() && check.includes('repairing')) return [true, 'repairing errors'];
     if (deleting && check.includes('deleting')) return [true, 'deleting videos'];
     if (downloader.isBusy(jobId) && check.includes('downloading')) return [true, 'downloading videos'];
     if (importing && check.includes('importing')) return [true, 'importing videos'];
@@ -641,7 +671,7 @@ const isBusy = (check = ['updating', 'retrying', 'deleting', 'downloading', 'imp
 
 const verifyFileHash = async (file, directory) => {
     if (file === null) return 0;
-    if (verifyingStopRequested) return 0; 
+    if (verifyingStopRequested) return 0;
 
     const md5 = file.md5;
     const filename = path.join(directory, file.name);
@@ -654,7 +684,7 @@ const verifyFileHash = async (file, directory) => {
         }
 
         let currentMd5 = await generateFileHash(filename);
-        if (verifyingStopRequested) return 0; 
+        if (verifyingStopRequested) return 0;
 
         if (md5 === currentMd5 || file.filesize === 0) {
             await logHashResult('OK', filename);
