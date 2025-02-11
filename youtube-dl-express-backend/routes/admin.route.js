@@ -383,7 +383,7 @@ router.post('/delete', async (req, res) => {
         const [busy, reason] = isBusy(['repairing', 'deleting', 'downloading', 'importing', 'verifying']);
         if (busy) return res.status(500).json({ error: (reason === 'deleting videos' ? 'Already ' : 'Cannot delete videos while ') + reason });
 
-        res.json({ success: `Deleting ${videos.length} video${videos.length !== 1 ? 's' : ''}, check the console for progress` });
+        res.json({ success: `Deleting ${videos.length} video${videos.length !== 1 ? 's' : ''}, check the console for progress. Video files will not be deleted until the next time the web app is restarted` });
         deleting = true;
 
         try {
