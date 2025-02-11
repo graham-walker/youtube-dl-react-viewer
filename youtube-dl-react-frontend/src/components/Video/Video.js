@@ -803,24 +803,28 @@ export default class VideoPage extends Component {
                                                     checked={this.state.spoofContentType}
                                                     type="switch"
                                                     name="spoofContentType"
-                                                    label="Spoof type"
+                                                    label={
+                                                        <OverlayTrigger
+                                                            placement="bottom"
+                                                            overlay={
+                                                                <Tooltip>
+                                                                    Spoof the content type of .MKV files to attempt to play them. If this does not work try a different browser
+                                                                </Tooltip>
+                                                            }
+                                                        >
+                                                            <Form.Label className='mb-0'>
+                                                                Spoof type
+                                                                <FontAwesomeIcon
+                                                                    className="ms-1 text-muted"
+                                                                    icon="info-circle"
+                                                                />
+                                                            </Form.Label>
+                                                        </OverlayTrigger>
+                                                        
+                                                    }
                                                     id="spoofContentType"
                                                     onChange={this.handleInputChange}
                                                 />
-                                                <OverlayTrigger
-                                                    placement="bottom"
-                                                    delay={{ show: 250, hide: 400 }}
-                                                    overlay={
-                                                        <Tooltip>
-                                                            Spoof the content type of .MKV files to attempt to play them. If this does not work try a different browser
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <FontAwesomeIcon
-                                                        className="ms-1 text-muted"
-                                                        icon="info-circle"
-                                                    />
-                                                </OverlayTrigger>
                                             </div>
                                         </Form.Group>
                                     </Form>
