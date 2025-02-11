@@ -31,7 +31,7 @@ let debug;
         .requiredOption('-j, --job-id <string>', 'Job document id')
         .option(
             '--youtube-dl-version <version>',
-            'Version of youtube-dl the video was downloaded with'
+            'Version of yt-dlp the video was downloaded with'
         )
         .option('--is-repair', 'Is exec being called to repair a failed download', false)
         .option('--error-id <string>', 'Error document id to be used in a repair')
@@ -79,7 +79,7 @@ let debug;
         throw err;
     }
 
-    // Get all of the files youtube-dl downloaded related to the video file
+    // Get all of the files yt-dlp downloaded related to the video file
     // The script assumes the output path downloads each video to a unique folder
     const videoDirectory = path.dirname(program.video);
     let files;
@@ -100,7 +100,7 @@ let debug;
     // This isn't perfect though as it is only checking the start of the filename
     if (files.filter(file => !file.startsWith(basename)).length > 0) {
         console.error(
-            'Make sure the youtube-dl config places downloaded videos in their'
+            'Make sure the yt-dlp config places downloaded videos in their'
             + ' own unique directory (i.e., --output "/%(extractor)s/%'
             + '(id)s/%(title)s - %(uploader)s - %(upload_date)s.%(ext)s'
         );
@@ -111,7 +111,7 @@ let debug;
     if (files.filter(file => file.endsWith('.info.json')).length === 0) {
         console.error('Could not find video metadata file: '
             + `${path.join(videoDirectory, basename + '.info.json')} (make sure`
-            + ' the youtube-dl config file includes the argument: --write-info-json)');
+            + ' the yt-dlp config file includes the argument: --write-info-json)');
         throw new Error('Could not find video metadata file');
     }
 

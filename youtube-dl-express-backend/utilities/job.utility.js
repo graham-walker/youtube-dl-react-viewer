@@ -94,7 +94,7 @@ export default class Downloader {
             this.process.on('close', async (code) => {
                 job.lastCompleted = new Date();
                 await job.save();
-                logLine(`youtube-dl exited with code ${code} (${code === 0 ? 'success' : 'failure'})`);
+                logLine(`yt-dlp exited with code ${code} (${code === 0 ? 'success' : 'failure'})`);
                 logLine(`Finished downloading job ${job.name}`);
 
                 this.queued.shift();

@@ -202,7 +202,7 @@ router.post('/errors/stop', async (req, res) => {
 
 router.post('/youtube-dl/update', async (req, res) => {
     const [busy, reason] = isBusy(['updating', 'repairing', 'importing', 'downloading']);
-    if (busy) return res.status(500).json({ error: (reason === 'updating youtube-dl' ? 'Already ' : 'Cannot update youtube-dl while ') + reason });
+    if (busy) return res.status(500).json({ error: (reason === 'updating yt-dlp' ? 'Already ' : 'Cannot update yt-dlp while ') + reason });
 
     updating = true;
     try {
@@ -526,7 +526,7 @@ router.post('/statistics/recalculate', async (req, res) => {
 
 const isBusy = (check = ['updating', 'repairing', 'deleting', 'downloading', 'importing', 'verifying'], jobId = null) => {
     // Ordered by shortest expected operation
-    if (updating && check.includes('updating')) return [true, 'updating youtube-dl'];
+    if (updating && check.includes('updating')) return [true, 'updating yt-dlp'];
     if (errorManager.isBusy() && check.includes('repairing')) return [true, 'repairing errors'];
     if (deleting && check.includes('deleting')) return [true, 'deleting videos'];
     if (downloader.isBusy(jobId) && check.includes('downloading')) return [true, 'downloading videos'];
