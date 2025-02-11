@@ -249,7 +249,7 @@ class JobForm extends Component {
                                     <OverlayTrigger overlay={<Tooltip>Command line arguments passed to yt-dlp</Tooltip>}>
                                         <Form.Label>Arguments <FontAwesomeIcon icon="circle-info" /></Form.Label>
                                     </OverlayTrigger>
-                                    {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker --cookies-from-browser will not work and --cookies must be set inside the container. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-download-from-websites-that-require-a-login'} target='_blank'>Learn more</a></Alert>}
+                                    {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker --cookies-from-browser will not work and --cookies must be set to a path inside the output directory. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-download-from-websites-that-require-a-login'} target='_blank'>Learn more</a></Alert>}
                                     <Form.Control
                                         as="textarea"
                                         rows="10"
