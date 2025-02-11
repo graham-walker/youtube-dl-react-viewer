@@ -91,7 +91,7 @@ class VideoImporter extends Component {
                                 {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker videos must be copied into the container before they can be imported. <a href={parsedEnv.REACT_APP_REPO_URL + '#importing-already-downloaded-videos'} target='_blank'>Learn more</a></Alert>}
                                 <Form.Control
                                     type="text"
-                                    placeholder={parsedEnv.REACT_APP_RUNNING_IN_DOCKER ? '/youtube-dl/TEMP' : 'C:\\Your\\Existing\\Downloads'}
+                                    placeholder={parsedEnv.REACT_APP_RUNNING_IN_DOCKER ? '/youtube-dl/TEMP' : 'C:\\Your Existing Downloads'}
                                     name="folder"
                                     value={this.state.folder}
                                     onChange={this.handleInputChange}

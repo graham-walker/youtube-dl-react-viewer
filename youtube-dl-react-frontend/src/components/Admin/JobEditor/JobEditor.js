@@ -334,7 +334,7 @@ $COOKIES
 #--sleep-requests 1
 #--datebefore "$(date --date="30 days ago" +%Y%m%d)"
 `;
-const manualDefaultArguments = defaultArguments.replace('$COOKIES', '#--cookies "C:\\Path\\To\\cookies.txt"');
+const manualDefaultArguments = defaultArguments.replace('$COOKIES', '#--cookies "C:\\cookies.txt"');
 const dockerDefaultArguments = defaultArguments.replace('$COOKIES', '#--cookies /youtube-dl/cookies.txt');
 const defaultFormatCode = 'bestvideo*+bestaudio/best';
 const defaultFormatCodeAudioOnly = 'bestaudio/best';
