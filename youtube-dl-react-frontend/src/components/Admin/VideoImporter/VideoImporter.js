@@ -52,6 +52,24 @@ class VideoImporter extends Component {
         });
     }
 
+    stop = () => {
+        this.setState({ success: undefined, error: undefined }, () => {
+            axios
+                .post(
+                    `/api/admin/import/stop/`
+                ).then(res => {
+                    if (res.status === 200) this.setState({
+                        success: res.data.success,
+                        error: res.data.error,
+                    });
+                }).catch(err => {
+                    this.setState({ error: getErrorMessage(err) });
+                }).finally(() => {
+                    scrollToElement('#import-videos-anchor');
+                });
+        });
+    }
+
     handleInputChange = (e) => {
         var { value, name, type } = e.target;
         if (type === 'checkbox') value = e.target.checked;
@@ -64,7 +82,7 @@ class VideoImporter extends Component {
                 <h5 id="import-videos-anchor" className="mb-4">Import videos</h5>
                 <Card className="mb-4">
                     <Card.Body>
-                        {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can import</Alert>}
+                        {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can import videos</Alert>}
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                         <Form onSubmit={this.onSubmit}>
@@ -151,7 +169,8 @@ class VideoImporter extends Component {
                                     </>
                                 </Accordion.Collapse>
                             </Accordion>
-                            <Button type="submit" disabled={this.props.jobs.length === 0}>Import</Button>
+                            <Button type="submit" className='me-2' disabled={this.props.jobs.length === 0}>Import</Button>
+                            <Button variant='danger' disabled={this.props.jobs.length === 0} onClick={() => this.stop()}>Stop</Button>
                         </Form>
                     </Card.Body>
                 </Card>
