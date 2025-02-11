@@ -46,7 +46,7 @@ const LogFileList = (props) => {
 
                 if (!auto) scrollToElement('#logs-anchor');
             }).catch(err => {
-                alert(getErrorMessage(err));
+                console.error(getErrorMessage(err));
             });
     };
 

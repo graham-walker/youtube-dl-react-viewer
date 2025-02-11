@@ -18,6 +18,7 @@ import { CommentsLoader } from './Comments/Comments';
 import parsedEnv from '../../parse-env';
 import ChatReplay from './ChatReplay/ChatReplay';
 import ConfirmModal from '../ConfirmModal/ConfirmModal';
+import AlertModal from '../AlertModal/AlertModal';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -48,6 +49,8 @@ export default class VideoPage extends Component {
             redirect: false,
             playerTime: 0,
             showConfirm: false,
+            showAlert: false,
+            alertMessage: '',
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -694,7 +697,7 @@ export default class VideoPage extends Component {
                                 onClick={() => {
                                     let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
                                     if (!warned && window.innerWidth > 768) {
-                                        alert('To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. You can do this with https://github.com/stefansundin/vlc-protocol/');
+                                        this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target='_blank'>Learn more</a></> });
                                         localStorage.setItem('seenVLCWarning', 'true');
                                     }
                                 }}
@@ -709,7 +712,7 @@ export default class VideoPage extends Component {
                                     onClick={() => {
                                         let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
                                         if (!warned && window.innerWidth > 768) {
-                                            alert('To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. You can do this with https://github.com/stefansundin/vlc-protocol/');
+                                            this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target='_blank'>Learn more</a></> });
                                             localStorage.setItem('seenVLCWarning', 'true');
                                         }
                                     }}
@@ -717,6 +720,11 @@ export default class VideoPage extends Component {
                                     <FontAwesomeIcon icon="play" /> Open in VLC (local)
                                 </Button>
                             }
+                            <AlertModal
+                                show={this.state.showAlert}
+                                message={this.state.alertMessage}
+                                onHide={() => this.setState({ showAlert: false })}
+                            />
                             {this.context?.user?.isSuperuser && <Button
                                 onClick={() => this.setState({ showConfirm: true })}
                                 variant="danger"
