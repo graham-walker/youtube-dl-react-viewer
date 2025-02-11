@@ -62,7 +62,7 @@ class JobDownloader extends Component {
                 <h5 id="download-anchor" className="mb-4">Download</h5>
                 <Card className="mb-4">
                     <Card.Body>
-                        {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can download</Alert>}
+                        {this.props.jobs.length === 0 && <Alert variant="danger">You must create a job before you can download videos</Alert>}
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                         <Form>
