@@ -2,7 +2,7 @@
 <img src="./youtube-dl-react-frontend/public/logo.svg" alt="icon" width="100px" height="100px" />
 <h1 align="center">youtube-dl-react-viewer</h1>
 
-**youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp)/[youtube-dl](https://github.com/ytdl-org/youtube-dl) created using the MERN stack. Supports viewing and downloading videos. **Usage with yt-dlp is assumed but most forks should work.**
+**youtube-dl-react-viewer** is a web app for [yt-dlp](https://github.com/yt-dlp/yt-dlp) that supports viewing and downloading videos.
 
 📷[Screenshots](https://imgur.com/a/l23b3dZ) | 🌎[Live Demo](https://react.gwalkerux.com)
 
@@ -24,118 +24,106 @@
 ---
 
 ## Features
-- Watch downloaded videos in the browser across your devices
-- Download videos by creating and running download jobs
-- Import your existing downloads
+- Download videos using [yt-dlp](https://github.com/yt-dlp/yt-dlp) by creating and running [download jobs](#downloading)
+- Watch downloaded videos in the browser
+- [Import already downloaded videos](#importing-already-downloaded-videos)
 - SponsorBlock integration
-- Watch history and resume playback
-- Full-text search and sort
-- Subtitle support
-- Autoplay & looping
-- Open video streams in VLC
-- Automatically generated playlists
-- Similar video recommendations
-- Sitewide password protection
-- Dark/OLED dark theme
-- Channel icon downloader (YouTube and SoundCloud only)
-- Verify the integrity (hash) of downloads
+- Return YouTube Dislike integration
+- Watch history and resume playback across devices
+- Full-text search for video titles, descriptions, and playlists
+- Playlist autoplay & looping
+- [Open video streams in VLC](#how-do-i-open-videos-in-vlc)
 - Download video comments
-- YouTube chat replay
+- YouTube live chat replay
+- Channel icon downloader (YouTube and SoundCloud)
+- Caption and subtitle support
+- Light and dark themes
+- Display videos related to the current video
+- Restrict access to the web app with a global password
+- Verify the integrity (hash) of downloaded videos
 
 ## Install
 
 > [!CAUTION]
-> Once updated, it is not recommended to downgrade an existing installation. Doing so will risk database corruption. If you plan on downgrading in the future, please backup your database before updating.
+> Only install the web app using release tags. Avoid installing directly from the main branch, as there may be breaking changes introduced between official releases.
+
+> [!CAUTION]
+> Downgrading an existing installation is not supported and may lead to database corruption. It is recommended to [backup your database](#how-do-i-backup-my-database) before upgrading versions.
 
 ### Docker Installation
 
-> [!NOTE]  
-> If you are updating an existing Docker installation simply repeat these same steps for the latest version. Remember to make the same edits to `docker-compose.yaml` as environment variables will be reset otherwise.
+1. Clone this repository
 
-1. Clone the repository `git clone https://github.com/graham-walker/youtube-dl-react-viewer`
+2. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-2. Navigate to `cd ./youtube-dl-react-viewer`
+3. Select the release tag of the version you want to install `git checkout tags/v1.3.1`
 
-3. Select the release you want to install `git checkout tags/v1.3.1`
-    - Installing from main is not recommended as database breaking changes can be made between releases
+4. Copy `.env.sample` to `.env`
 
-4. Set the environment variables by editing `docker-compose.yaml`
-    - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
-    - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
-    - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
-    - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-    - If you are not planning on using yt-dlp set the update command for your fork `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install your-fork-name`
-    - Other [environment variables](#environment-variables) can optionally be set
+5. Edit `.env` and [configure the required environment variables](#required-environment-variables)
 
-5. Build the image and start the container `docker compose up -d` (on Linux run as sudo)
-    - If using Compose V1 run `docker-compose up -d` instead
+6. Run `docker compose up -d` to build the image and start the container
 
-6. Install yt-dlp or your preferred fork to the container
-    - Open the container command line `docker exec -it youtube-dl-react-viewer-app-1 /bin/sh` (on Linux run as sudo)
-    - Install yt-dlp `python3 -m pip install --no-deps -U yt-dlp`
+7. The web app will be accessible in the browser at `http://localhost:5000`
 
-7. View the web app in the browser `http://localhost:5000`
-    - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux)
-    - If this does not work check if your firewall settings are blocking Node.js
+#### Editing environment variables
+Because `.env` is copied to the container during the build step the Docker image must be rebuilt in order to change environment variables. After editing `.env` run `docker compose build --no-cache app && docker compose up -d` to rebuild.
 
-8. Downloads can be found in the Docker volume `youtube-dl-react-viewer_ytrv_downloads`
+#### Updating a Docker Installation
+
+> [!CAUTION]
+> If you are updating a Docker installation from a version prior to 1.4.0 see the [v1.4.0 Docker Update Guide](./docs/v1.4.0-docker-update-guide.md)
+
+To update a Docker installation run `git pull && git checkout tags/v1.3.1 && docker compose build --no-cache && docker compose up -d`.
 
 ### Manual Installation
 
-1. [Install Python 3.7+](https://www.python.org/downloads/) (this step can be skipped on Windows)
+1. [Install Node.js 18.x.x (LTS)](https://nodejs.org/en/download/current/)
 
-2. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation) and add `yt-dlp` to PATH
+2. [Install MongoDB 6.0.x](https://www.mongodb.com/try/download/community)
 
-3. [Install the latest versions of FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
-4. [Install Node.js 18.16.0 and npm 9.2.0](https://nodejs.org/en/download/current/)
+3. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation) and add `yt-dlp` to PATH
 
-5. [Install MongoDB 6.0.0](https://www.mongodb.com/try/download/community)
+4. [Install FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
 
-6. [Download the Source code (zip) for the latest release of youtube-dl-react-viewer](https://github.com/graham-walker/youtube-dl-react-viewer/releases)
-    - Unzip to the location of your choosing
-    - Navigate to `cd ./youtube-dl-react-viewer/youtube-dl-express-backend`
-    - Copy `.env.sample` to `.env` (you may need to enable view hidden files and folders)
-    - Set environment variables by editing `.env`
-        - Set `OUTPUT_DIRECTORY` to the location you want to save downloads. Set to an empty directory
-            - On Windows it is recommended to use a location as close to the root directory as possible `C:\youtube-dl` to avoid issues with the path length limit
-        - Set `SUPERUSER_USERNAME` to the desired username for the superuser account
-        - Set `SUPERUSER_PASSWORD` to the desired password for the superuser account. Value cannot be `'password'` and must be at least 8 characters
-        - Set `JWT_TOKEN_SECRET` to any securely generated random string. At least 32 characters is recommended. Value cannot be `'secret'`
-        - If using a HTTPS server set `SECURE_COOKIES=true`. If running locally leave the value as `false`
-        - On Windows make sure `FFMPEG_PATH="C:/Path/To/ffmpeg.exe"` instead of `ffmpeg`. Using PATH for FFmpeg does not work with the web app on Windows
-        - If you installed yt-dlp using pip set `YOUTUBE_DL_UPDATE_COMMAND=python3 -m pip install --no-deps -U yt-dlp`
-        - Other [environment variables](#environment-variables) can optionally be set
-    - Return to the parent directory `cd ..`
-    - Install additional dependencies and build the web app `sh install.sh` (on Windows run `install.bat` instead)
-    - Start the web app `sh start-server.sh` (on Windows run `start-server.bat` instead)
-    - View the web app in the browser `http://localhost:5000`
-        - Access from other devices on your network by replacing `localhost` with your device ip address (find using `ipconfig` on Windows or `ip addr` on Linux). If this does not work check if your firewall settings are blocking Node.js
-    - View the console output `pm2 logs youtube-dl-react-viewer`
-    - Stop the web app `pm2 stop youtube-dl-react-viewer`
+5. Download the [Source code (zip)](https://github.com/graham-walker/youtube-dl-react-viewer/releases) for the latest release of youtube-dl-react-viewer
+6. Unzip to the location of your choosing
+7. Copy `.env.sample` to `.env`
+8. Edit `.env` and [configure the required environment variables](#required-environment-variables)
+9. Run the install script located in `./youtube-dl-react-viewer/scripts`
+10. The web app will be accessible in the browser at `http://localhost:5000`
 
-### Open URLs in VLC
-To open videos using the open in VLC button on PC/Mac you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
+#### Managing the Web App Process
+When installed manually the web app process is managed by [pm2](https://github.com/Unitech/pm2).
 
-No additional configuration is required for iOS/Android devices.
+Usage:
+- Start the web app `pm2 start youtube-dl-react-viewer`
+- Stop the web app `pm2 stop youtube-dl-react-viewer`
+- View logs `pm2 logs youtube-dl-react-viewer`
+- Run at pc startup `pm2 startup youtube-dl-react-viewer` (unix only)
+
+#### Updating a Manual Installation
+To update a manual installation run `git pull && git checkout tags/v1.3.1 && pm2 restart youtube-dl-react-viewer`.
 
 ## Environment Variables
+Configure environment variables by editing the `.env` file in the repository root directory. If this file does not exist yet copy `.sample.env` to `.env`. Use this file to set environment variables for both the frontend and backend. Some variables are required for the app to run, see [required environment variables](#required-environment-variables) for details.
 <!-- Do not go past col 80 -->
 ```
 OUTPUT_DIRECTORY                    Location downloads will be saved to
                                     (path, default: '/youtube-dl')
 
-SUPERUSER_USERNAME                  Superuser username. The superuser is
-                                    created when the web app is started
+SUPERUSER_USERNAME                  Admin account username. The admin account
+                                    is created when the web app is started
                                     (string < 50, default: admin)
 
-SUPERUSER_PASSWORD                  Superuser password. If the value is
-                                    `password` or less than 8 characters the 
-                                    app will not start
-                                    (string > 8 && !== password, default:
+SUPERUSER_PASSWORD                  Admin account password. If the value is
+                                    `password` or less than 8 characters the
+                                    web app will not start
+                                    (string >= 8 && !== password, default:
                                     password)
 
 JWT_TOKEN_SECRET                    Secret key to sign the JSON Web Token. If
-                                    the value is `secret` the app will not
+                                    the value is `secret` the web app will not
                                     start. Use a securely generated random
                                     string at least 32 characters long
                                     (string !== secret, default: secret)
@@ -145,15 +133,15 @@ MONGOOSE_URL                        Database connection URL. If the database
                                     (url, default:
                                     mongodb://127.0.0.1:27017/youtubeDlDB)
 
-BACKEND_PORT                        Port used by the web app
+BACKEND_PORT                        Port used to serve the web app
                                     (0-65535, default: 5000)
 
 SECURE_COOKIES                      Only serve cookies over HTTPS. Enable if
                                     not running locally
                                     (true|false, default: false)
 
-YOUTUBE_DL_PATH                     Path to yt-dlp/youtube-dl. Forks should
-                                    work as drop in replacements
+YOUTUBE_DL_PATH                     Path to yt-dlp. Forks should work as drop
+                                    in replacements
                                     (path, default: yt-dlp)
 
 FFMPEG_PATH                         Path to FFmpeg
@@ -162,40 +150,51 @@ FFMPEG_PATH                         Path to FFmpeg
 FFPROBE_PATH                        Path to FFprobe
                                     (path, default: ffprobe)
 
-THUMBNAIL_QUALITY                   JPEG quality level for thumbnails. Does not
-                                    effect existing thumbnails
+THUMBNAIL_QUALITY                   JPEG quality level used when creating
+                                    new thumbnails
                                     (0-100, default: 80)
 
-THUMBNAIL_CHROMA_SUBSAMPLING        Chroma subsampling for thumbnails. Does not
-                                    effect existing thumbnails
+THUMBNAIL_CHROMA_SUBSAMPLING        Chroma subsampling used when creating
+                                    new thumbnails
                                     (4:4:4|4:2:0, default: 4:4:4)
 
-PAGE_SIZE                           Number of videos that will be loaded per
-                                    page
+PAGE_SIZE                           Number of videos that are loaded per page
                                     (number >= 1, default: 54)
 
-SKIP_HASHING                        Do not generate hashes when importing
-                                    videos
+SKIP_HASHING                        Skip generating hashes when downloading
+                                    or importing videos
                                     (true|false, default: false)
 
-ENABLE_USER_REGISTRATION            Allow users to create accounts
-                                    (true|false: default: true)
+ENABLE_USER_REGISTRATION            Allow users to create new accounts
+                                    (true|false, default: true)
 
-DISPLAY_SIMILAR_VIDEOS              Algorithm used to find similar videos. With
-                                    lots of videos the algorithm can make page
-                                    loads slow. Consider changing or disabling
+DISPLAY_SIMILAR_VIDEOS              Algorithm used to find similar videos.
+                                    Consider disabling if page loads start to
+                                    become slow
                                     (complex|simple|disabled, default: complex)
 
 SPONSORBLOCK_API_URL                API used to retrieve sponsor segments
                                     (url, default: https://sponsor.ajay.app/)
 
-EXPOSE_LOCAL_VIDEO_PATH             Expose the local video path to the user to
-                                    allow for local VLC playback
+SPONSORBLOCK_K_ANONYMITY            Use the k-anonymity system when fetching
+                                    sponsor segments to preserve privacy
+                                    (true|false, default: true)
+
+RETURN_YOUTUBE_DISLIKE_API_URL      API used to retrieve video dislikes
+                                    (url, default:
+                                    https://returnyoutubedislikeapi.com/)
+
+EXPOSE_LOCAL_VIDEO_PATH             Expose the local video path to allow for
+                                    local VLC playback
                                     (true|false, default: false)
 
-YOUTUBE_DL_UPDATE_COMMAND           Command run when updating youtube-dl from
-                                    the admin panel. If not set will run `-U`
+YOUTUBE_DL_UPDATE_COMMAND           Command run when updating yt-dlp from the
+                                    admin panel. If not set will run `-U`
                                     (string, default: '')
+
+UPDATE_YOUTUBE_DL_ON_JOB_START      Automatically update yt-dlp when a download
+                                    job is started
+                                    (true|false, default: false)
 
 VERBOSE                             Print detailed error messages to the
                                     console
@@ -208,11 +207,11 @@ NODE_ENV                            Should be set to `production` unless
 REACT_APP_BRAND                     Name shown in the navbar
                                     (string, default: youtube-dl Viewer)
 
-REACT_APP_CHECK_FOR_UPDATES         Automatically check the GitHub repo for
-                                    new releases on the admin page
+REACT_APP_CHECK_FOR_UPDATES         Automatically check for new releases on the
+                                    admin page
                                     (true|false, default: true) 
 
-REACT_APP_SHOW_VERSION_TAG          Display the current release version number 
+REACT_APP_SHOW_VERSION_TAG          Show the current release version number 
                                     in the navbar
                                     (true|false, default: true)
 
@@ -227,167 +226,207 @@ REACT_APP_LOAD_EXTERNAL_THUMBNAILS  Load thumbnails and avatars from third
                                     (true|false, default: false)
 
 REACT_APP_OUT_OF_DATE_COLOR_DAYS    Days until a job is highlighted in red to
-                                    alert that it has not been run recently
+                                    indicate it has not been run recently
                                     (number > 0, default: 30)
+
+REACT_APP_REPO_NAME                 Name of the repository
+                                    (string, default: youtube-dl-react-viewer)
+
+REACT_APP_REPO_URL                  Link to the repository
+                                    (url)
+
+REACT_APP_GITHUB_API_URL            Link to the GitHub API URL for the latest
+                                    release
+                                    (url)
+
+REACT_APP_LATEST_RELEASE_LINK       Link to the latest release page
+                                    (url)
+
+PORT                                Port used by the web app frontend in
+                                    development mode
 ```
-When setting environment variables that start with `REACT_APP_` you will need to rebuild the web app for changes to take effect:
+If the web app was installed using Docker you will need to rebuild the image after changing any environment variables by running `docker compose build --no-cache app && docker compose up -d`.
+
+If the web app was installed manually you will need to rebuild the web app frontend after changing environment variables that start with `REACT_APP_`.
+
+Changing `REACT_APP_LIGHT_THEME_LOGO`/`REACT_APP_DARK_THEME_LOGO` will not change the favicon and manifest icons. They can only be changed by replacing the icon files in `./youtube-dl-react-frontend/public` and rebuilding the web app frontend.
+
+**To rebuild the web app frontend:**
 ```
 cd ./youtube-dl-react-frontend
 npm install --unsafe-perm
 npm run build
 ```
-You can change the favicon and manifest icons by replacing the files in `./youtube-dl-react-frontend/public` and rebuilding the app.
 
-The repo and check for update URLs are hard coded in `./youtube-dl-react-frontend/src/index.js`.
+### Required Environment Variables
+These environment variables are required for the web app to run. Ensure they are set in the `.env` file in the repository root directory.
+
+#### `OUTPUT_DIRECTORY`
+The location on your device where downloads will be saved.
+
+#### `SUPERUSER_USERNAME`
+The username for the admin account. If an admin account with this username does not already exist, it will be created.
+
+#### `SUPERUSER_PASSWORD`
+The password for the admin account. The value cannot be `'password'` and must be at least 8 characters long.
+
+#### `JWT_TOKEN_SECRET`
+Used to sign the JSON Web Tokens (JWT). The value cannot be `'secret'` and it is recommended to use a random string of at least 32 characters.
+
+#### `SECURE_COOKIES`
+Determines whether cookies should be marked as secure. Set to `true` if using an HTTPS server. Set to `false` if running locally.
+
+#### `BACKEND_PORT`
+The port on which the web app will be served. The default port is `5000`. If another service is already using port `5000`, specify any other available port.
 
 ## Downloading
 
-To download videos from the web app you must be signed in with the superuser account.
-1. Navigate to the admin panel `http://localhost:5000/admin`
-2. Scroll to the jobs section
-3. Create and save a new job
+1. Sign into the web app with the admin account
+2. Go to the [admin panel](http://localhost:5000/admin) and scroll to the Jobs section
+3. Click the plus icon to create a new job, configure, and save it
 
     ```
-    Job name                        Job display name
+    Job name                        Display name
 
-    Format code                     Format code used by yt-dlp/youtube-dl when
-                                    downloading videos
+    Format code                     Format code used by yt-dlp when downloading
+                                    videos
 
-    Download audio only             Should only audio be downloaded
+    Download audio only             Enable to only download audio
 
-    Download comments               Should comments be downloaded. Only works
-                                    if using yt-dlp
+    Download comments               Enable to download comments if supported
+                                    for the website
     
-    Recode video                    Convert downloaded videos to mp4 to
-                                    increase browser playback compatibility
+    Recode video                    Enable to convert downloaded videos to mp4
+                                    to increase browser playback compatibility
+                                    (may reduce quality)
 
-    URLs                            URLs that will be downloaded by the job.
-                                    URLs can be individual videos, channels, 
-                                    playlists, etc. One URL per line
+    URLs                            URLs that will be downloaded each time the
+                                    job is run. URLs can be individual videos,
+                                    channels, playlists, etc. One URL per line
 
-    Override config                 Arguments passed to yt-dlp/youtube-dl when
-                                    downloading. For example, you can set
-                                    `--cookies C:/Path/To/cookies.txt` here
+    Override config                 Arguments passed to yt-dlp when
+                                    downloading. For example, you can add
+                                    `--cookies` here
 
-    Override uploader               Overrides the uploader for a video 
-                                    downloaded by this job. Useful for websites 
-                                    that do not return the uploader name in
-                                    metadata
+    Override uploader               Treat all videos downloaded by this job as
+                                    if they were uploaded by the specified
+                                    uploader. Useful for websites that do not
+                                    return a uploader name
     ```
-4. Scroll to download section
-5. Select the jobs you want to download. Multiple jobs can be selected. Jobs will run in the order they are started
+4. Scroll to the Download section
+5. Select and run the jobs you want to download. Multiple jobs can be selected. Jobs will run in the order they are started
 
 ## Importing Already Downloaded Videos
 
-You can import videos already downloaded with yt-dlp/youtube-dl as long as they were downloaded with the `--write-info-json` option and the `.json` file is in the same folder as the video.
+You can import videos already downloaded with yt-dlp as long as they were downloaded with `--write-info-json` and `--write-thumbnail` and the thumbnail and JSON files are in the same folder as the video.
 
-To import videos from the web app you must be signed in with the superuser account.
-1. Navigate to the admin panel `http://localhost:5000/admin`
-2. Scroll to the import videos section
+1. Sign into the web app with the admin account
+2. Go to the [admin panel](http://localhost:5000/admin) and scroll to the Import videos section, configure, and import
 
 ```    
-Folder to import                    Folder on the server computer to import
-                                    videos from
+Folder to import                    Folder to import videos from
 
 Job                                 Job imported videos will be added to.
                                     Imported videos will appear in the web app
-                                    as if have been downloaded by this job
+                                    as if they were downloaded by this job
 
 Search subfolders                   Search subfolders for videos
 
-Copy files                          Copy files when importing instead of moving
-                                    them
+Copy files                          Copy files instead of moving them
 
-Continue on failed                  Continue importing videos if a single video
-                                    fails to import
+Continue on failed                  Continue importing videos instead of
+                                    stopping if a video fails to import
 
 Override ext                        Sometimes the video file extension cannot
-                                    be determined by the importer. If you know
-                                    the extension you can set it here
+                                    be determined when importing. If you know
+                                    the extension and it is the same for all
+                                    videos you can specify it here
 ```
 
-If the web app was installed using Docker you will need to copy your existing downloads into the Docker volume before they can be imported.
-
-```
-# 1. Copy the existing downloads to a temporary folder in the Docker container
-docker cp "C:\Your\Existing\Downloads" youtube-dl-react-viewer-app-1:/youtube-dl/TEMP
-
-# 2. Import the temporary folder
-/youtube-dl/TEMP
-```
+> [!CAUTION]
+> If the web app was installed using Docker you will need to copy the videos you want to import into the output directory first, then import the videos using the path on the container filesystem.
+> 
+> 1. Copy your videos from `C:\Your Existing Downloads` to `C:\Output Directory\TEMP`
+> 2. In the web app import the folder `/youtube-dl/TEMP`
+> 3. After importing `C:\Output Directory\TEMP` can be deleted
 
 ## Issues & Limitations
-- **Browser Playback:**
-    <br/>
-    The format code `bestvideo*+bestaudio/best` is used by default. This can sometimes create videos with codecs individual browsers do not support. If a playback error occurs, try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.
 
-    To create videos with better browser playback compatibility, try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` or enable recode video in job settings (may reduce quality).
+### Video Browser Playback
+The default format code used to download videos is `bestvideo*+bestaudio/best`. This can sometimes create a video that cannot be played in the web browser, although this is dependent on the specific web browser and device. If a playback error occurs try: [opening the video in VLC](#how-do-i-open-videos-in-vlc), using a different browser, or changing the format code and redownloading.
 
-- **Playlists:**
-    <br/>
-    youtube-dl only downloads playlist metadata if a video was downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video, it will not appear in the automatically generated playlist in the web app. The best approach to prevent this is to download playlists before downloading individual videos.
+To download videos that may have a greater chance of playing in the web browser try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` instead, or enable recode video in the download job settings (may reduce quality).
 
-- **Xattrs:**
-    <br/>
-    Windows does not support xattrs. Videos downloaded on Windows will not have xattrs added to them.
+### Missing Videos in Playlists
+yt-dlp only downloads playlist metadata for videos if they were downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video it will not appear in the playlist in the web app. To prevent this it is recommended to download playlists before downloading individual videos.
 
-- **Windows Path Limit:**
-    <br/>
-    Windows file paths cannot be longer than 260 characters. To prevent errors where downloaded file names are too long, set the output directory to a location as close to the root directory as possible `C:\youtube-dl`. Alternatively, you can remove the path length limit by [enabling long paths](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later).
-
-- **PM2 and Windows**
-    <br/>
-    PM2 is used to manage the web app process if it was installed using the manual install method. On Windows, console windows may briefly appear when starting a download job. This is an issue that occurs when a process PM2 is managing spawns a subprocess. To prevent this you can start the web app with node instead, however, it will not auto restart if it crashes.
-    ```
-    cd ./youtube-dl-express-backend
-    node --require dotenv/config index.js
-    ```
+### Windows Path Limit
+File paths on Windows cannot be longer than 260 characters. To prevent errors where downloaded videos exceed the path length limit, set the output directory to a location as close to the root directory as possible (i.e., `C:\Output Directory`). Alternatively, you can remove the path length limit on Windows by [enabling long paths](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later).
 
 ## Handling Download Errors
 
-There are two main types of errors that can occur when downloading videos:
-1. **youtube-dl fails to download a video**
-    <br/>
-    This could happen for many reasons: poor internet connection, incompatible format code, broken extractor, private video, etc. These errors are not recorded by the web app, but can be seen in the console output. youtube-dl will try to download the video again the next time the job is run. If you notice a video did not download but do not see an error on the admin page it is most likely because youtube-dl failed to download it.
+There are two types of errors that can occur when downloading videos:
+### yt-dlp fails to download a video
+This could happen for many reasons: poor internet connection, broken extractor, private video, etc. yt-dlp will try to download the video again the next time the job is run.
 
-2. **youtube-dl successfully downloads a video, but the web app fails to import it**
-    <br/>
-    This could happen if the web app could not read the metadata downloaded by youtube-dl or could not identify the video file, thumbnails, subtitles, etc. youtube-dl will not try to redownload the video as it has been successfully downloaded.
-    
-    You can attempt to reimport videos from the failed to import section of the admin panel. This will likely still fail until a version of the web app that fixes the issue is released. Report import errors [here](https://github.com/graham-walker/youtube-dl-react-viewer/issues).
+### yt-dlp successfully downloads a video, but the web app fails to parse it
+If the web app fails to parse the video metadata the video will appear under the Failed to parse section of the admin panel. yt-dlp will not try to redownload the video as it has been successfully downloaded.
+
+You can attempt to retry parsing the video from the Failed to parse section of the admin panel, however, this will likely still fail until a version of the web app that fixes the issue is released. Report parsing errors [here](https://github.com/graham-walker/youtube-dl-react-viewer/issues).
 
 ## FAQ
-**Q:** How do I sign in to websites that require a login?
+### How do I open videos in VLC?
+To open videos from the web app in VLC on PC/Mac you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
 
-**A:** You can set cookies for individual jobs to login to websites. Sign in and export a Netscape cookie file for the website. Edit a job, open advanced options and add this line to override config `--cookies "C:/Path/To/cookies.txt"`
-#
-**Q:** Can I update youtube-dl from the web app?
+No additional configuration is required for iOS/Android devices.
 
-**A:** You can update youtube-dl from the youtube-dl section of the admin panel.
+### How do I download from websites that require a login?
 
-If you installed youtube-dl with a package manager you may need to set the environment variable `YOUTUBE_DL_UPDATE_COMMAND` to the correct update command.
-#
-**Q:** How can I add uploader icons to the web app?
+You can download from websites that require a login by passing your cookies to the download job. In job settings under Advanced options in Override config you can set `--cookies` or `--cookies-from-browser`.
 
-**A:** Uploader icons for YouTube and SoundCloud can be downloaded automatically from the uploader icons section of the admin panel.
+If the web app was installed using Docker `--cookies-from-browser` will not work. To pass cookies to a job when using Docker:
 
-For other websites uploader icons must be downloaded manually and placed in the `./avatars` folder of the output directory. Use the Network tab of the browser DevTools to find the expected filename. 
-#
-**Q:** I am running out of space. Can I use a second hard drive or change/add another output directory?
+1. [Export a Netscape formatted cookie file](https://github.com/dandv/convert-chrome-cookies-to-netscape-format) with the cookies for the desired websites 
+2. Save the cookies file to the root of your output directory `C:\Output Directory\cookies.txt`
+3. In Override config set `--cookies /youtube-dl/cookies.txt`
 
-**A:** You cannot set more than one output directory. If you need to change the output directory, stop the web app and change the environment variable `OUTPUT_DIRECTORY`. Move the contents of the previous output directory to the new one. Paths are stored relative to the output directory so you will not need to update anything else.
+### How can I update yt-dlp?
 
-If you need more space than a single hard drive can offer, use a drive pooling solution like [DrivePool](https://stablebit.com/DrivePool).
-#
-**Q:** Where files generated by youtube-dl, such as `archive.txt` located?
+You can update yt-dlp from the yt-dlp section of the admin panel. This will run the value of the `YOUTUBE_DL_UPDATE_COMMAND` environment variable.
 
-**A:** These files are located at the root of the output directory. You can also view them from the logs section of the admin panel.
-#
-**Q:** Can I delete downloaded videos?
+### How can I add channel/uploader icons to the web app?
 
-**A:** Videos can be deleted from the admin panel, with the option to prevent videos from being redownloaded or not.
+Channel/uploader icons can be downloaded from the Uploader icons section of the admin panel. Icons are downloaded using the third-party service [unavatar.io](https://unavatar.io/). The icon downloader currently only supports YouTube and SoundCloud, other icons must be added manually.
 
-If you are deleting videos because you are running low on storage, note that the actual video files are not deleted until the server is restarted.
+Icons can be added manually to the `./avatars` folder in the output directory. Use the Network tab of the browser DevTools to find the expected filename. 
+
+### I am running out of space. How can I change where videos are downloaded?
+
+To change the output directory stop the web app and set the environment variable `OUTPUT_DIRECTORY` to the new location. Move the contents from the previous output directory to the new one. You do not need to update anything else.
+
+If you need more space than a single hard drive can offer try using a drive pooling solution like [DrivePool](https://stablebit.com/DrivePool).
+
+### How can I delete videos?
+
+Videos can be deleted the Delete videos section of the admin panel.
+
+If you are deleting videos because you are running low on storage be aware that the actual video files are not deleted from the disk until the web app is restarted.
+
+### Where are files generated by yt-dlp such as archive.txt located?
+
+These files are located at the root of the output directory. You can also view them from the Logs section of the admin panel.
+
+### How can I watch videos on my phone or other devices?
+You can access the web app from other devices on your local network by replacing `localhost` with the ip address of the device the web app is running on. You can find this by running `ipconfig` on Windows or `ip addr` on Linux. If the web app does not load check if your firewall settings are blocking Node.js or if your router is blocking communication between devices.
+
+### How do I backup my database?
+#### Manual Installation
+1. Install the [MongoDB Command Line Database Tools](https://www.mongodb.com/try/download/database-tools)
+2. Run `mongodump /d youtubeDlDB` to backup the database to the disk
+#### Docker Installation
+1. Run `docker exec -it youtube-dl-react-viewer-db-1 /bin/bash` to open a new shell session in the database container
+2. In the new session run `mongodump /d youtubeDlDB` to backup the database to the disk
+3. Exit the session and run `docker cp youtube-dl-react-viewer-db-1:/dump/youtubeDlDB "C:\Your Backups Folder\youtubeDlDB"` to copy the backup from the docker container to your disk
 
 ## Planned
 Planned features in no particular order. There is no timeline or guarantee features will be added.
@@ -395,35 +434,42 @@ Planned features in no particular order. There is no timeline or guarantee featu
 **In release 1.2.1:**
 - [x] Import already downloaded videos
 - [x] Docker container
-- [x] Uploader pages
-- [x] Update youtube-dl from the web app
+- [x] Video channel/uploader pages
+- [x] Update yt-dlp from the web app
 
 **In release 1.3.0:**
 - [x] Watch history
 - [x] Video playback resume
-- [x] Dark aware theme
+- [x] Dark theme
 - [x] Verify the integrity of video file hashes
-- [x] SponsorBlock Implementation
+- [x] SponsorBlock integration
 - [x] Display video chapters in the player
 - [x] Chat replay (YouTube only)
 
-**Planned for future releases:**
+**In release 1.3.1**
+- [x] User setting to hide shorts
+
+**In release 1.4.0**
+- [x] Return YouTube Dislike integration
+
+**For future releases:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
 - [ ] Refetch updated metadata for downloaded videos
 - [ ] Twitch chat replay
-- [ ] Stream audio only mode
+- [ ] Stream audio only option
 - [ ] Download job scheduling
+- [ ] API documentation
 
 ## License/Credits
 
 - The function `doProbeSync()` in `./youtube-dl-express-backend/exec.js` is based on [node-ffprobe](https://github.com/ListenerApproved/node-ffprobe#readme), [MIT](https://opensource.org/licenses/MIT)
 - Created with [facebook/create-react-app](https://github.com/facebook/create-react-app), [MIT](https://opensource.org/licenses/MIT)
 - Permission to mirror the videos in the live demo obtained from [Public Domain Films](https://www.youtube.com/channel/UCm0SxTO3_kulT6SE0AAeHOw)
-- Dockerfile created by [JamoDevNich](https://github.com/JamoDevNich)
+- Original Dockerfile created by [JamoDevNich](https://github.com/JamoDevNich)
 - SponsorBlock API from [SponsorBlock](https://sponsor.ajay.app/)
 - See packages for additional licenses
 
 ## Disclaimer
-**youtube-dl-react-viewer does not contain any code from [ytdl-org/youtube-dl](https://youtube-dl.org/). youtube-dl-react-viewer by itself does not have any capability to download videos.**
+youtube-dl-react-viewer is free and open-source software. This software is provided "as-is", without warranty of any kind. See the [LICENSE](./LICENSE) file for more details.
