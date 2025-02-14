@@ -31,6 +31,11 @@ export default class Downloader {
             if (parsedEnv.UPDATE_YOUTUBE_DL_ON_JOB_START && !chained) {
                 let message = updateYoutubeDl();
                 if (message.success) updated = true;
+                if (message.error) {
+                    logError(message.error);
+                    this.stop();
+                    return 'failed';
+                }
             }
 
             // Get the next job in the queue
@@ -53,8 +58,9 @@ export default class Downloader {
             try {
                 parsedArguments = parseArguments(job.arguments);
                 parsedUrls = parseUrls(job.urls);
-                youtubeDlVersion = getYoutubeDlVersion();
+                youtubeDlVersion = getYoutubeDlVersion(true);
             } catch (err) {
+                logError(err);
                 this.stop();
                 return 'failed';
             }
@@ -204,12 +210,18 @@ const parseUrls = (text) => {
         .filter((i) => i != '');
 }
 
-export const getYoutubeDlVersion = () => {
+export const getYoutubeDlVersion = (throwError = false) => {
     const versionProcess = spawnSync(parsedEnv.YOUTUBE_DL_PATH, ['--version'], { windowsHide: true });
     if (versionProcess.status === 0) {
         return versionProcess.stdout.toString().trim();
     } else {
-        throw new Error('Failed to get version');
+        let message = 'failed to get version';
+        if (versionProcess?.error?.code === 'ENOENT') message = 'not installed';
+        if (throwError) {
+            throw new Error(message);
+        } else {
+            return message;
+        }
     }
 }
 
