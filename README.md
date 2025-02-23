@@ -15,6 +15,7 @@
 - [DOWNLOADING](#downloading)
 - [IMPORTING ALREADY DOWNLOADED VIDEOS](#importing-already-downloaded-videos)
 - [ISSUES & LIMITATIONS](#issues--limitations)
+- [SCRIPTS](#scripts)
 - [HANDLING DOWNLOAD ERRORS](#handling-download-errors)
 - [FAQ](#faq)
 - [PLANNED](#planned)
@@ -375,6 +376,13 @@ yt-dlp only downloads playlist metadata for videos if they were downloaded as pa
 
 ### Windows Path Limit
 File paths on Windows cannot be longer than 260 characters. To prevent errors where downloaded videos exceed the path length limit, set the output directory to a location as close to the root directory as possible (i.e., `C:\Output Directory`). Alternatively, you can remove the path length limit on Windows by [enabling long paths](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later).
+
+## Scripts
+Scripts offer or extend functionality that is not present in youtube-dl-react-viewer by default.
+
+- [A Node.js script to automatically run download jobs at a specified time using a cron scheduler](./examples/nodejs-schedule-download-jobs.js)
+- [A bookmarklet to append the URL of the current page to a specified download job](./examples/bookmarklet-append-url-to-job.js)
+- [A bookmarklet to start running any number of specified download jobs](./examples/bookmarklet-download-jobs.js)
 
 ## Handling Download Errors
 
