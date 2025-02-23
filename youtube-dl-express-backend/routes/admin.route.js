@@ -147,6 +147,19 @@ router.post('/jobs/save/:jobId', async (req, res) => {
     res.json({ jobId: job._id, name: job.name });
 });
 
+router.post('/jobs/append/:jobId', async (req, res) => {
+    let job;
+    try {
+        job = await Job.findOne({ _id: req.params.jobId });
+        if (job.urls.split('\n').includes(req.body.url)) return res.status(500).json({ error: 'URL already added to job' });
+        job.urls = `${job.urls.trim() === '' ? job.urls : job.urls.replace(/\n*$/, '\n\n')}# ${req.body.title}\n${req.body.url}\n`;
+        await job.save();
+    } catch (err) {
+        return res.status(500).json({ error: 'Failed to add URL to job' });
+    }
+    return res.json({ success: 'URL added to job' });
+});
+
 router.post('/jobs/download/', async (req, res) => {
     const [busy, reason] = isBusy(['updating', 'repairing', 'deleting', 'importing'], req.params.jobId);
     if (busy) return res.status(500).json({ error: 'Cannot start download while ' + reason });
