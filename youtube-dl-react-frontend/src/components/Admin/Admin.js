@@ -14,6 +14,7 @@ import RetryImports from './RetryImports/RetryImports';
 import JobEditor from './JobEditor/JobEditor';
 import VideoImporter from './VideoImporter/VideoImporter';
 import RecalcStatistics from './RecalcStatistics/RecalcStatistics';
+import ApiKeyManager from './ApiKeyManager/ApiKeyManager';
 import parsedEnv from '../../parse-env';
 
 export default class AdminPage extends Component {
@@ -34,6 +35,8 @@ export default class AdminPage extends Component {
             defaultActivejobId: undefined,
             consoleOutput: [],
             historyUpdated: 0,
+            apiKeys: [],
+            currentUserId: undefined,
         };
     }
 
@@ -53,6 +56,8 @@ export default class AdminPage extends Component {
                     defaultActivejobId: res.data.jobs[0]?._id,
                     consoleOutput: res.data.consoleOutput,
                     historyUpdated: res.data.historyUpdated,
+                    apiKeys: res.data.apiKeys,
+                    currentUserId: res.data.currentUserId,
                 });
             }).catch(err => {
                 this.setState({ error: err });
@@ -88,6 +93,7 @@ export default class AdminPage extends Component {
                         <ChannelIconDownloader />
                         <HashVerifier />
                         <RecalcStatistics />
+                        <ApiKeyManager apiKeys={this.state.apiKeys} onApiKeysChange={(apiKeys) => this.setState({ apiKeys })} currentUserId={this.state.currentUserId} />
                         <RetryImports errors={this.state.errors} />
                     </div>
                 }

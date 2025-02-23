@@ -11,6 +11,7 @@ import Video from '../models/video.model.js';
 import Playlist from '../models/playlist.model.js';
 import Statistic from '../models/statistic.model.js';
 import Version from '../models/version.model.js';
+import ApiKey from '../models/apikey.model.js';
 
 import Downloader from '../utilities/job.utility.js';
 import ErrorManager from '../utilities/error.utility.js';
@@ -40,6 +41,7 @@ router.get('/', async (req, res) => {
         let errors = await DownloadError.find({}).sort({ errorOccurred: -1 }).lean().exec();
         let extractors = await Video.distinct('extractor');
         let adminFiles = (await fs.readdir(parsedEnv.OUTPUT_DIRECTORY, { withFileTypes: true })).filter(file => file.isFile()).map(file => file.name);
+        let apiKeys = await ApiKey.find({}).sort({ createdAt: 1 }).lean().exec();
 
         res.json({
             jobs,
@@ -50,6 +52,8 @@ router.get('/', async (req, res) => {
             youtubeDlVersion,
             consoleOutput: history,
             historyUpdated,
+            apiKeys,
+            currentUserId: req.userId,
         });
     } catch (err) {
         res.sendStatus(500);
@@ -68,6 +72,37 @@ router.get('/logs', async (req, res) => {
     } catch (err) {
         res.sendStatus(500);
     }
+});
+
+router.post('/api-keys/save/new', async (req, res) => {
+    let apiKey;
+    try {
+        apiKey = new ApiKey({
+            name: req.body.name,
+            userDocument: req.body.userDocument,
+            pattern: req.body.pattern,
+            enabled: req.body.enabled,
+        });
+        await apiKey.save();
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+    res.json(apiKey.toJSON());
+});
+
+router.post('/api-keys/save/:apiKeyId', async (req, res) => {
+    let apiKey;
+    try {
+        apiKey = await ApiKey.findOne({ _id: req.params.apiKeyId });
+        apiKey.name = req.body.name;
+        apiKey.userDocument = req.body.userDocument;
+        apiKey.pattern = req.body.pattern;
+        apiKey.enabled = req.body.enabled;
+        await apiKey.save();
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+    res.json(apiKey.toJSON());
 });
 
 router.post('/jobs/save/new', async (req, res) => {
