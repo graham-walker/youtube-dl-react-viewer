@@ -51,7 +51,6 @@
 > Downgrading an existing installation is not supported and may lead to database corruption. It is recommended to [backup your database](#how-do-i-backup-my-database) before upgrading versions.
 
 ### Docker Installation
-
 1. Clone this repository
 
 2. Open the repository directory `cd ./youtube-dl-react-viewer`
@@ -74,10 +73,13 @@ Because `.env` is copied to the container during the build step the Docker image
 > [!CAUTION]
 > If you are updating a Docker installation from a version prior to 1.4.0 see the [v1.4.0 Docker Update Guide](./docs/v1.4.0-docker-update-guide.md)
 
-To update a Docker installation run `git pull && git checkout tags/v1.4.1 && docker compose build --no-cache && docker compose up -d`.
+1. Run `git pull`
+
+2. Select the latest release `git checkout tags/v1.4.1`
+
+3. Rebuild and restart the container `docker compose build --no-cache && docker compose up -d`
 
 ### Manual Installation
-
 1. [Install Node.js 18.x.x (LTS)](https://nodejs.org/en/download/current/)
 
 2. [Install MongoDB 6.0.x](https://www.mongodb.com/try/download/community)
@@ -86,12 +88,19 @@ To update a Docker installation run `git pull && git checkout tags/v1.4.1 && doc
 
 4. [Install FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
 
-5. Download the [Source code (zip)](https://github.com/graham-walker/youtube-dl-react-viewer/releases) for the latest release of youtube-dl-react-viewer
-6. Unzip to the location of your choosing
-7. Copy `.env.sample` to `.env`
-8. Edit `.env` and [configure the required environment variables](#required-environment-variables)
-9. Run the install script located in `./youtube-dl-react-viewer/scripts`
-10. The web app will be accessible in the browser at `http://localhost:5000`
+5. Clone this repository
+
+6. Open the repository directory `cd ./youtube-dl-react-viewer`
+
+7. Select the release tag of the version you want to install `git checkout tags/v1.4.1`
+
+8. Copy `.env.sample` to `.env`
+
+9. Edit `.env` and [configure the required environment variables](#required-environment-variables)
+
+10. Run the install script located in `./youtube-dl-react-viewer/scripts`
+
+11. The web app will be accessible in the browser at `http://localhost:5000`
 
 #### Managing the Web App Process
 When installed manually the web app process is managed by [pm2](https://github.com/Unitech/pm2).
@@ -103,7 +112,11 @@ Usage:
 - Run at pc startup `pm2 startup youtube-dl-react-viewer` (unix only)
 
 #### Updating a Manual Installation
-To update a manual installation run `git pull && git checkout tags/v1.4.1 && pm2 restart youtube-dl-react-viewer`.
+1. Run `git pull`
+
+2. Select the latest release `git checkout tags/v1.4.1`
+
+3. Rerun the install script located in `./youtube-dl-react-viewer/scripts`
 
 ## Environment Variables
 Configure environment variables by editing the `.env` file in the repository root directory. If this file does not exist yet copy `.sample.env` to `.env`. Use this file to set environment variables for both the frontend and backend. Some variables are required for the app to run, see [required environment variables](#required-environment-variables) for details.
