@@ -56,7 +56,7 @@
 
 2. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-3. Select the release tag of the version you want to install `git checkout tags/v1.4.0`
+3. Select the release tag of the version you want to install `git checkout tags/v1.4.1`
 
 4. Copy `.env.sample` to `.env`
 
@@ -74,7 +74,7 @@ Because `.env` is copied to the container during the build step the Docker image
 > [!CAUTION]
 > If you are updating a Docker installation from a version prior to 1.4.0 see the [v1.4.0 Docker Update Guide](./docs/v1.4.0-docker-update-guide.md)
 
-To update a Docker installation run `git pull && git checkout tags/v1.4.0 && docker compose build --no-cache && docker compose up -d`.
+To update a Docker installation run `git pull && git checkout tags/v1.4.1 && docker compose build --no-cache && docker compose up -d`.
 
 ### Manual Installation
 
@@ -103,7 +103,7 @@ Usage:
 - Run at pc startup `pm2 startup youtube-dl-react-viewer` (unix only)
 
 #### Updating a Manual Installation
-To update a manual installation run `git pull && git checkout tags/v1.4.0 && pm2 restart youtube-dl-react-viewer`.
+To update a manual installation run `git pull && git checkout tags/v1.4.1 && pm2 restart youtube-dl-react-viewer`.
 
 ## Environment Variables
 Configure environment variables by editing the `.env` file in the repository root directory. If this file does not exist yet copy `.sample.env` to `.env`. Use this file to set environment variables for both the frontend and backend. Some variables are required for the app to run, see [required environment variables](#required-environment-variables) for details.
@@ -452,6 +452,9 @@ Planned features in no particular order. There is no timeline or guarantee featu
 **In release 1.4.0**
 - [x] Return YouTube Dislike integration
 
+**In release 1.4.1**
+- [x] API key system
+
 **For future releases:**
 - [ ] Create custom playlists, favorites, comments
 - [ ] Search and sort for uploaders
@@ -459,7 +462,6 @@ Planned features in no particular order. There is no timeline or guarantee featu
 - [ ] Refetch updated metadata for downloaded videos
 - [ ] Twitch chat replay
 - [ ] Stream audio only option
-- [ ] Download job scheduling
 - [ ] API documentation
 
 ## License/Credits

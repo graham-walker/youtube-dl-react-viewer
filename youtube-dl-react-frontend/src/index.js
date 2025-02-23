@@ -7,7 +7,7 @@ import App from './App';
 import parsedEnv from './parse-env';
 
 document.title = parsedEnv.REACT_APP_BRAND;
-window.appVersion = '1.4.0';
+window.appVersion = '1.4.1';
 
 ReactDOM.render(
   <React.StrictMode>
