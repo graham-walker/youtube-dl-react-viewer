@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Tab, Form, Button, Accordion, Card, Nav, Alert, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getErrorMessage, getWarningColor } from '../../../utilities/format.utility';
@@ -10,8 +10,13 @@ import ImportSubscriptionsButton from '../../ImportSubscriptionsButton/ImportSub
 import parsedEnv from '../../../parse-env';
 
 const JobEditor = (props) => {
+    const [activeKey, setActiveKey] = useState(props.defaultActivejobId || 'new');
 
-    const addJob = (job) => props.onJobsChange([...props.jobs, job]);
+    const addJob = (job) => {
+        setActiveKey(job._id);
+        job.isNew = true;
+        props.onJobsChange([...props.jobs, job]);
+    }
 
     const setJob = (job) => {
         let jobs = [...props.jobs];
@@ -28,7 +33,7 @@ const JobEditor = (props) => {
         <>
             <h5 id="jobs-anchor" className="mb-4">Jobs</h5>
             <Card className="mb-4">
-                <Tab.Container defaultActiveKey={props.defaultActivejobId || 'new'}>
+                <Tab.Container activeKey={activeKey} onSelect={activeKey => setActiveKey(activeKey)}>
                     <Card.Header>
                         <Nav
                             className="nav-tabs card-header-tabs"
@@ -66,6 +71,7 @@ const JobEditor = (props) => {
                                     <JobForm
                                         job={job}
                                         setJob={setJob}
+                                        active={activeKey === job._id}
                                     />
                                 </Tab.Pane>
                             )}
@@ -73,6 +79,7 @@ const JobEditor = (props) => {
                                 <JobForm
                                     addJob={addJob}
                                     new
+                                    active={activeKey === 'new'}
                                 />
                             </Tab.Pane>
                         </Tab.Content>
@@ -107,7 +114,18 @@ class JobForm extends Component {
         if (this.props.job) {
             let job = { ...this.props.job };
             delete job._id;
-            this.setState(job);
+            if (job.isNew) {
+                delete job.isNew;
+                this.setState({ ...job, success: 'New job saved' });
+            } else {
+                this.setState(job);
+            }
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.active && !this.props.active) {
+            this.setState({ ...this.state, error: undefined, success: undefined });
         }
     }
 
@@ -142,7 +160,6 @@ class JobForm extends Component {
                     if (res.status === 200) {
                         if (this.props.new) {
                             let state = { ...this.initialState };
-                            state.success = 'New job saved';
                             this.setState(state);
                             this.props.addJob(res.data);
                         } else {
@@ -275,6 +292,20 @@ class JobForm extends Component {
                                         onChange={this.handleInputChange}
                                     />
                                 </Form.Group>
+                                {this.props.job?._id &&
+                                    <Form.Group className="mb-3" controlId={'jobId' + this.props.job._id}>
+                                        <OverlayTrigger overlay={<Tooltip>Used to interact with the job from the API</Tooltip>}>
+                                            <Form.Label>Job ID <FontAwesomeIcon icon="circle-info" /></Form.Label>
+                                        </OverlayTrigger>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Job ID"
+                                            name="jobId"
+                                            value={this.props.job._id}
+                                            disabled={true}
+                                        />
+                                    </Form.Group>
+                                }
                             </>
                         </Accordion.Collapse>
                     </Accordion>
