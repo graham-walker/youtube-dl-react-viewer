@@ -15,6 +15,7 @@ const updateIds = {
     '1.3.1_comments': 2,
     '1.3.1_uploader_use_channel': 3,
     '1.3.1_detect_shorts': 4,
+    '1.4.2_detect_three_minute_shorts': 5,
 };
 
 const applyUpdates = async () => {
@@ -218,12 +219,31 @@ const applyUpdates = async () => {
         let videos = await Video.find({}, 'extractor duration uploadDate width height');
         for (let i = 0; i < videos.length; i++) {
             let video = videos[i];
-            video.isShort = detectShort(video);
-            await video.save();
+            const isShort = detectShort(video);
+            if (isShort !== video.isShort) {
+                video.isShort = isShort;
+                await video.save();
+            }
             printProgress(`Doing version 1.3.1 migrations 3/3... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
         }
 
         version.lastUpdateCompleted = updateIds['1.3.1_detect_shorts'];
+        await version.save();
+    }
+
+    if (updateIds['1.4.2_detect_three_minute_shorts'] > version.lastUpdateCompleted) {
+        let videos = await Video.find({}, 'extractor duration uploadDate width height');
+        for (let i = 0; i < videos.length; i++) {
+            let video = videos[i];
+            const isShort = detectShort(video);
+            if (isShort !== video.isShort) {
+                video.isShort = isShort;
+                await video.save();
+            }
+            printProgress(`Doing version 1.4.2 migrations 1/1... ${(((i + 1) / videos.length) * 100).toFixed(2)}%`);
+        }
+
+        version.lastUpdateCompleted = updateIds['1.4.2_detect_three_minute_shorts'];
         await version.save();
     }
 

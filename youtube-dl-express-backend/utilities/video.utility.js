@@ -274,14 +274,18 @@ const dot = (vector1, vector2) => {
 }
 
 export const detectShort = (video) => {
-    // yt-dlp does not tell if a video is a short from the metadata
-    // A short is always between 15 and 60 seconds, and is either a vertical or square video
-    // However, there appear to be many exceptions where shorts shorter than 15 seconds are appearing
-    // The shorts feature was introduced July 13th, 2021
+    // yt-dlp does not directly say if a video is a short in the metadata
     return (
         video.extractor === 'youtube' &&
-        video.duration < 61 &&
         video.width <= video.height &&
-        video.uploadDate.getTime() > new Date('2021-07-12').getTime()
+        (
+            (
+                video.duration <= 60 &&
+                video.uploadDate.getTime() >= new Date('2021-07-13').getTime() // Shorts were introduced July 13, 2021
+            ) || (
+                video.duration <= 180 &&
+                video.uploadDate.getTime() >= new Date('2024-10-15').getTime() // Three minute shorts were introduced October 15, 2024
+            )
+        )
     );
 }
