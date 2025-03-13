@@ -7,6 +7,7 @@ import { defaultImage } from '../../utilities/image.utility';
 import VideoPreview from '../VideoPreview/VideoPreview';
 import axios from '../../utilities/axios.utility';
 import parsedEnv from '../../parse-env';
+import ConfirmModal from '../ConfirmModal/ConfirmModal';
 
 export default class ActivityPage extends Component {
     static contextType = UserContext;
@@ -21,6 +22,7 @@ export default class ActivityPage extends Component {
             count: undefined,
             user: undefined,
             hasMore: true,
+            showConfirm: false,
         };
     }
 
@@ -100,7 +102,16 @@ export default class ActivityPage extends Component {
                                 <p className="text-muted text-center">
                                     Registered: {new Date(user.createdAt).toLocaleDateString()}
                                 </p>
-                                <p className="text-right"><Button onClick={this.clearActivity}>Clear Activity</Button></p>
+                                <p className="text-right"><Button onClick={() => this.setState({ showConfirm: true })}>Clear activity</Button></p>
+                                <ConfirmModal
+                                    show={this.state.showConfirm}
+                                    onHide={() => this.setState({ showConfirm: false })}
+                                    onConfirm={() => {
+                                        this.setState({ showConfirm: false });
+                                        this.clearActivity();
+                                    }}
+                                    title="Clear activity"
+                                />
                             </div>
                         </Col>
                         <Col>
