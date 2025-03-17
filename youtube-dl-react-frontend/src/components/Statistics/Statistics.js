@@ -74,9 +74,7 @@ export default class StatisticsPage extends Component {
                                     <StatisticColumn
                                         title="Total Filesize"
                                         icon="file"
-                                        statistic={bytesToSizeString(statistic.totalFilesize,
-                                            this.context.user?.reportBytesUsingIec ?? true
-                                        )}
+                                        statistic={bytesToSizeString(statistic.totalFilesize, this.context.getSetting('reportBytesUsingIec'))}
                                         detailedStatistic={statistic.totalFilesize.toLocaleString() + ' bytes'}
                                     />
                                     <StatisticColumn
@@ -172,7 +170,7 @@ export default class StatisticsPage extends Component {
                                                         if (label) {
                                                             label += ': ' + bytesToSizeString(
                                                                 data.datasets[0].data[tooltipItem.index],
-                                                                this.context.user?.reportBytesUsingIec ?? true
+                                                                this.context.getSetting('reportBytesUsingIec')
                                                             );
                                                         }
                                                         return label;

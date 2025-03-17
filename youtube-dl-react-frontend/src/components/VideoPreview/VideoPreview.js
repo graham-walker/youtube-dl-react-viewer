@@ -25,7 +25,7 @@ const VideoPreview = props => {
                         width={36}
                         height={36}
                         src="/default-avatar.svg"
-                        roundedCircle={userContext.user?.useCircularAvatars ?? true}
+                        roundedCircle={userContext.getSetting('useCircularAvatars')}
                         className="mt-1"
                     />
                 }
@@ -42,7 +42,7 @@ const VideoPreview = props => {
         const videoImage = <>
             <div
                 className="video-thumbnail bg-light force-16-9" // Default thumbnail always 16:9
-                style={{ width: props.width, borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
+                style={{ width: props.width, borderRadius: userContext.getSetting('useCircularAvatars') ? '0.5rem' : 0 }}
             >
                 <Image
                     style={{ filter: props.watched ? 'brightness(75%)' : 'none' }}
@@ -105,7 +105,7 @@ const VideoPreview = props => {
                             height={36}
                             src={getImage(video, 'avatar')}
                             onError={(e) => { defaultImage(e, 'avatar') }}
-                            roundedCircle={userContext.user?.useCircularAvatars ?? true}
+                            roundedCircle={userContext.getSetting('useCircularAvatars')}
                             className="mt-1"
                         />
                     </Link>
@@ -166,8 +166,8 @@ const VideoPreview = props => {
 
         const videoImage = <>
             <div
-                className={`video-thumbnail bg-light${(userContext.user?.fitThumbnails ?? true) ? ' force-16-9' : ''}`}
-                style={{ width: props.width, borderRadius: (userContext.user?.useCircularAvatars ?? true) ? '0.5rem' : 0 }}
+                className={`video-thumbnail bg-light${userContext.getSetting('fitThumbnails') ? ' force-16-9' : ''}`}
+                style={{ width: props.width, borderRadius: userContext.getSetting('useCircularAvatars') ? '0.5rem' : 0 }}
             >
                 <Image
                     style={{ filter: props.watched ? 'brightness(75%)' : 'none' }}

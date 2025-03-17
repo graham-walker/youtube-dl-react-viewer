@@ -74,7 +74,7 @@ const ChatReplay = (props) => {
                                                 height={24}
                                                 src={parsedEnv.REACT_APP_LOAD_EXTERNAL_THUMBNAILS ? comment.photo : '/default-avatar.svg'}
                                                 onError={(e) => { defaultImage(e, 'avatar') }}
-                                                roundedCircle={userContext.user?.useCircularAvatars ?? true}
+                                                roundedCircle={userContext.getSetting('useCircularAvatars')}
                                             />
                                             <div className="media-body ms-2">
                                                 <p className="mb-0">

@@ -47,7 +47,7 @@ class AppNavbar extends Component {
     render() {
         if (history.location.pathname !== '/global'
             && history.location.pathname !== '/global/') {
-            const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
+            const avatar = this.context.getAvatar();
             return (
                 <Navbar
                     sticky="top"
@@ -134,13 +134,13 @@ class AppNavbar extends Component {
                                         <NavDropdown
                                             title={
                                                 <>
-                                                    <span title={this.context.user.username}>{this.context.user.username}</span>
+                                                    <span title={this.context.getSetting('username')}>{this.context.getSetting('username')}</span>
                                                     <Image
                                                         width={36}
                                                         height={36}
                                                         src={avatar}
                                                         onError={(e) => { defaultImage(e, 'avatar') }}
-                                                        roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                                        roundedCircle={this.context.getSetting('useCircularAvatars')}
                                                         style={{ marginLeft: '0.5em' }}
                                                     />
                                                 </>
@@ -161,7 +161,7 @@ class AppNavbar extends Component {
                                             >
                                                 Settings
                                             </NavDropdown.Item>
-                                            {this.context.user.isSuperuser &&
+                                            {this.context.getSetting('isSuperuser') &&
                                                 <NavDropdown.Item
                                                     as={NavLink}
                                                     to="/admin"

@@ -63,7 +63,7 @@ export default class UploaderPage extends Component {
                                 height={145}
                                 src={getImage(uploader, 'avatar')}
                                 onError={(e) => { defaultImage(e, 'avatar') }}
-                                roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                roundedCircle={this.context.getSetting('useCircularAvatars')}
                                 className="mb-1 mb-lg-0"
                             />
                         </Col>
@@ -103,9 +103,7 @@ export default class UploaderPage extends Component {
                                     <MiniStatisticColumn
                                         title="Total Filesize"
                                         icon="file"
-                                        statistic={bytesToSizeString(statistics.totalVideoFilesize,
-                                            this.context.user?.reportBytesUsingIec ?? true
-                                        )}
+                                        statistic={bytesToSizeString(statistics.totalVideoFilesize, this.context.getSetting('reportBytesUsingIec'))}
                                         detailedStatistic={statistics.totalVideoFilesize.toLocaleString() + ' bytes'}
                                     />
                                 }

@@ -64,7 +64,7 @@ export default class Job extends Component {
                                     <Image
                                         src={getImage(video, 'thumbnail', 'medium')}
                                         onError={(e) => defaultImage(e, 'thumbnail')}
-                                        style={{borderRadius: (this.context.user?.useCircularAvatars ?? true) ? '0.5rem' : 0}}
+                                        style={{borderRadius: this.context.getSetting('useCircularAvatars') ? '0.5rem' : 0}}
                                     />
                                 </div>
                                 <h3>{name}</h3>

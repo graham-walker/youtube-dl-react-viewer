@@ -62,7 +62,7 @@ export default class ActivityPage extends Component {
 
     render() {
         const user = this.state.user;
-        const avatar = this.context.user && this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
+        const avatar = this.context.getAvatar();
 
         const activities = this.state.activities.map((activity, i) =>
             <Col
@@ -95,7 +95,7 @@ export default class ActivityPage extends Component {
                                         height={145}
                                         src={avatar}
                                         onError={(e) => { defaultImage(e, 'avatar') }}
-                                        roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                        roundedCircle={this.context.getSetting('useCircularAvatars')}
                                     />
                                     <h3>Activity for {user.username}</h3>
                                 </div>
@@ -149,7 +149,7 @@ export default class ActivityPage extends Component {
 
 const ActivityItem = props => {
     const userContext = useContext(UserContext);
-    const avatar = userContext.user && userContext.user.avatar ? '/static/users/avatars/' + userContext.user.avatar : '/default-avatar.svg';
+    const avatar = userContext.getAvatar();
 
     const activity = props.activity;
 
@@ -180,10 +180,10 @@ const ActivityItem = props => {
                     height={36}
                     src={avatar}
                     onError={(e) => { defaultImage(e, 'avatar') }}
-                    roundedCircle={userContext.user?.useCircularAvatars ?? true}
+                    roundedCircle={userContext.getSetting('useCircularAvatars')}
                     className="me-2"
                 />
-                    <span className="fw-bold">{userContext.user.username} {eventType}</span><small className="text-muted ms-3">{new Date(activity.createdAt).toLocaleString()}</small></p>
+                    <span className="fw-bold">{userContext.getSetting('username')} {eventType}</span><small className="text-muted ms-3">{new Date(activity.createdAt).toLocaleString()}</small></p>
             </div>
             <div className="activity-body">{activityBody}</div>
         </>

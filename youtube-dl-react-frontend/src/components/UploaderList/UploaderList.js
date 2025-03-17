@@ -70,7 +70,7 @@ export default class UploaderList extends Component {
                             height={145}
                             src={getImage(uploader, 'avatar')}
                             onError={(e) => { defaultImage(e, 'avatar') }}
-                            roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                            roundedCircle={this.context.getSetting('useCircularAvatars')}
                             className="me-3"
                         />
                     </Link>
@@ -85,8 +85,7 @@ export default class UploaderList extends Component {
                             <small>
                                 {uploader.statistics.totalVideoCount.toLocaleString()} video{(uploader.statistics.totalVideoCount !== 1) && 's'}
                                 <span> &middot; </span>
-                                {bytesToSizeString(uploader.statistics.totalVideoFilesize,
-                                    this.context.user?.reportBytesUsingIec ?? true)}
+                                {bytesToSizeString(uploader.statistics.totalVideoFilesize, this.context.getSetting('reportBytesUsingIec'))}
                             </small>
                         </p>
                         <p className="text-muted mb-0">

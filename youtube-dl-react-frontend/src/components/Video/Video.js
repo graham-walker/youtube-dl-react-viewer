@@ -112,12 +112,12 @@ export default class VideoPage extends Component {
                 if (res.status === 200) {
                     window.scrollTo(0, 0);
 
-                    if (this.context.user?.enableSponsorblock
+                    if (this.context.getSetting('enableSponsorblock')
                         && res.data.video.extractor === 'youtube'
                         && res.data.sponsorSegments
                     ) this.sponsorRef.current = res.data.sponsorSegments;
 
-                    if (this.context.user?.enableReturnYouTubeDislike && res.data.returnYouTubeDislikeVotes !== null) {
+                    if (this.context.getSetting('enableReturnYouTubeDislike') && res.data.returnYouTubeDislikeVotes !== null) {
                         res.data.video.viewCount = res.data.returnYouTubeDislikeVotes.viewCount;
                         res.data.video.likeCount = res.data.returnYouTubeDislikeVotes.likes;
                         res.data.video.dislikeCount = res.data.returnYouTubeDislikeVotes.dislikes;
@@ -198,16 +198,16 @@ export default class VideoPage extends Component {
                                     // Mark sponsor segments
                                     if (this.sponsorRef.current) {
                                         for (let sponsor of this.sponsorRef.current) {
-                                            if (this.context.user.onlySkipLocked && (sponsor.locked === 0 || sponsor.locked === null || sponsor.locked === false)) continue;
+                                            if (this.context.getSetting('onlySkipLocked') && (sponsor.locked === 0 || sponsor.locked === null || sponsor.locked === false)) continue;
 
-                                            if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
-                                            if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
-                                            if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
-                                            if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
-                                            if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
-                                            if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
-                                            if (!this.context.user.skipFiller && sponsor.category === 'filler') continue;
-                                            if (!this.context.user.skipMusicOfftopic && sponsor.category === 'music_offtopic') continue;
+                                            if (!this.context.getSetting('skipSponsor') && sponsor.category === 'sponsor') continue;
+                                            if (!this.context.getSetting('skipSelfpromo') && sponsor.category === 'selfpromo') continue;
+                                            if (!this.context.getSetting('skipInteraction') && sponsor.category === 'interaction') continue;
+                                            if (!this.context.getSetting('skipIntro') && sponsor.category === 'intro') continue;
+                                            if (!this.context.getSetting('skipOutro') && sponsor.category === 'outro') continue;
+                                            if (!this.context.getSetting('skipPreview') && sponsor.category === 'preview') continue;
+                                            if (!this.context.getSetting('skipFiller') && sponsor.category === 'filler') continue;
+                                            if (!this.context.getSetting('skipMusicOfftopic') && sponsor.category === 'music_offtopic') continue;
 
                                             let segmentElement = document.createElement('div');
                                             const left = (sponsor.segment[0] / sponsor.videoDuration) * 100;
@@ -257,14 +257,14 @@ export default class VideoPage extends Component {
 
                                             let skip = false;
                                             for (let sponsor of this.sponsorRef.current) {
-                                                if (!this.context.user.skipSponsor && sponsor.category === 'sponsor') continue;
-                                                if (!this.context.user.skipSelfpromo && sponsor.category === 'selfpromo') continue;
-                                                if (!this.context.user.skipInteraction && sponsor.category === 'interaction') continue;
-                                                if (!this.context.user.skipIntro && sponsor.category === 'intro') continue;
-                                                if (!this.context.user.skipOutro && sponsor.category === 'outro') continue;
-                                                if (!this.context.user.skipPreview && sponsor.category === 'preview') continue;
-                                                if (!this.context.user.skipFiller && sponsor.category === 'filler') continue;
-                                                if (!this.context.user.skipMusicOfftopic && sponsor.category === 'music_offtopic') continue;
+                                                if (!this.context.getSetting('skipSponsor') && sponsor.category === 'sponsor') continue;
+                                                if (!this.context.getSetting('skipSelfpromo') && sponsor.category === 'selfpromo') continue;
+                                                if (!this.context.getSetting('skipInteraction') && sponsor.category === 'interaction') continue;
+                                                if (!this.context.getSetting('skipIntro') && sponsor.category === 'intro') continue;
+                                                if (!this.context.getSetting('skipOutro') && sponsor.category === 'outro') continue;
+                                                if (!this.context.getSetting('skipPreview') && sponsor.category === 'preview') continue;
+                                                if (!this.context.getSetting('skipFiller') && sponsor.category === 'filler') continue;
+                                                if (!this.context.getSetting('skipMusicOfftopic') && sponsor.category === 'music_offtopic') continue;
 
                                                 if (currentTime >= sponsor.segment[0] && currentTime < sponsor.segment[1]) {
                                                     currentTime = sponsor.segment[1];
@@ -378,7 +378,7 @@ export default class VideoPage extends Component {
     }
 
     saveActivity() {
-        if (this.context.user?.recordWatchHistory && this.state.activityDocument && this.player) {
+        if (this.context.getSetting('recordWatchHistory') && this.state.activityDocument && this.player) {
             let stopTime = this.player.currentTime();
             axios
                 .post(`/api/activity/record`, {
@@ -492,7 +492,7 @@ export default class VideoPage extends Component {
                                                     height={48}
                                                     src={getImage(video, 'avatar')}
                                                     onError={(e) => { defaultImage(e, 'avatar') }}
-                                                    roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                                                    roundedCircle={this.context.getSetting('useCircularAvatars')}
                                                 />
                                             </Link>
                                             <div className="media-body">
@@ -566,9 +566,7 @@ export default class VideoPage extends Component {
                                             <MiniStatisticColumn
                                                 title="Filesize"
                                                 icon="file"
-                                                statistic={bytesToSizeString(video.videoFile.filesize,
-                                                    this.context.user?.reportBytesUsingIec ?? true
-                                                )}
+                                                statistic={bytesToSizeString(video.videoFile.filesize, this.context.getSetting('reportBytesUsingIec'))}
                                                 detailedStatistic={video.videoFile.filesize.toLocaleString() + ' bytes'}
                                             />
                                         }
@@ -725,7 +723,7 @@ export default class VideoPage extends Component {
                                 message={this.state.alertMessage}
                                 onHide={() => this.setState({ showAlert: false })}
                             />
-                            {this.context?.user?.isSuperuser && <Button
+                            {this.context?.getSetting('isSuperuser') && <Button
                                 onClick={() => this.setState({ showConfirm: true })}
                                 variant="danger"
                                 className="mb-2 me-2"

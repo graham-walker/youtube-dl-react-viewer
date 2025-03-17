@@ -120,7 +120,7 @@ const Comment = props => {
                 height={48}
                 src={parsedEnv.REACT_APP_LOAD_EXTERNAL_THUMBNAILS ? comment.author_thumbnail : '/default-avatar.svg'}
                 onError={(e) => { defaultImage(e, 'avatar') }}
-                roundedCircle={userContext.user?.useCircularAvatars ?? true}
+                roundedCircle={userContext.getSetting('useCircularAvatars')}
             />
             <div className="media-body ms-3">
                 <p className="mb-0"><span className="fw-bold text-break">{comment.author_is_uploader ? <Badge bg="secondary" pill style={{ fontSize: '100%' }}>{comment.author}</Badge> : comment.author}</span><small className="ms-2" title={'Comment posted ' + new Date(comment.timestamp * 1000).toLocaleString()}>{dateToTimeSinceString(new Date(comment.timestamp * 1000))}</small></p>

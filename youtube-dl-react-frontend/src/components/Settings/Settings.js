@@ -121,7 +121,7 @@ class SettingsForm extends Component {
     }
 
     render() {
-        const avatar = this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
+        const avatar = this.context.getAvatar();
         const viewports = ['desktop', 'tablet', 'mobile'];
         return (
             <>
@@ -135,7 +135,7 @@ class SettingsForm extends Component {
                             height={145}
                             src={avatar}
                             onError={(e) => { defaultImage(e, 'avatar') }}
-                            roundedCircle={this.context.user?.useCircularAvatars ?? true}
+                            roundedCircle={this.context.getSetting('useCircularAvatars')}
                             style={{ display: 'block', marginBottom: '0.5rem' }}
                         />
                         <Form.Control
