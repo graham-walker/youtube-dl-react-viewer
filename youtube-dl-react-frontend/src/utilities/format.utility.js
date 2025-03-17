@@ -142,3 +142,8 @@ export const getWarningColor = (job, prefix = '') => {
     if (percent <= 0.5) return prefix + 'text-warning';
     return prefix + 'text-success';
 }
+
+export const capitalizeFirstLetter = (string) => {
+    if (!string) return string;
+    return string[0].toUpperCase() + string.slice(1);
+}

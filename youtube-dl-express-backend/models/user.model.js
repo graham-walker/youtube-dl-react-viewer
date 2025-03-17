@@ -3,7 +3,30 @@ import bcrypt from 'bcrypt';
 
 const saltRounds = 10;
 
+const playerSettingsSchema = new mongoose.Schema({
+    enabled: { type: Boolean, default: false },
+    defaultPlaybackRate: { type: Number, default: 1 },
+    autoplayVideo: { type: Boolean, default: true },
+    keepPlayerControlsVisible: {
+        type: String,
+        enum: ['never', 'windowed', 'fullscreen', 'always'],
+        default: 'never',
+    },
+    playerControlsPosition: {
+        type: String,
+        enum: ['on_video', 'under_video'],
+        default: 'on_video',
+    },
+    playerControlsScale: { type: Number, default: 1 },
+    largePlayButtonEnabled: { type: Boolean, default: true },
+    seekButtonsEnabled: { type: Boolean, default: true },
+    forwardSeekButtonSeconds: { type: Number, default: 10 },
+    backSeekButtonSeconds: { type: Number, default: 10 },
+});
+
 const userSchema = new mongoose.Schema({
+    isSuperuser: { type: Boolean, default: false },
+    avatar: { type: String, default: null },
     username: {
         type: String,
         required: true,
@@ -12,14 +35,20 @@ const userSchema = new mongoose.Schema({
         maxlength: 50
     },
     password: { type: String, required: true, minlength: 8 },
-    isSuperuser: { type: Boolean, default: false },
+    desktopPlayerSettings: {
+        type: playerSettingsSchema,
+        default: () => ({ enabled: true }), // Desktop player settings should always be enabled
+    },
+    tabletPlayerSettings: playerSettingsSchema,
+    mobilePlayerSettings: playerSettingsSchema,
+    hideShorts: { type: Boolean, default: false },
+    useLargeLayout: { type: Boolean, default: true },
+    fitThumbnails: { type: Boolean, default: true },
+    useCircularAvatars: { type: Boolean, default: true },
+    reportBytesUsingIec: { type: Boolean, default: true },
+    recordWatchHistory: { type: Boolean, default: true },
     resumeVideos: { type: Boolean, default: true },
     enableSponsorblock: { type: Boolean, default: true },
-    enableReturnYouTubeDislike: { type: Boolean, default: false },
-    reportBytesUsingIec: { type: Boolean, default: true },
-    useCircularAvatars: { type: Boolean, default: true },
-    avatar: { type: String, default: null },
-    recordWatchHistory: { type: Boolean, default: true },
     onlySkipLocked: { type: Boolean, default: false },
     skipSponsor: { type: Boolean, default: true },
     skipSelfpromo: { type: Boolean, default: true },
@@ -29,9 +58,7 @@ const userSchema = new mongoose.Schema({
     skipPreview: { type: Boolean, default: true },
     skipFiller: { type: Boolean, default: false },
     skipMusicOfftopic: { type: Boolean, default: true },
-    useLargeLayout: { type: Boolean, default: true },
-    fitThumbnails: { type: Boolean, default: true },
-    hideShorts: { type: Boolean, default: false },
+    enableReturnYouTubeDislike: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

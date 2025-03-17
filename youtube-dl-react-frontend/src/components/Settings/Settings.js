@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Form, Button, Alert, Image } from 'react-bootstrap';
+import { Form, Button, Alert, Image, Tab, Card, Nav } from 'react-bootstrap';
 import AuthService from '../../services/auth.service';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import { UserContext } from '../../contexts/user.context';
 import Page from '../Page/Page';
-import { getErrorMessage } from '../../utilities/format.utility';
+import { getErrorMessage, capitalizeFirstLetter } from '../../utilities/format.utility';
 import axios from '../../utilities/axios.utility';
 import { defaultImage } from '../../utilities/image.utility';
 import parsedEnv from '../../parse-env';
+import { getDefaultUserSettings } from '../../utilities/user.utility';
 
 export default class SettingsPage extends Component {
     static contextType = UserContext;
@@ -60,17 +61,9 @@ class SettingsForm extends Component {
         this.state = {
             success: undefined,
             error: undefined,
-            username: '',
-            password: '',
+            playerSettingsTab: 'desktop',
             verifyPassword: '',
-            resumeVideos: false,
-            enableSponsorblock: false,
-            enableReturnYouTubeDislike: false,
-            useCircularAvatars: false,
-            reportBytesUsingIec: false,
-            avatar: '',
-            recordWatchHistory: false,
-            hideShorts: false,
+            ...getDefaultUserSettings(),
         };
     }
 
@@ -101,13 +94,17 @@ class SettingsForm extends Component {
 
             var formData = new FormData();
             for (var key in user) {
+                if (key.includes('PlayerSettings')) {
+                    formData.append(key, JSON.stringify(user[key]));
+                    continue;
+                }
                 formData.append(key, user[key]);
             }
 
             axios
                 .post('/api/users/settings', formData).then(res => {
                     if (res.status === 200) {
-                        this.setState({ success: 'Settings Saved' });
+                        this.setState({ success: 'Settings Saved', password: '', verifyPassword: '' });
                         let user = AuthService.getCurrentUser();
                         for (let key in res.data) {
                             user[key] = res.data[key];
@@ -125,13 +122,14 @@ class SettingsForm extends Component {
 
     render() {
         const avatar = this.context.user.avatar ? '/static/users/avatars/' + this.context.user.avatar : '/default-avatar.svg';
+        const viewports = ['desktop', 'tablet', 'mobile'];
         return (
             <>
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 <Form onSubmit={this.onSubmit}>
+                    <strong className='d-block mb-2'>Account</strong>
                     <Form.Group className="mb-3" controlId="avatar">
-                        <Form.Label>Profile Image</Form.Label>
                         <Image
                             width={145}
                             height={145}
@@ -177,6 +175,43 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <strong className='d-block'>Video Player</strong>
+                    <Tab.Container activeKey={this.state.playerSettingsTab} onSelect={tab => this.setState({ playerSettingsTab: tab })}>
+                        <Card.Header>
+                            <Nav
+                                className="nav-tabs card-header-tabs"
+                                style={{ transform: 'translateY(1px)' }}
+                            >
+                                {viewports.map(viewport =>
+                                    <Nav.Link
+                                        eventKey={viewport}
+                                        className="tab-constrained"
+                                        title={viewport}
+                                        key={viewport}
+                                    >
+                                        {capitalizeFirstLetter(viewport)}
+                                    </Nav.Link>
+                                )}
+                            </Nav>
+                        </Card.Header>
+                        <Card.Body>
+                            <Tab.Content>
+                                {viewports.map(viewport =>
+                                    <Tab.Pane
+                                        eventKey={viewport}
+                                        key={viewport}
+                                    >
+                                        <PlayerSettingsForm
+                                            viewport={viewport}
+                                            settings={this.state[viewport + 'PlayerSettings']}
+                                            onSettingsChange={(settings) => this.setState({ [viewport + 'PlayerSettings']: settings })}
+                                        />
+                                    </Tab.Pane>
+                                )}
+                            </Tab.Content>
+                        </Card.Body>
+                    </Tab.Container>
+                    <strong className='d-block mb-2'>Appearance</strong>
                     <Form.Group className="mb-3" controlId="hideShorts">
                         <Form.Check
                             checked={this.state.hideShorts}
@@ -227,6 +262,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <strong className='d-block mb-2'>History</strong>
                     <Form.Group className="mb-3" controlId="recordWatchHistory">
                         <Form.Check
                             checked={this.state.recordWatchHistory}
@@ -248,11 +284,11 @@ class SettingsForm extends Component {
                             disabled={!this.state.recordWatchHistory}
                         />
                     </Form.Group>
+                    <strong className='d-block mb-2'>SponsorBlock</strong>
                     <Form.Group
                         controlId="enableSponsorblock"
                         className="mb-3"
                     >
-                        <Form.Label className='fw-bold'>SponsorBlock</Form.Label>
                         <Form.Check
                             checked={this.state.enableSponsorblock}
                             type="checkbox"
@@ -388,11 +424,11 @@ class SettingsForm extends Component {
                             disabled={!this.state.enableSponsorblock}
                         />
                     </Form.Group>
+                    <strong className='d-block mb-2'>Return YouTube Dislike</strong>
                     <Form.Group
                         controlId="enableReturnYouTubeDislike"
                         className="mb-3"
                     >
-                        <Form.Label className='fw-bold'>Return YouTube Dislike</Form.Label>
                         <Form.Check
                             checked={this.state.enableReturnYouTubeDislike}
                             type="checkbox"
@@ -402,9 +438,185 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <Button type="submit">Save</Button>
+                    <div
+                        className='position-sticky bottom-0 py-3'
+                        style={{ background: 'var(--bs-card-bg)', marginTop: '-1rem', marginBottom: '-1rem' }}
+                    >
+                        <Button type="submit">Save</Button>
+                    </div>
                 </Form>
             </>
         );
     }
+}
+
+const PlayerSettingsForm = (props) => {
+    const viewport = props.viewport;
+    const settings = props.settings;
+
+    const handleInputChange = (e) => {
+        let newSettings = { ...settings };
+        let { value, name, type } = e.target;
+        name = name.slice(viewport.length);
+        if (type === 'checkbox') value = e.target.checked;
+        newSettings[name] = value;
+        props.onSettingsChange(newSettings);
+    }
+
+    return (
+        <>
+            {viewport !== 'desktop' &&
+                <Form.Group className="mb-3" controlId={viewport + 'enabled'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.enabled}
+                        name={viewport + 'enabled'}
+                        label={`Use separate player settings for ${viewport}, otherwise the next largest viewport's settings will be used`}
+                        onChange={handleInputChange}
+                    />
+                </Form.Group>
+            }
+            <div className={settings.enabled ? undefined : 'opacity-50'}>
+                <Form.Group className="mb-3" controlId={viewport + 'defaultPlaybackRate'}>
+                    <Form.Label>Default playback speed</Form.Label>
+                    <Form.Select
+                        name={viewport + 'defaultPlaybackRate'}
+                        onChange={handleInputChange}
+                        value={settings.defaultPlaybackRate}
+                        disabled={!settings.enabled}
+                    >
+                        <option value="0.25">0.25x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1">1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="1.75">1.75x</option>
+                        <option value="2">2x</option>
+                        <option value="2.25">2.25x</option>
+                        <option value="2.5">2.5x</option>
+                        <option value="2.75">2.75x</option>
+                        <option value="3">3x</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'autoplayVideo'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.autoplayVideo}
+                        name={viewport + 'autoplayVideo'}
+                        label="Autoplay video on page load"
+                        disabled={!settings.enabled}
+                        onChange={handleInputChange}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'keepPlayerControlsVisible'}>
+                    <Form.Label>Keep video player controls visible</Form.Label>
+                    <Form.Select
+                        name={viewport + 'keepPlayerControlsVisible'}
+                        onChange={handleInputChange}
+                        value={settings.keepPlayerControlsVisible}
+                        disabled={!settings.enabled}
+                    >
+                        <option value="never">Never</option>
+                        <option value="windowed">Windowed</option>
+                        <option value="fullscreen">Fullscreen</option>
+                        <option value="always">Always</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'playerControlsPosition'}>
+                    <Form.Label>Player controls are positioned</Form.Label>
+                    <Form.Select
+                        name={viewport + 'playerControlsPosition'}
+                        onChange={handleInputChange}
+                        value={settings.playerControlsPosition}
+                        disabled={!settings.enabled}
+                    >
+                        <option value="on_video">On the video</option>
+                        <option value="under_video">Under the video</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'playerControlsScale'}>
+                    <Form.Label>Player controls scale</Form.Label>
+                    <Form.Select
+                        name={viewport + 'playerControlsScale'}
+                        onChange={handleInputChange}
+                        value={settings.playerControlsScale}
+                        disabled={!settings.enabled}
+                    >
+                        <option value="1">1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="1.75">1.75x</option>
+                        <option value="2">2x</option>
+                        <option value="2.25">2.25x</option>
+                        <option value="2.5">2.5x</option>
+                        <option value="2.75">2.75x</option>
+                        <option value="3">3x</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'largePlayButtonEnabled'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.largePlayButtonEnabled}
+                        name={viewport + 'largePlayButtonEnabled'}
+                        label="Enable large play button"
+                        onChange={handleInputChange}
+                        disabled={!settings.enabled}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'seekButtonsEnabled'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.seekButtonsEnabled}
+                        name={viewport + 'seekButtonsEnabled'}
+                        label="Enable seek buttons"
+                        onChange={handleInputChange}
+                        disabled={!settings.enabled}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'forwardSeekButtonSeconds'}>
+                    <Form.Label>Forward seek button step</Form.Label>
+                    <Form.Select
+                        name={viewport + 'forwardSeekButtonSeconds'}
+                        onChange={handleInputChange}
+                        value={settings.forwardSeekButtonSeconds}
+                        disabled={!settings.enabled || !settings.seekButtonsEnabled}
+                    >
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="15">15 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="25">25 seconds</option>
+                        <option value="30">30 seconds</option>
+                        <option value="45">45 seconds</option>
+                        <option value="60">60 seconds</option>
+                        <option value="90">90 seconds</option>
+                        <option value="120">120 seconds</option>
+                        <option value="180">180 seconds</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'backSeekButtonSeconds'}>
+                    <Form.Label>Back seek button step</Form.Label>
+                    <Form.Select
+                        name={viewport + 'backSeekButtonSeconds'}
+                        onChange={handleInputChange}
+                        value={settings.backSeekButtonSeconds}
+                        disabled={!settings.enabled || !settings.seekButtonsEnabled}
+                    >
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="15">15 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="25">25 seconds</option>
+                        <option value="30">30 seconds</option>
+                        <option value="45">45 seconds</option>
+                        <option value="60">60 seconds</option>
+                        <option value="90">90 seconds</option>
+                        <option value="120">120 seconds</option>
+                        <option value="180">180 seconds</option>
+                    </Form.Select>
+                </Form.Group>
+            </div>
+        </>
+    );
 }

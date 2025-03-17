@@ -13,7 +13,7 @@ import Activity from '../models/activity.model.js';
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
 
-export const settingsFields = 'hideShorts resumeVideos enableSponsorblock enableReturnYouTubeDislike useCircularAvatars reportBytesUsingIec avatar recordWatchHistory onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic useLargeLayout fitThumbnails';
+export const settingsFields = 'avatar desktopPlayerSettings tabletPlayerSettings mobilePlayerSettings hideShorts useLargeLayout fitThumbnails useCircularAvatars reportBytesUsingIec recordWatchHistory resumeVideos enableSponsorblock onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic enableReturnYouTubeDislike';
 
 router.get('/settings', async (req, res) => {
     let user;
@@ -58,13 +58,17 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
 
     user.username = req.body.username;
     if (req.body.password) user.password = req.body.password;
-    user.resumeVideos = req.body.resumeVideos;
+    user.desktopPlayerSettings = JSON.parse(req.body.desktopPlayerSettings);
+    user.tabletPlayerSettings = JSON.parse(req.body.tabletPlayerSettings);
+    user.mobilePlayerSettings = JSON.parse(req.body.mobilePlayerSettings);
     user.hideShorts = req.body.hideShorts;
-    user.enableSponsorblock = req.body.enableSponsorblock;
-    user.enableReturnYouTubeDislike = req.body.enableReturnYouTubeDislike;
-    user.reportBytesUsingIec = req.body.reportBytesUsingIec;
+    user.useLargeLayout = req.body.useLargeLayout;
+    user.fitThumbnails = req.body.fitThumbnails;
     user.useCircularAvatars = req.body.useCircularAvatars;
+    user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.recordWatchHistory = req.body.recordWatchHistory;
+    user.resumeVideos = req.body.resumeVideos;
+    user.enableSponsorblock = req.body.enableSponsorblock;
     user.onlySkipLocked = req.body.onlySkipLocked;
     user.skipSponsor = req.body.skipSponsor;
     user.skipSelfpromo = req.body.skipSelfpromo;
@@ -74,8 +78,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user.skipPreview = req.body.skipPreview;
     user.skipFiller = req.body.skipFiller;
     user.skipMusicOfftopic = req.body.skipMusicOfftopic;
-    user.useLargeLayout = req.body.useLargeLayout;
-    user.fitThumbnails = req.body.fitThumbnails;
+    user.enableReturnYouTubeDislike = req.body.enableReturnYouTubeDislike;
 
     if (!user.recordWatchHistory) {
         try {
