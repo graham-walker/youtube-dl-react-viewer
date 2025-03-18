@@ -19,6 +19,7 @@ import parsedEnv from '../../parse-env';
 import ChatReplay from './ChatReplay/ChatReplay';
 import ConfirmModal from '../ConfirmModal/ConfirmModal';
 import AlertModal from '../AlertModal/AlertModal';
+import ScreenshotButton from './ScreenshotButton/ScreenshotButton';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -184,6 +185,15 @@ export default class VideoPage extends Component {
                                     },
                                 },
                             }, () => {
+                                // Add screenshot button to controls
+                                if (this.context.getPlayerSetting('enableScreenshotButton')) {
+                                    const fullScreenButton = this.player.controlBar.getChild('FullscreenToggle');
+                                    const button = this.player.controlBar.addChild('ScreenshotButton', { behavior: this.context.getPlayerSetting('screenshotButtonBehavior') });
+                                    if (fullScreenButton) {
+                                        this.player.controlBar.el().insertBefore(button.el(), fullScreenButton.el());
+                                    }
+                                }
+
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) {
                                     // Scale player UI

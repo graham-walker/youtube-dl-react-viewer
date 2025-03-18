@@ -28,6 +28,12 @@ const playerSettingsSchema = new mongoose.Schema({
     seekButtonsEnabled: { type: Boolean, default: true },
     forwardSeekButtonSeconds: { type: Number, default: 10 },
     backSeekButtonSeconds: { type: Number, default: 10 },
+    enableScreenshotButton: { type: Boolean, default: true },
+    screenshotButtonBehavior: {
+        type: String,
+        enum: ['save', 'copy'],
+        default: 'save',
+    },
 });
 
 const userSchema = new mongoose.Schema({

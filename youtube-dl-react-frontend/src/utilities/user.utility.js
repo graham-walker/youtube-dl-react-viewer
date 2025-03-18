@@ -11,6 +11,8 @@ const defaultPlayerSettings = {
     seekButtonsEnabled: true,
     forwardSeekButtonSeconds: 10,
     backSeekButtonSeconds: 10,
+    enableScreenshotButton: true,
+    screenshotButtonBehavior: 'save',
 }
 
 const defaultUserSettings = {

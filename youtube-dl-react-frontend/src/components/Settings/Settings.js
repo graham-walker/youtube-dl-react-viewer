@@ -175,7 +175,7 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <strong className='d-block'>Video Player</strong>
+                    <strong className='d-block'>Video player</strong>
                     <Tab.Container activeKey={this.state.playerSettingsTab} onSelect={tab => this.setState({ playerSettingsTab: tab })}>
                         <Card.Header>
                             <Nav
@@ -590,7 +590,7 @@ const PlayerSettingsForm = (props) => {
                         <option value="inline">Inline</option>
                     </Form.Select>
                 </Form.Group>
-                <strong className='d-block mb-2'>Buttons</strong>
+                <strong className='d-block mb-2'>Overlay</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'largePlayButtonEnabled'}>
                     <Form.Check
                         type="checkbox"
@@ -651,6 +651,29 @@ const PlayerSettingsForm = (props) => {
                         <option value="90">90 seconds</option>
                         <option value="120">120 seconds</option>
                         <option value="180">180 seconds</option>
+                    </Form.Select>
+                </Form.Group>
+                <strong className='d-block mb-2'>Screenshot</strong>
+                <Form.Group className="mb-3" controlId={viewport + 'enableScreenshotButton'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.enableScreenshotButton}
+                        name={viewport + 'enableScreenshotButton'}
+                        label="Enable screenshot button"
+                        disabled={!settings.enabled}
+                        onChange={handleInputChange}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'screenshotButtonBehavior'}>
+                    <Form.Label>Screenshot button behavior</Form.Label>
+                    <Form.Select
+                        name={viewport + 'screenshotButtonBehavior'}
+                        onChange={handleInputChange}
+                        value={settings.screenshotButtonBehavior}
+                        disabled={!settings.enabled || !settings.enableScreenshotButton}
+                    >
+                        <option value="save">Save to file</option>
+                        <option value="copy">Copy to clipboard</option>
                     </Form.Select>
                 </Form.Group>
             </div>
