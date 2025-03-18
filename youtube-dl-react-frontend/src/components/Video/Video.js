@@ -185,8 +185,14 @@ export default class VideoPage extends Component {
                                     },
                                 },
                             }, () => {
+                                // Scale player UI
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
+
+                                // Show/hide large play/pause and seek buttons
+                                document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));
+                                document.querySelectorAll('.player-button.skip-back, .player-button.skip-forwards')
+                                    .forEach(button => button.classList.toggle('d-none', !this.context.getPlayerSetting('seekButtonsEnabled')));
 
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
@@ -830,7 +836,7 @@ export default class VideoPage extends Component {
                                                                 />
                                                             </Form.Label>
                                                         </OverlayTrigger>
-                                                        
+
                                                     }
                                                     id="spoofContentType"
                                                     onChange={this.handleInputChange}
