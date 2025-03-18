@@ -21,6 +21,30 @@ class Context extends Component {
                 return defaultUserSettings?.[settingKey] ?? undefined;
             }
         },
+        getPlayerSetting: (settingKey) => {
+            const user = this.state?.user;
+
+            // Get the current viewport
+            let viewport = window.innerWidth >= 1200 ? 'desktop' : window.innerWidth >= 768 ? 'tablet' : 'mobile';
+            while (!user?.[viewport + 'PlayerSettings'].enabled) { // Fallback to largest enabled viewport
+                if (viewport === 'mobile') {
+                    viewport = 'tablet';
+                    continue;
+                }
+                if (viewport === 'tablet') {
+                    viewport = 'desktop';
+                    continue;
+                }
+                if (viewport === 'desktop') break;
+            }
+            const viewportKey = viewport + 'PlayerSettings';
+
+            if (user && user?.[viewportKey]?.hasOwnProperty(settingKey)) {
+                return user[viewportKey][settingKey];
+            } else {
+                return defaultUserSettings?.[viewportKey]?.[settingKey] ?? undefined;
+            }
+        },
         getAvatar: () => {
             return this.state.getSetting('avatar') ? ('/static/users/avatars/' + this.state.getSetting('avatar')) : '/default-avatar.svg';
         },

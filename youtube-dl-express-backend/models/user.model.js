@@ -18,6 +18,11 @@ const playerSettingsSchema = new mongoose.Schema({
         default: 'on_video',
     },
     playerControlsScale: { type: Number, default: 1 },
+    volumeControlPosition: {
+        type: String,
+        enum: ['vertical', 'inline'],
+        default: 'vertical',
+    },
     largePlayButtonEnabled: { type: Boolean, default: true },
     seekButtonsEnabled: { type: Boolean, default: true },
     forwardSeekButtonSeconds: { type: Number, default: 10 },

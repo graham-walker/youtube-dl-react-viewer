@@ -510,7 +510,7 @@ const PlayerSettingsForm = (props) => {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId={viewport + 'keepPlayerControlsVisible'}>
-                    <Form.Label>Keep video player controls visible</Form.Label>
+                    <Form.Label>Keep player controls visible</Form.Label>
                     <Form.Select
                         name={viewport + 'keepPlayerControlsVisible'}
                         onChange={handleInputChange}
@@ -552,6 +552,18 @@ const PlayerSettingsForm = (props) => {
                         <option value="2.5">2.5x</option>
                         <option value="2.75">2.75x</option>
                         <option value="3">3x</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'volumeControlPosition'}>
+                    <Form.Label>Volume control position</Form.Label>
+                    <Form.Select
+                        name={viewport + 'volumeControlPosition'}
+                        onChange={handleInputChange}
+                        value={settings.volumeControlPosition}
+                        disabled={!settings.enabled}
+                    >
+                        <option value="vertical">Vertical</option>
+                        <option value="inline">Inline</option>
                     </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId={viewport + 'largePlayButtonEnabled'}>
