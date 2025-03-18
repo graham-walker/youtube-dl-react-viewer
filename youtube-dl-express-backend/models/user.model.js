@@ -6,6 +6,7 @@ const saltRounds = 10;
 const playerSettingsSchema = new mongoose.Schema({
     enabled: { type: Boolean, default: false },
     defaultPlaybackRate: { type: Number, default: 1 },
+    enableDefaultTheaterMode: { type: Boolean, default: false },
     autoplayVideo: { type: Boolean, default: true },
     keepPlayerControlsVisible: {
         type: String,

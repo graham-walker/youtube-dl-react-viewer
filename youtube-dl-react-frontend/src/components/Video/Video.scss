@@ -1,9 +1,52 @@
-@media screen and (min-width: 1200px) {
-    .recommendations-column {
-        width: 400px;
+// Desktop layout
+.video-grid {
+    display: grid;
+    gap: 0 1.5rem;
+    grid-template-columns: 1fr 1fr 400px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "video video recommendations"
+        "description description recommendations";
+
+    .video-section {
+        grid-area: video;
+    }
+
+    .description-section {
+        grid-area: description;
+    }
+
+    .recommendations-section {
+        grid-area: recommendations;
     }
 }
 
+// Theater mode
+.video-grid.theater-mode {
+    grid-template-columns: 1fr 400px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "video video"
+        "description recommendations";
+}
+
+// Mobile layout
+@media only screen and (width < 1200px) {
+    .video-grid {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto auto !important;
+        grid-template-areas:
+            "video"
+            "description"
+            "recommendations" !important;
+    }
+
+    .vjs-custom-theater-mode-button {
+        display: none !important;
+    }
+}
+
+// Video player
 [data-vjs-player="true"] {
     margin: 0 auto;
 }

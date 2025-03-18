@@ -512,6 +512,16 @@ const PlayerSettingsForm = (props) => {
                         onChange={handleInputChange}
                     />
                 </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'enableDefaultTheaterMode'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.enableDefaultTheaterMode}
+                        name={viewport + 'enableDefaultTheaterMode'}
+                        label="Start in theater mode"
+                        disabled={!settings.enabled}
+                        onChange={handleInputChange}
+                    />
+                </Form.Group>
                 <strong className='d-block mb-2'>Controls</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'keepPlayerControlsVisible'}>
                     <Form.Label>Keep player controls visible</Form.Label>

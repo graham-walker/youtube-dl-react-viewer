@@ -20,6 +20,7 @@ import ChatReplay from './ChatReplay/ChatReplay';
 import ConfirmModal from '../ConfirmModal/ConfirmModal';
 import AlertModal from '../AlertModal/AlertModal';
 import ScreenshotButton from './ScreenshotButton/ScreenshotButton';
+import TheaterModeButton from './TheaterModeButton/TheaterModeButton';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -51,10 +52,12 @@ export default class VideoPage extends Component {
             showConfirm: false,
             showAlert: false,
             alertMessage: '',
+            theaterMode: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
         this.playerRef = React.createRef();
+        this.theaterModeButtonRef = React.createRef();
     }
 
     componentDidMount() {
@@ -64,6 +67,7 @@ export default class VideoPage extends Component {
         }, 10000);
         this.handleResize = this.handleResize.bind(this);
         window.addEventListener('resize', this.handleResize);
+        if (this.context.getPlayerSetting('enableDefaultTheaterMode')) this.setState({ theaterMode: true });
     }
 
     componentWillUnmount() {
@@ -75,12 +79,15 @@ export default class VideoPage extends Component {
     }
 
     handleResize() {
+        const theaterMode = this.state.theaterMode && window.innerWidth >= 1200;
         if (this.playerRef.current && this.state.video.height && this.state.video.width) {
             let newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - (window.innerWidth < 1200 ? 24 : 424); // Change width if sidebar visible
+            if (theaterMode) newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - 24;
+
             let newHeight = (this.state.video.height / this.state.video.width) * newWidth;
 
             // if (window.innerWidth > 1200) { // Only cap height on desktop view
-            const maxHeight = window.innerHeight * 0.7;
+            const maxHeight = window.innerHeight * (theaterMode ? 0.8 : 0.7);
             if (newHeight > maxHeight) {
                 newWidth = (maxHeight / newHeight) * newWidth;
                 newHeight = maxHeight;
@@ -92,13 +99,21 @@ export default class VideoPage extends Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         if (prevProps.location.pathname !==
             `/videos/${this.props.match.params.extractor}/${this.props.match.params.id}`
         ) {
             this.saveActivity();
             this.getVideo();
         }
+
+        // Update the title of the theater mode button to say exit if it is enabled
+        if (this.theaterModeButtonRef.current) {
+            this.theaterModeButtonRef.current.updateText(this.state.theaterMode);
+        }
+
+        // Resize player on theater mode change
+        if (prevState.theaterMode !== this.state.theaterMode) this.handleResize();
     }
 
     getVideo() {
@@ -188,14 +203,19 @@ export default class VideoPage extends Component {
                                 currentTimeDisplay: true,
                                 timeDivider: true,
                             }, () => {
+                                const fullScreenButton = this.player.controlBar.getChild('FullscreenToggle');
+
                                 // Add screenshot button to controls
                                 if (this.context.getPlayerSetting('enableScreenshotButton')) {
-                                    const fullScreenButton = this.player.controlBar.getChild('FullscreenToggle');
                                     const button = this.player.controlBar.addChild('ScreenshotButton', { behavior: this.context.getPlayerSetting('screenshotButtonBehavior') });
-                                    if (fullScreenButton) {
-                                        this.player.controlBar.el().insertBefore(button.el(), fullScreenButton.el());
-                                    }
+                                    this.player.controlBar.el().insertBefore(button.el(), fullScreenButton.el());
                                 }
+
+                                // Add theater mode button to controls
+                                this.theaterModeButtonRef.current = this.player.controlBar.addChild('TheaterModeButton', {
+                                    onClick: () => this.setState({ theaterMode: !this.state.theaterMode }),
+                                });
+                                this.player.controlBar.el().insertBefore(this.theaterModeButtonRef.current.el(), fullScreenButton.el());
 
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) {
@@ -468,8 +488,8 @@ export default class VideoPage extends Component {
                 error={this.state.error}
             >
                 {!this.state.loading && <>
-                    <Row>
-                        <Col className={`keep-controls-open-${keepPlayerControlsVisible}`}>
+                    <div className={`video-grid${this.state.theaterMode ? ' theater-mode' : ''}`}>
+                        <div className={`video-section keep-controls-open-${keepPlayerControlsVisible}`}>
                             <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"
@@ -513,6 +533,8 @@ export default class VideoPage extends Component {
                                 >
                                 </video>
                             </div>
+                        </div>
+                        <div className='description-section'>
                             {!!video.series || video.seasonNumber !== null || video.episodeNumber !== null || !!video.location
                                 ? (!!video.series || video.seasonNumber !== null || video.episodeNumber !== null)
                                     ? !!video.series
@@ -822,11 +844,8 @@ export default class VideoPage extends Component {
                                     />
                                 </>
                             }
-                        </Col>
-                        <Col
-                            xs="12"
-                            className="recommendations-column"
-                        >
+                        </div>
+                        <div className="recommendations-section">
                             {(this.state.uploaderVideos || this.state.playlistVideos || this.state.jobVideos) &&
                                 <>
                                     <Form className="form-inline mb-1">
@@ -1010,8 +1029,8 @@ export default class VideoPage extends Component {
                                     )}
                                 </>
                             }
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </>}
             </PageLoadWrapper>
         );
