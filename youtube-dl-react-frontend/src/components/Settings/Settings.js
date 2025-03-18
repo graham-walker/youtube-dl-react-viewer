@@ -175,42 +175,44 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
-                    <strong className='d-block'>Video player</strong>
-                    <Tab.Container activeKey={this.state.playerSettingsTab} onSelect={tab => this.setState({ playerSettingsTab: tab })}>
-                        <Card.Header>
-                            <Nav
-                                className="nav-tabs card-header-tabs"
-                                style={{ transform: 'translateY(1px)' }}
-                            >
-                                {viewports.map(viewport =>
-                                    <Nav.Link
-                                        eventKey={viewport}
-                                        className="tab-constrained"
-                                        title={viewport}
-                                        key={viewport}
-                                    >
-                                        {capitalizeFirstLetter(viewport)}
-                                    </Nav.Link>
-                                )}
-                            </Nav>
-                        </Card.Header>
-                        <Card.Body>
-                            <Tab.Content>
-                                {viewports.map(viewport =>
-                                    <Tab.Pane
-                                        eventKey={viewport}
-                                        key={viewport}
-                                    >
-                                        <PlayerSettingsForm
-                                            viewport={viewport}
-                                            settings={this.state[viewport + 'PlayerSettings']}
-                                            onSettingsChange={(settings) => this.setState({ [viewport + 'PlayerSettings']: settings })}
-                                        />
-                                    </Tab.Pane>
-                                )}
-                            </Tab.Content>
-                        </Card.Body>
-                    </Tab.Container>
+                    <strong className='d-block mb-2'>Video player</strong>
+                    <Card className="mb-3">
+                        <Tab.Container activeKey={this.state.playerSettingsTab} onSelect={tab => this.setState({ playerSettingsTab: tab })}>
+                            <Card.Header>
+                                <Nav
+                                    className="nav-tabs card-header-tabs"
+                                    style={{ transform: 'translateY(1px)' }}
+                                >
+                                    {viewports.map(viewport =>
+                                        <Nav.Link
+                                            eventKey={viewport}
+                                            className="tab-constrained"
+                                            title={viewport}
+                                            key={viewport}
+                                        >
+                                            {capitalizeFirstLetter(viewport)}
+                                        </Nav.Link>
+                                    )}
+                                </Nav>
+                            </Card.Header>
+                            <Card.Body>
+                                <Tab.Content>
+                                    {viewports.map(viewport =>
+                                        <Tab.Pane
+                                            eventKey={viewport}
+                                            key={viewport}
+                                        >
+                                            <PlayerSettingsForm
+                                                viewport={viewport}
+                                                settings={this.state[viewport + 'PlayerSettings']}
+                                                onSettingsChange={(settings) => this.setState({ [viewport + 'PlayerSettings']: settings })}
+                                            />
+                                        </Tab.Pane>
+                                    )}
+                                </Tab.Content>
+                            </Card.Body>
+                        </Tab.Container>
+                    </Card>
                     <strong className='d-block mb-2'>Appearance</strong>
                     <Form.Group className="mb-3" controlId="hideShorts">
                         <Form.Check
@@ -687,7 +689,7 @@ const PlayerSettingsForm = (props) => {
                         disabled={!settings.enabled}
                     />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId={viewport + 'showRemainingTime'}>
+                <Form.Group controlId={viewport + 'showRemainingTime'}>
                     <Form.Check
                         type="checkbox"
                         checked={settings.showRemainingTime}
