@@ -12,6 +12,7 @@
     background-size: cover !important;
 }
 
+// Keep player controls visible
 .keep-controls-open-windowed .video-js:not(.vjs-fullscreen) .vjs-control-bar,
 .keep-controls-open-fullscreen .video-js.vjs-fullscreen .vjs-control-bar,
 .keep-controls-open-always .video-js .vjs-control-bar {
@@ -21,6 +22,7 @@
     pointer-events: initial !important;
 }
 
+// Position player controls below video
 .vjs-control-bar.positioned-below {
     transform: translateY(100%);
 }
@@ -28,6 +30,7 @@
     transform: unset;
 }
 
+// Highlight SponsorBlock segments
 .sponsor-segment {
     position: absolute;
     bottom: 0;
@@ -68,6 +71,7 @@
     background: rgb(115, 0, 255);
 }
 
+// Chapter markers
 .chapter-section {
     position: absolute;
     bottom: -14px;
@@ -92,6 +96,7 @@
     display: block;
 }
 
+// Overlay controls
 .player-button {
     position: absolute;
     top: 50%;
@@ -184,6 +189,34 @@
     display: none !important;
 }
 
+// Time controls
+.vjs-time-divider {
+    padding: 0 !important;
+    min-width: 1em !important;
+    text-align: center;
+}
+
+.vjs-current-time {
+    padding-right: 0 !important;
+}
+
+.vjs-duration {
+    padding-left: 0 !important;
+}
+
+.show-current-time {
+    .vjs-current-time,
+    .vjs-time-divider,
+    .vjs-duration {
+        display: initial !important;
+    }
+}
+
+.hide-remaining-time .vjs-remaining-time {
+    display: none;
+}
+
+// Hide player error message on mobile (it is too long)
 @media screen and (max-width: 768px) {
     .vjs-error .vjs-error-display::before {
         display: none;

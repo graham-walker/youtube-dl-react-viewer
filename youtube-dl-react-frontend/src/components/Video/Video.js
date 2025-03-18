@@ -184,6 +184,9 @@ export default class VideoPage extends Component {
                                         inline: this.context.getPlayerSetting('volumeControlPosition') === 'inline',
                                     },
                                 },
+                                durationDisplay: true,
+                                currentTimeDisplay: true,
+                                timeDivider: true,
                             }, () => {
                                 // Add screenshot button to controls
                                 if (this.context.getPlayerSetting('enableScreenshotButton')) {
@@ -208,6 +211,10 @@ export default class VideoPage extends Component {
                                     this.player.el().style.setProperty('margin-bottom', `calc(${30 * this.context.getPlayerSetting('playerControlsScale')}px + 1rem)`, 'important'); // 30 = 10px (default video.js font size) * 3em (default video.js controls height)
                                     this.player.el().classList.add('vjs-has-started'); // Show the player controls before playback starts
                                 }
+
+                                // Show/hide current/remaining time
+                                if (this.context.getPlayerSetting('showCurrentTime')) this.player.el().classList.add('show-current-time');
+                                if (!this.context.getPlayerSetting('showRemainingTime')) this.player.el().classList.add('hide-remaining-time');
 
                                 // Show/hide large play/pause and seek buttons
                                 document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));

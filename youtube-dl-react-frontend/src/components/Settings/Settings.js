@@ -538,7 +538,7 @@ const PlayerSettingsForm = (props) => {
                     </Form.Select>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId={viewport + 'playerControlsScale'}>
-                    <Form.Label>Player controls scale</Form.Label>
+                    <Form.Label>Player UI scale</Form.Label>
                     <Form.Select
                         name={viewport + 'playerControlsScale'}
                         onChange={handleInputChange}
@@ -675,6 +675,27 @@ const PlayerSettingsForm = (props) => {
                         <option value="save">Save to file</option>
                         <option value="copy">Copy to clipboard</option>
                     </Form.Select>
+                </Form.Group>
+                <strong className='d-block mb-2'>Time</strong>
+                <Form.Group className="mb-3" controlId={viewport + 'showCurrentTime'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.showCurrentTime}
+                        name={viewport + 'showCurrentTime'}
+                        label="Show current time"
+                        onChange={handleInputChange}
+                        disabled={!settings.enabled}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'showRemainingTime'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.showRemainingTime}
+                        name={viewport + 'showRemainingTime'}
+                        label="Show remaining time"
+                        onChange={handleInputChange}
+                        disabled={!settings.enabled}
+                    />
                 </Form.Group>
             </div>
         </>

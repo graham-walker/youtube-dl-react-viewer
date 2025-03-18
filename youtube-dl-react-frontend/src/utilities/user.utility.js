@@ -13,6 +13,8 @@ const defaultPlayerSettings = {
     backSeekButtonSeconds: 10,
     enableScreenshotButton: true,
     screenshotButtonBehavior: 'save',
+    showCurrentTime: true,
+    showRemainingTime: true,
 }
 
 const defaultUserSettings = {

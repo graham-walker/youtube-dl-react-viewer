@@ -34,6 +34,8 @@ const playerSettingsSchema = new mongoose.Schema({
         enum: ['save', 'copy'],
         default: 'save',
     },
+    showCurrentTime: { type: Boolean, default: true },
+    showRemainingTime: { type: Boolean, default: true },
 });
 
 const userSchema = new mongoose.Schema({
