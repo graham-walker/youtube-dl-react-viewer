@@ -18,6 +18,7 @@
     visibility: visible !important;
     opacity: 1 !important;
     transition-duration: 0s !important;
+    pointer-events: initial !important;
 }
 
 .vjs-control-bar.positioned-below {
