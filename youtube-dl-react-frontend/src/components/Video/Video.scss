@@ -117,11 +117,11 @@
 
     &.skip-back,
     &.skip-forwards {
-        &::before {
-            content: '10';
+        .skip-amount {
             position: absolute;
-            top: 39%;
-            left: 35%;
+            top: calc(50% + 1px);
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 1rem;
             filter: drop-shadow(0 0 2px #2b333f);
         }

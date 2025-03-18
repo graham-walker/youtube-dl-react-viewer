@@ -449,20 +449,22 @@ export default class VideoPage extends Component {
                                 <div
                                     className="player-button skip-back"
                                     onClick={() => {
-                                        this.player.currentTime(Math.max(this.player.currentTime() - 10, 0));
+                                        this.player.currentTime(Math.max(this.player.currentTime() - this.context.getPlayerSetting('backSeekButtonSeconds'), 0));
                                         this.player.play();
                                     }}
                                 >
                                     <FontAwesomeIcon icon="rotate-left" />
+                                    <div className='skip-amount'>{this.context.getPlayerSetting('backSeekButtonSeconds')}</div>
                                 </div>
                                 <div
                                     className="player-button skip-forwards"
                                     onClick={() => {
-                                        this.player.currentTime(Math.min(this.player.currentTime() + 10, this.player.duration()));
+                                        this.player.currentTime(Math.min(this.player.currentTime() + this.context.getPlayerSetting('forwardSeekButtonSeconds'), this.player.duration()));
                                         this.player.play();
                                     }}
                                 >
                                     <FontAwesomeIcon icon="rotate-right" />
+                                    <div className='skip-amount'>{this.context.getPlayerSetting('forwardSeekButtonSeconds')}</div>
                                 </div>
                                 <video
                                     controls
