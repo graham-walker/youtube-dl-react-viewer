@@ -45,7 +45,6 @@ export default class VideoPage extends Component {
             loop: localStorage.getItem('loop') === null ? false : localStorage.getItem('loop') === 'true',
             playNext: localStorage.getItem('playNext') === null ? false : localStorage.getItem('playNext') === 'true',
             spoofContentType: localStorage.getItem('spoofContentType') === null ? false : localStorage.getItem('spoofContentType') === 'true',
-            keepPlayerControlsVisible: localStorage.getItem('keepPlayerControlsVisible') || 'never', // never, windowed, fullscreen, always
             redirect: false,
             playerTime: 0,
             showConfirm: false,
@@ -431,7 +430,7 @@ export default class VideoPage extends Component {
             >
                 {!this.state.loading && <>
                     <Row>
-                        <Col className={`keep-controls-open-${this.state.keepPlayerControlsVisible}`}>
+                        <Col className={`keep-controls-open-${this.context.getPlayerSetting('keepPlayerControlsVisible')}`}>
                             <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"
