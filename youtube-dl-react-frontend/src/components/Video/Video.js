@@ -43,7 +43,7 @@ export default class VideoPage extends Component {
             resumeTime: undefined,
             activityDocument: undefined,
             loop: localStorage.getItem('loop') === null ? false : localStorage.getItem('loop') === 'true',
-            autoplay: localStorage.getItem('autoplay') === null ? false : localStorage.getItem('autoplay') === 'true',
+            playNext: localStorage.getItem('playNext') === null ? false : localStorage.getItem('playNext') === 'true',
             spoofContentType: localStorage.getItem('spoofContentType') === null ? false : localStorage.getItem('spoofContentType') === 'true',
             keepPlayerControlsVisible: localStorage.getItem('keepPlayerControlsVisible') || 'never', // never, windowed, fullscreen, always
             redirect: false,
@@ -176,7 +176,7 @@ export default class VideoPage extends Component {
                         if (!this.player) {
                             this.player = videojs(this.videoRef.current, {
                                 fluid: (this.state.video.width && this.state.video.height) ? undefined : true,
-                                autoplay: true,
+                                autoplay: this.context.getPlayerSetting('autoplayVideo'),
                                 playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
                                 techOrder: ['html5'],
                                 controlBar: {
@@ -364,7 +364,7 @@ export default class VideoPage extends Component {
 
     onVideoEnd() {
         this.saveActivity();
-        if (!this.state.loop && this.state.autoplay) {
+        if (!this.state.loop && this.state.playNext) {
             const nextVideo = this.state.nextVideos[this.state.activeTab];
             const firstVideo = this.state.firstVideos[this.state.activeTab];
             if (nextVideo) {
@@ -463,6 +463,7 @@ export default class VideoPage extends Component {
                                     className="video-js vjs-big-play-centered mb-3"
                                     ref={this.videoRef}
                                     loop={this.state.loop}
+                                    autoPlay={this.context.getPlayerSetting('autoplayVideo')}
                                 >
                                 </video>
                             </div>
@@ -796,11 +797,11 @@ export default class VideoPage extends Component {
                                         </Form.Group>
                                         <Form.Group>
                                             <Form.Check
-                                                checked={this.state.autoplay}
+                                                checked={this.state.playNext}
                                                 type="switch"
-                                                name="autoplay"
-                                                label="Autoplay"
-                                                id="autoplay"
+                                                name="playNext"
+                                                label="Play next"
+                                                id="playNext"
                                                 onChange={this.handleInputChange}
                                                 disabled={this.state.loop}
                                                 className="me-2"
