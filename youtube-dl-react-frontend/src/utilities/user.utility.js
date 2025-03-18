@@ -5,6 +5,7 @@ const defaultPlayerSettings = {
     keepPlayerControlsVisible: 'never',
     playerControlsPosition: 'on_video',
     playerControlsScale: 1,
+    defaultVolume: 1,
     volumeControlPosition: 'vertical',
     largePlayButtonEnabled: true,
     seekButtonsEnabled: true,

@@ -188,7 +188,7 @@ export default class VideoPage extends Component {
                                 if (playerControls) {
                                     // Scale player UI
                                     playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
-                                    
+
                                     // Position player controls below video
                                     playerControls.classList.toggle('positioned-below', this.context.getPlayerSetting('playerControlsPosition') === 'under_video');
                                 }
@@ -203,6 +203,9 @@ export default class VideoPage extends Component {
                                 document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));
                                 document.querySelectorAll('.player-button.skip-back, .player-button.skip-forwards')
                                     .forEach(button => button.classList.toggle('d-none', !this.context.getPlayerSetting('seekButtonsEnabled')));
+
+                                // Default volume
+                                this.player.volume(this.context.getPlayerSetting('defaultVolume'));
 
                                 this.player.hotkeys({
                                     volumeStep: 0.1,

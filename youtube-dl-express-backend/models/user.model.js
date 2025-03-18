@@ -18,6 +18,7 @@ const playerSettingsSchema = new mongoose.Schema({
         default: 'on_video',
     },
     playerControlsScale: { type: Number, default: 1 },
+    defaultVolume: { type: Number, default: 1 },
     volumeControlPosition: {
         type: String,
         enum: ['vertical', 'inline'],
@@ -37,7 +38,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         minlength: 1,
-        maxlength: 50
+        maxlength: 50,
     },
     password: { type: String, required: true, minlength: 8 },
     desktopPlayerSettings: {
