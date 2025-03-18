@@ -42,7 +42,7 @@ export default class ActivityPage extends Component {
                         count: res.data.count ?? this.state.count,
                         user: res.data.user ?? this.state.user,
                         page: this.state.page + 1,
-                        hasMore: (this.state.activities.length + res.data.activities.length) < res.data.count,
+                        hasMore: (this.state.activities.length + res.data.activities.length) < (res.data.count ?? this.state.count),
                     });
                 }
             }).catch(err => {
