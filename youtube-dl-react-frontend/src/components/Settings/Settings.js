@@ -477,8 +477,9 @@ const PlayerSettingsForm = (props) => {
                 </Form.Group>
             }
             <div className={settings.enabled ? undefined : 'opacity-50'}>
+                <strong className='d-block mb-2'>Playback</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'defaultPlaybackRate'}>
-                    <Form.Label>Default playback speed</Form.Label>
+                    <Form.Label>Default speed</Form.Label>
                     <Form.Select
                         name={viewport + 'defaultPlaybackRate'}
                         onChange={handleInputChange}
@@ -509,6 +510,7 @@ const PlayerSettingsForm = (props) => {
                         onChange={handleInputChange}
                     />
                 </Form.Group>
+                <strong className='d-block mb-2'>Controls</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'keepPlayerControlsVisible'}>
                     <Form.Label>Keep player controls visible</Form.Label>
                     <Form.Select
@@ -554,6 +556,7 @@ const PlayerSettingsForm = (props) => {
                         <option value="3">3x</option>
                     </Form.Select>
                 </Form.Group>
+                <strong className='d-block mb-2'>Volume</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'defaultVolume'}>
                     <Form.Label>Default volume</Form.Label>
                     <Form.Select
@@ -587,6 +590,7 @@ const PlayerSettingsForm = (props) => {
                         <option value="inline">Inline</option>
                     </Form.Select>
                 </Form.Group>
+                <strong className='d-block mb-2'>Buttons</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'largePlayButtonEnabled'}>
                     <Form.Check
                         type="checkbox"
