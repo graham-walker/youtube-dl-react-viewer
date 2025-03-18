@@ -53,6 +53,7 @@ export default class VideoPage extends Component {
             showAlert: false,
             alertMessage: '',
             theaterMode: false,
+            defaultVolumeSet: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -62,11 +63,15 @@ export default class VideoPage extends Component {
 
     componentDidMount() {
         this.getVideo();
+        
         this.interval = setInterval(() => {
             if (this.player && !this.player.paused()) this.saveActivity();
         }, 10000);
+
         this.handleResize = this.handleResize.bind(this);
         window.addEventListener('resize', this.handleResize);
+
+        // Use default theater mode
         if (this.context.getPlayerSetting('enableDefaultTheaterMode')) this.setState({ theaterMode: true });
     }
 
@@ -242,7 +247,13 @@ export default class VideoPage extends Component {
                                     .forEach(button => button.classList.toggle('d-none', !this.context.getPlayerSetting('seekButtonsEnabled')));
 
                                 // Default volume
-                                this.player.volume(this.context.getPlayerSetting('defaultVolume'));
+                                if (!this.state.defaultVolumeSet) {
+                                    this.player.volume(this.context.getPlayerSetting('defaultVolume'));
+                                    this.setState({ defaultVolumeSet: true });
+                                }
+
+                                // Default playback rate
+                                this.player.defaultPlaybackRate(this.context.getPlayerSetting('defaultPlaybackRate'));
 
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
@@ -253,9 +264,6 @@ export default class VideoPage extends Component {
                                 this.videoReady();
 
                                 this.player.on('loadedmetadata', () => {
-                                    // Default playback rate
-                                    this.player.playbackRate(this.context.getPlayerSetting('defaultPlaybackRate'));
-
                                     // Resume playback
                                     if (this.state.resumeTime) {
                                         let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
