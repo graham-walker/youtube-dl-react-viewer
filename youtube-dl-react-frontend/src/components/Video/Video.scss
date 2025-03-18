@@ -20,6 +20,13 @@
     transition-duration: 0s !important;
 }
 
+.vjs-control-bar.positioned-below {
+    transform: translateY(100%);
+}
+.vjs-fullscreen .vjs-control-bar.positioned-below {
+    transform: unset;
+}
+
 .sponsor-segment {
     position: absolute;
     bottom: 0;

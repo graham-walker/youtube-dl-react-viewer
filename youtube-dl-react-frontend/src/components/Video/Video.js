@@ -184,9 +184,20 @@ export default class VideoPage extends Component {
                                     },
                                 },
                             }, () => {
-                                // Scale player UI
                                 const playerControls = document.querySelector('.vjs-control-bar');
-                                if (playerControls) playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
+                                if (playerControls) {
+                                    // Scale player UI
+                                    playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
+                                    
+                                    // Position player controls below video
+                                    playerControls.classList.toggle('positioned-below', this.context.getPlayerSetting('playerControlsPosition') === 'under_video');
+                                }
+
+                                // Add margin below video player if controls are positioned below video
+                                if (this.context.getPlayerSetting('playerControlsPosition') === 'under_video') {
+                                    this.player.el().style.setProperty('margin-bottom', `calc(${30 * this.context.getPlayerSetting('playerControlsScale')}px + 1rem)`, 'important'); // 30 = 10px (default video.js font size) * 3em (default video.js controls height)
+                                    this.player.el().classList.add('vjs-has-started'); // Show the player controls before playback starts
+                                }
 
                                 // Show/hide large play/pause and seek buttons
                                 document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));
@@ -423,6 +434,14 @@ export default class VideoPage extends Component {
             </>;
         }
 
+        let keepPlayerControlsVisible = this.context.getPlayerSetting('keepPlayerControlsVisible');
+
+        // The player controls should also be kept visible if positioned under the video
+        if (this.context.getPlayerSetting('playerControlsPosition') === 'under_video') {
+            if (keepPlayerControlsVisible === 'never') keepPlayerControlsVisible = 'windowed';
+            if (keepPlayerControlsVisible === 'fullscreen') keepPlayerControlsVisible = 'always';
+        }
+
         return (
             <PageLoadWrapper
                 loading={this.state.loading}
@@ -430,7 +449,7 @@ export default class VideoPage extends Component {
             >
                 {!this.state.loading && <>
                     <Row>
-                        <Col className={`keep-controls-open-${this.context.getPlayerSetting('keepPlayerControlsVisible')}`}>
+                        <Col className={`keep-controls-open-${keepPlayerControlsVisible}`}>
                             <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"
