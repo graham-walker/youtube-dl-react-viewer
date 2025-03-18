@@ -185,6 +185,9 @@ export default class VideoPage extends Component {
                                     },
                                 },
                             }, () => {
+                                const playerControls = document.querySelector('.vjs-control-bar');
+                                if (playerControls) playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
+                                
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
                                     seekStep: 5,
