@@ -187,7 +187,7 @@ export default class VideoPage extends Component {
                             }, () => {
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
-                                
+
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
                                     seekStep: 5,
@@ -197,6 +197,9 @@ export default class VideoPage extends Component {
                                 this.videoReady();
 
                                 this.player.on('loadedmetadata', () => {
+                                    // Default playback rate
+                                    this.player.playbackRate(this.context.getPlayerSetting('defaultPlaybackRate'));
+
                                     // Resume playback
                                     if (this.state.resumeTime) {
                                         let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
