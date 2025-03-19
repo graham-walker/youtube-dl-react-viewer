@@ -8,10 +8,9 @@ const TopTagsList = props => {
     const tags = props.tags.sort((a, b) => b.count - a.count);
 
     const list = tags.map((tag, i) =>
-        <As>
+        <As key={i}>
             <Link
                 to={createSearchLink(tag.name)}
-                key={i}
             >
                 <Badge
                     bg={props.bg || 'light'}
