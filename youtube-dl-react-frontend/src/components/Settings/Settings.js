@@ -6,9 +6,9 @@ import { UserContext } from '../../contexts/user.context';
 import Page from '../Page/Page';
 import { getErrorMessage, capitalizeFirstLetter } from '../../utilities/format.utility';
 import axios from '../../utilities/axios.utility';
-import { defaultImage } from '../../utilities/image.utility';
 import parsedEnv from '../../parse-env';
 import { getDefaultUserSettings } from '../../utilities/user.utility';
+import AvatarForm from './AvatarForm/AvatarForm';
 
 export default class SettingsPage extends Component {
     static contextType = UserContext;
@@ -129,21 +129,13 @@ class SettingsForm extends Component {
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
                 <Form onSubmit={this.onSubmit}>
                     <strong className='d-block mb-2'>Account</strong>
-                    <Form.Group className="mb-3" controlId="avatar">
-                        <Image
-                            width={145}
-                            height={145}
-                            src={avatar}
-                            onError={(e) => { defaultImage(e, 'avatar') }}
-                            roundedCircle={this.context.getSetting('useCircularAvatars')}
-                            style={{ display: 'block', marginBottom: '0.5rem' }}
-                        />
-                        <Form.Control
-                            type="file"
-                            name="avatar"
-                            onChange={this.handleInputChange}
-                        />
-                    </Form.Group>
+                    <AvatarForm
+                        width={145}
+                        height={145}
+                        src={avatar}
+                        name="avatar"
+                        onChange={this.handleInputChange}
+                    />
                     <Form.Group className="mb-3" controlId="username">
                         <Form.Label>Username</Form.Label>
                         <Form.Control

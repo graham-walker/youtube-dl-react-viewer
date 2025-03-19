@@ -1,0 +1,49 @@
+.avatar-form-group {
+    position: relative;
+    display: inline-block;
+
+    .form-control,
+    .avatar-focus-outline,
+    .avatar-edit-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+    }
+
+    .form-control {
+        opacity: 0;
+    }
+
+    .avatar-focus-outline {
+        pointer-events: none;
+        transition: box-shadow 0.15s ease-in-out;
+    }
+    .form-control:focus + .avatar-focus-outline {
+        --bs-btn-focus-shadow-rgb: 49, 132, 253;
+        --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-btn-focus-shadow-rgb), 0.5);
+        box-shadow: var(--bs-btn-focus-box-shadow);
+    }
+
+    .avatar-edit-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        background: rgba(0, 0, 0, 0.66);
+        transition: 0.333s ease opacity;
+        margin: 0;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        svg {
+            font-size: 2rem;
+        }
+    }
+    .form-control:focus + .avatar-focus-outline + .avatar-edit-overlay {
+        opacity: 1;
+    }
+}

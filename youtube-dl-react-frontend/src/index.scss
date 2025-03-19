@@ -39,6 +39,7 @@ $dark: #000; // Make dark OLED dark
 @import "./components/ThemeController/ThemeController.scss";
 @import "./components/Settings/Settings.scss";
 @import "./components/Admin/LogFileList/LogFileList.scss";
+@import "./components/Settings/AvatarForm/AvatarForm.scss";
 
 html {
     width: 100%;

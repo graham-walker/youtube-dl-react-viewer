@@ -20,6 +20,7 @@ import { decrementStatistics } from '../utilities/statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
 import { logLine, logError, history, historyUpdated } from '../utilities/logger.utility.js';
 import { updateYoutubeDl, getYoutubeDlVersion } from '../utilities/job.utility.js';
+import { makeSafe } from '../utilities/file.utility.js';
 
 const router = express.Router();
 
@@ -280,7 +281,7 @@ router.post('/download_uploader_icons', async (req, res) => {
         if (uploaders.length === 0) return res.status(500).json({ error: 'No valid uploaders' });
 
         for (let uploader of uploaders) {
-            const channelIconFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars/' + uploader.extractor, uploader.id.replace(/[|:&;$%@"<>()+,/\\*?]/g, '_') + '.jpg');
+            const channelIconFile = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars', makeSafe(uploader.extractor, ' -'), makeSafe(uploader.id, '_') + '.jpg');
             if (req.query?.force !== 'true' && (await fs.exists(channelIconFile))) continue;
 
             if (!sentResponse) {

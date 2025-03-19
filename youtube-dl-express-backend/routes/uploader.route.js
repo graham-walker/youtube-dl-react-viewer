@@ -1,12 +1,20 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import sharp from 'sharp';
+import fs from 'fs-extra';
+
+import { parsedEnv } from '../parse-env.js';
 
 import Video from '../models/video.model.js';
 import Uploader from '../models/uploader.model.js';
 
 import { search, getRandomVideo } from '../utilities/video.utility.js';
 import { applyTags } from '../utilities/statistic.utility.js';
+import { makeSafe } from '../utilities/file.utility.js';
 
 const router = express.Router();
+const avatarUpload = multer({ storage: multer.memoryStorage() });
 
 router.get('/page/:page', async (req, res) => {
     const perPage = 18;
@@ -108,6 +116,44 @@ router.get('/:extractor/:id/:page', async (req, res) => {
         totals,
         randomVideo,
     });
+});
+
+router.post('/:extractor/:id/upload_avatar', avatarUpload.single('avatar'), async (req, res) => {
+    if (!req.user || !req.user.isSuperuser) return res.sendStatus(403);
+    if (!req.file) return res.status(500).json({ error: 'Missing file' });
+
+    let uploader;
+    try {
+        uploader = await Uploader.findOne({
+            extractor: req.params.extractor,
+            id: req.params.id,
+        });
+    }
+    catch (err) {
+        return res.sendStatus(500);
+    }
+    if (!uploader) return res.sendStatus(404);
+
+    try {
+        const avatarDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'avatars', makeSafe(uploader.extractor, ' -'));
+        const avatarFilename = makeSafe(uploader.id, '_') + '.jpg';
+
+        fs.ensureDirSync(avatarDirectory);
+
+        await sharp(req.file.buffer)
+            .resize({
+                fit: sharp.fit.cover,
+                width: 512,
+                height: 512,
+            })
+            .jpeg()
+            .toFile(path.join(avatarDirectory, avatarFilename));
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to upload avatar' });
+    }
+
+    return res.sendStatus(200);
 });
 
 export default router;

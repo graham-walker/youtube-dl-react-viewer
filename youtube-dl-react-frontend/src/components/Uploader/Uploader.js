@@ -14,6 +14,7 @@ import {
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
 import parsedEnv from '../../parse-env';
+import AvatarForm from '../Settings/AvatarForm/AvatarForm';
 
 export default class UploaderPage extends Component {
     static contextType = UserContext;
@@ -24,6 +25,8 @@ export default class UploaderPage extends Component {
             loading: true,
             error: undefined,
             uploader: undefined,
+            uploaderAvatar: null,
+            imageKey: 0,
         };
     }
 
@@ -43,6 +46,29 @@ export default class UploaderPage extends Component {
             });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.uploaderAvatar && prevState.uploaderAvatar !== this.state.uploaderAvatar) this.onSubmit();
+    }
+
+    handleInputChange = (e) => {
+        var { value, name, type } = e.target;
+        if (type === 'file') value = e.target.files[0];
+        this.setState({ [name]: value });
+    }
+
+    onSubmit = () => {
+        let formData = new FormData();
+        formData.append('avatar', this.state.uploaderAvatar);
+        axios
+            .post(`/api/uploaders/${this.state.uploader.extractor}/${this.state.uploader.id}/upload_avatar`, formData).then(res => {
+                // Reload the avatar
+                this.setState((prevState) => ({ imageKey: prevState.imageKey + 1 }));
+            }).catch(err => {
+                console.error(err);
+                alert('Failed to upload avatar');
+            });
+    }
+
     render() {
         const uploader = this.state.uploader;
         const statistics = uploader?.statistics;
@@ -58,14 +84,24 @@ export default class UploaderPage extends Component {
                             xs="auto"
                             className="align-self-start"
                         >
-                            <Image
-                                width={145}
-                                height={145}
-                                src={getImage(uploader, 'avatar')}
-                                onError={(e) => { defaultImage(e, 'avatar') }}
-                                roundedCircle={this.context.getSetting('useCircularAvatars')}
-                                className="mb-1 mb-lg-0"
-                            />
+                            {this.context.getSetting('isSuperuser')
+                                ? <AvatarForm
+                                    width={145}
+                                    height={145}
+                                    src={getImage(uploader, 'avatar')}
+                                    name="uploaderAvatar"
+                                    onChange={this.handleInputChange}
+                                    imageKey={this.state.imageKey}
+                                />
+                                : <Image
+                                    width={145}
+                                    height={145}
+                                    src={getImage(uploader, 'avatar')}
+                                    onError={(e) => { defaultImage(e, 'avatar') }}
+                                    roundedCircle={this.context.getSetting('useCircularAvatars')}
+                                    className="mb-1 mb-lg-0"
+                                />
+                            }
                         </Col>
                         <Col
                             xs="auto"
