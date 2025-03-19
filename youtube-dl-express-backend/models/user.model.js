@@ -62,6 +62,7 @@ const userSchema = new mongoose.Schema({
     useCircularAvatars: { type: Boolean, default: true },
     reportBytesUsingIec: { type: Boolean, default: true },
     recordWatchHistory: { type: Boolean, default: true },
+    showWatchedHistory: { type: Boolean, default: true },
     resumeVideos: { type: Boolean, default: true },
     enableSponsorblock: { type: Boolean, default: true },
     onlySkipLocked: { type: Boolean, default: false },

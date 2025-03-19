@@ -4,11 +4,11 @@ import Statistic from '../models/statistic.model.js';
 import { applyTags } from './statistic.utility.js';
 import { parsedEnv } from '../parse-env.js';
 
-export const search = async (query, page, filter = {}, relevanceMeans = 'uploadDate', relevanceDirection = -1) => {
+export const search = async (query, page, user, filter = {}, relevanceMeans = 'uploadDate', relevanceDirection = -1) => {
     let sortField = sortBy(query['sort'], relevanceMeans, relevanceDirection);
 
     let fields = {
-        _id: 0,
+        _id: 1,
         extractor: 1,
         id: 1,
         title: 1,
@@ -45,10 +45,17 @@ export const search = async (query, page, filter = {}, relevanceMeans = 'uploadD
         { $skip: page * parsedEnv.PAGE_SIZE },
         { $limit: parsedEnv.PAGE_SIZE },
     ];
+
+    // Add the search query to the pipeline
     if (query.search) pipeline.unshift({ $match: Object.assign({ $text: { $search: query.search } }, filter) });
 
     let videos = await Video.aggregate(pipeline);
-    return await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
+
+    videos = await Video.populate(videos, { path: 'uploaderDocument', select: 'extractor id name' });
+    videos = await attachWatchHistory(videos, user);
+    videos = stripIds(videos);
+
+    return videos;
 }
 
 export const sortBy = (option, relevanceMeans, relevanceDirection) => {
@@ -288,4 +295,61 @@ export const detectShort = (video) => {
             )
         )
     );
+}
+
+export const attachWatchHistory = async (videos, user) => {
+    if (!videos || !videos.length || !user || !user.recordWatchHistory || !user.showWatchedHistory) return videos;
+
+    const videoIds = videos.map(video => video._id);
+
+    // Get the watch history for videos
+    const historyEntries = await Video.aggregate([
+        { $project: { _id: 1 } },
+        { $match: { _id: { $in: videoIds } } },
+        {
+            $lookup: {
+                from: 'activities',
+                let: { videoId: '$_id', userId: user._id },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ['$videoDocument', '$$videoId'] },
+                                    { $eq: ['$userDocument', '$$userId'] },
+                                    { $eq: ['$eventType', 'watched'] },
+                                ],
+                            },
+                        },
+                    },
+                    { $sort: { createdAt: -1 } }, // Sort by the most recent history entries
+                    { $limit: 1 }, // Only get the most recent history entry
+                    { $project: { _id: 0, stopTime: 1 } }, // Return only the stopped watching time
+                ],
+                as: 'watchHistory',
+            },
+        },
+        {
+            $addFields: {
+                watchHistory: { $arrayElemAt: ['$watchHistory', 0] } // Convert the array to a single object
+            },
+        },
+    ]);
+
+    // Match and merge the video with it's history entry 
+    const historyMap = new Map(historyEntries.map(video => [video._id.toString(), video]));
+    return videos.map(video => ({
+        ...video,
+        watchHistory: historyMap.get(video._id.toString())?.watchHistory || null,
+    }));
+};
+
+export const stripIds = (videos) => {
+    if (!videos) return videos;
+
+    videos.forEach(video => {
+        delete video._id;
+    });
+
+    return videos;
 }

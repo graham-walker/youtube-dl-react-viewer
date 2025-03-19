@@ -63,7 +63,7 @@ export default class VideoPage extends Component {
 
     componentDidMount() {
         this.getVideo();
-        
+
         this.interval = setInterval(() => {
             if (this.player && !this.player.paused()) this.saveActivity();
         }, 10000);
@@ -1033,6 +1033,8 @@ export default class VideoPage extends Component {
                                             small
                                             horizontal
                                             key={video.extractor + video.id}
+                                            watched={video.watchHistory ? true : false}
+                                            stopTime={video.watchHistory ? video.watchHistory.stopTime : undefined}
                                         />
                                     )}
                                 </>
@@ -1089,6 +1091,7 @@ class VideoScroller extends Component {
                             horizontal
                             small
                             simple
+                            stopTime={video.watchHistory ? video.watchHistory.stopTime : undefined}
                         >
                             <small
                                 className="text-muted m-auto text-center"

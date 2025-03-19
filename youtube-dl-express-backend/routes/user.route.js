@@ -13,7 +13,7 @@ import Activity from '../models/activity.model.js';
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
 
-export const settingsFields = 'avatar desktopPlayerSettings tabletPlayerSettings mobilePlayerSettings hideShorts useLargeLayout fitThumbnails useCircularAvatars reportBytesUsingIec recordWatchHistory resumeVideos enableSponsorblock onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic enableReturnYouTubeDislike';
+export const settingsFields = 'avatar desktopPlayerSettings tabletPlayerSettings mobilePlayerSettings hideShorts useLargeLayout fitThumbnails useCircularAvatars reportBytesUsingIec recordWatchHistory showWatchedHistory resumeVideos enableSponsorblock onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic enableReturnYouTubeDislike';
 
 router.get('/settings', async (req, res) => {
     let user;
@@ -67,6 +67,7 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     user.useCircularAvatars = req.body.useCircularAvatars;
     user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.recordWatchHistory = req.body.recordWatchHistory;
+    user.showWatchedHistory = req.body.showWatchedHistory;
     user.resumeVideos = req.body.resumeVideos;
     user.enableSponsorblock = req.body.enableSponsorblock;
     user.onlySkipLocked = req.body.onlySkipLocked;

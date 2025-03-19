@@ -223,7 +223,7 @@ const VideoPreview = props => {
                     style={{ lineHeight: '1em' }}
                 >
                     <Link to={videoLink}>
-                        <div className="position-relative mb-1">
+                        <div className={`position-relative${!!props.stopTime ? '' : ' mb-1'}`}>
                             {videoImage}
                         </div>
                     </Link>

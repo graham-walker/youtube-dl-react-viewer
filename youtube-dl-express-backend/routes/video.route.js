@@ -15,6 +15,8 @@ import {
     fields,
     getSimilarVideos,
     limitVideoList,
+    attachWatchHistory,
+    stripIds,
 } from '../utilities/video.utility.js';
 import { parsedEnv } from '../parse-env.js';
 import { logError } from '../utilities/logger.utility.js';
@@ -28,7 +30,7 @@ router.get('/search/:page', async function (req, res) {
 
     let videos;
     try {
-        videos = await search(req.query, page, filter);
+        videos = await search(req.query, page, req.user, filter);
     }
     catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
@@ -91,7 +93,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         if (video.uploaderDocument) uploaderVideos = await Video.find(
             Object.assign({ uploaderDocument: video.uploaderDocument }, filter),
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ uploadDate: -1 })
             .lean()
@@ -99,7 +101,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         if (video.playlistDocument) playlistVideos = await Video.find(
             Object.assign({ playlistDocument: video.playlistDocument }, filter),
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ playlistIndex: 1 })
             .lean()
@@ -107,7 +109,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         jobVideos = await Video.find(
             Object.assign({ jobDocument: video.jobDocument }, filter),
-            '-_id extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ dateDownloaded: -1 })
             .lean()
@@ -121,6 +123,9 @@ router.get('/:extractor/:id', async (req, res) => {
         if (playlistVideos) [playlistVideos, playlistVideosOffset] = limitVideoList(playlistVideos, video);
         if (jobVideos) [jobVideos, jobVideosOffset] = limitVideoList(jobVideos, video);
 
+        uploaderVideos = await attachWatchHistory(uploaderVideos, req.user);
+        playlistVideos = await attachWatchHistory(playlistVideos, req.user);
+        jobVideos = await attachWatchHistory(jobVideos, req.user);
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err)
         return res.sendStatus(500);
@@ -128,7 +133,10 @@ router.get('/:extractor/:id', async (req, res) => {
 
     let similarVideos;
     try {
-        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled') similarVideos = await getSimilarVideos(video, filter);
+        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled')  {
+            similarVideos = await getSimilarVideos(video, filter);
+            similarVideos = await attachWatchHistory(similarVideos, req.user);
+        }
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -193,16 +201,16 @@ router.get('/:extractor/:id', async (req, res) => {
 
     res.json({
         video,
-        uploaderVideos,
-        playlistVideos,
-        jobVideos,
+        uploaderVideos: stripIds(uploaderVideos),
+        playlistVideos: stripIds(playlistVideos),
+        jobVideos: stripIds(jobVideos),
         uploaderVideosOffset,
         playlistVideosOffset,
         jobVideosOffset,
         firstUploaderVideo,
         firstPlaylistVideo,
         firstJobVideo,
-        similarVideos,
+        similarVideos: stripIds(similarVideos),
         localVideoPath: parsedEnv.EXPOSE_LOCAL_VIDEO_PATH ? slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)) : null,
         resumeTime,
         activityDocument: activity?._id,

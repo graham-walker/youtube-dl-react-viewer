@@ -275,6 +275,17 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <Form.Group className="mb-3" controlId="showWatchedHistory">
+                        <Form.Check
+                            checked={this.state.showWatchedHistory}
+                            type="checkbox"
+                            name="showWatchedHistory"
+                            label="Show watched history on the search, channel, and playlist pages"
+                            id="showWatchedHistory"
+                            onChange={this.handleInputChange}
+                            disabled={!this.state.recordWatchHistory}
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="resumeVideos">
                         <Form.Check
                             checked={this.state.resumeVideos}

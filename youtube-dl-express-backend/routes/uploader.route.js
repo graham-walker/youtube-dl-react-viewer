@@ -89,7 +89,7 @@ router.get('/:extractor/:id/:page', async (req, res) => {
     let videos;
     let totals = {};
     try {
-        videos = await search(req.query, page, filter);
+        videos = await search(req.query, page, req.user, filter);
         totals.count = (await Video.countDocuments(filter)) || 0;
         totals.shorts = (await Video.countDocuments(Object.assign({ ...filter }, { isShort: true })) || 0)
     } catch (err) {

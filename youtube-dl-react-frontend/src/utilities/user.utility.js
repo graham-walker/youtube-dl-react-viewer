@@ -32,6 +32,7 @@ const defaultUserSettings = {
     useCircularAvatars: true,
     reportBytesUsingIec: true,
     recordWatchHistory: true,
+    showWatchedHistory: true,
     resumeVideos: true,
     enableSponsorblock: true,
     onlySkipLocked: false,

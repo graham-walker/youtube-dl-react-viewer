@@ -104,6 +104,8 @@ export default class VideoList extends Component {
                     badge={this.state['sort']}
                     icon={this.props.url === 'videos/search' ? this.context.getSetting('useLargeLayout') : this.props.icon}
                     hideUploader={this.props.hideUploader}
+                    watched={video.watchHistory ? true : false}
+                    stopTime={video.watchHistory ? video.watchHistory.stopTime : undefined}
                 />
             </Col>
         );
