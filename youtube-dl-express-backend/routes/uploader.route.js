@@ -11,7 +11,7 @@ import Uploader from '../models/uploader.model.js';
 
 import { search, getRandomVideo } from '../utilities/video.utility.js';
 import { applyTags } from '../utilities/statistic.utility.js';
-import { makeSafe } from '../utilities/file.utility.js';
+import { makeSafe, getTargetSquareSize } from '../utilities/file.utility.js';
 
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
@@ -140,11 +140,12 @@ router.post('/:extractor/:id/upload_avatar', avatarUpload.single('avatar'), asyn
 
         fs.ensureDirSync(avatarDirectory);
 
+        const targetSize = await getTargetSquareSize(req.file.buffer, 512);
         await sharp(req.file.buffer)
             .resize({
                 fit: sharp.fit.cover,
-                width: 512,
-                height: 512,
+                width: targetSize,
+                height: targetSize,
             })
             .jpeg()
             .toFile(path.join(avatarDirectory, avatarFilename));

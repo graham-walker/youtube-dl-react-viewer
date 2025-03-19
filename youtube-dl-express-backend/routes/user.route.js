@@ -9,6 +9,7 @@ import { parsedEnv } from '../parse-env.js';
 
 import User from '../models/user.model.js';
 import Activity from '../models/activity.model.js';
+import { getTargetSquareSize } from '../utilities/file.utility.js';
 
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
@@ -41,11 +42,12 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
             const avatarDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'users/avatars');
             const avatar = uuidv4() + '.webp';
             fs.ensureDirSync(avatarDirectory);
+            const targetSize = await getTargetSquareSize(req.file.buffer, 256);
             await sharp(req.file.buffer)
                 .resize({
                     fit: sharp.fit.cover,
-                    width: 256,
-                    height: 256,
+                    width: targetSize,
+                    height: targetSize,
                 })
                 .webp({ quality: 100, lossless: true })
                 .toFile(path.join(avatarDirectory, avatar));
