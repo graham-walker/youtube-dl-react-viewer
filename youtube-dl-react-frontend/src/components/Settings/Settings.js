@@ -74,8 +74,25 @@ class SettingsForm extends Component {
     handleInputChange = (e) => {
         var { value, name, type } = e.target;
         if (type === 'checkbox') value = e.target.checked;
-        if (type === 'file') value = e.target.files[0];
         this.setState({ [name]: value });
+    }
+
+    uploadAvatar = (e) => {
+        let formData = new FormData();
+        formData.append('avatar', e.target.files[0]);
+        this.setState({ error: undefined, success: undefined }, () => {
+            axios
+                .post(`/api/users/upload_avatar`, formData).then(res => {
+                    let user = AuthService.getCurrentUser();
+                    user.avatar = res.data.avatar;
+                    this.context.updateUser(user);
+
+                    this.setState(({ success: 'Avatar uploaded' }));
+                }).catch(err => {
+                    console.error(err);
+                    this.setState({ error: getErrorMessage(err, 'Failed to upload avatar') });
+                });
+        });
     }
 
     onSubmit = (event) => {
@@ -92,19 +109,10 @@ class SettingsForm extends Component {
             }
             delete user.verifyPassword;
 
-            var formData = new FormData();
-            for (var key in user) {
-                if (key.includes('PlayerSettings')) {
-                    formData.append(key, JSON.stringify(user[key]));
-                    continue;
-                }
-                formData.append(key, user[key]);
-            }
-
             axios
-                .post('/api/users/settings', formData).then(res => {
+                .post('/api/users/settings', user).then(res => {
                     if (res.status === 200) {
-                        this.setState({ success: 'Settings Saved', password: '', verifyPassword: '' });
+                        this.setState({ success: 'Settings saved', password: '', verifyPassword: '' });
                         let user = AuthService.getCurrentUser();
                         for (let key in res.data) {
                             user[key] = res.data[key];
@@ -127,15 +135,17 @@ class SettingsForm extends Component {
             <>
                 {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                 {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
+                <strong className='d-block mb-2'>Account</strong>
+                <AvatarForm
+                    width={145}
+                    height={145}
+                    src={avatar}
+                    name="avatar"
+                    onChange={this.uploadAvatar}
+                    label="Avatar"
+                    className="mb-1"
+                />
                 <Form onSubmit={this.onSubmit}>
-                    <strong className='d-block mb-2'>Account</strong>
-                    <AvatarForm
-                        width={145}
-                        height={145}
-                        src={avatar}
-                        name="avatar"
-                        onChange={this.handleInputChange}
-                    />
                     <Form.Group className="mb-3" controlId="username">
                         <Form.Label>Username</Form.Label>
                         <Form.Control

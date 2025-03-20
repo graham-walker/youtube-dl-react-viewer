@@ -28,7 +28,7 @@ router.get('/settings', async (req, res) => {
     res.json({ user: user.toJSON() });
 });
 
-router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
+router.post('/settings', async (req, res) => {
     let user;
     try {
         user = await User.findOne({ _id: req.userId }, 'username password isSuperuser ' + settingsFields);
@@ -37,32 +37,11 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     }
     if (!user) return res.sendStatus(500);
 
-    if (req.file) {
-        try {
-            const avatarDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'users/avatars');
-            const avatar = uuidv4() + '.webp';
-            fs.ensureDirSync(avatarDirectory);
-            const targetSize = await getTargetSquareSize(req.file.buffer, 256);
-            await sharp(req.file.buffer)
-                .resize({
-                    fit: sharp.fit.cover,
-                    width: targetSize,
-                    height: targetSize,
-                })
-                .webp({ quality: 100, lossless: true })
-                .toFile(path.join(avatarDirectory, avatar));
-            if (user.avatar && fs.existsSync(path.join(avatarDirectory, user.avatar))) fs.unlinkSync(path.join(avatarDirectory, user.avatar));
-            user.avatar = avatar;
-        } catch (err) {
-            return res.status(500).json({ error: 'Failed to change profile image' });
-        }
-    }
-
     user.username = req.body.username;
     if (req.body.password) user.password = req.body.password;
-    user.desktopPlayerSettings = JSON.parse(req.body.desktopPlayerSettings);
-    user.tabletPlayerSettings = JSON.parse(req.body.tabletPlayerSettings);
-    user.mobilePlayerSettings = JSON.parse(req.body.mobilePlayerSettings);
+    user.desktopPlayerSettings = req.body.desktopPlayerSettings;
+    user.tabletPlayerSettings = req.body.tabletPlayerSettings;
+    user.mobilePlayerSettings = req.body.mobilePlayerSettings;
     user.hideShorts = req.body.hideShorts;
     user.useLargeLayout = req.body.useLargeLayout;
     user.fitThumbnails = req.body.fitThumbnails;
@@ -96,13 +75,54 @@ router.post('/settings', avatarUpload.single('avatar'), async (req, res) => {
     } catch (err) {
         return res.sendStatus(500);
     }
-    
+
     user = user.toJSON();
     delete user._id;
     delete user.password;
     delete user.updatedAt;
 
     res.json(user);
+});
+
+router.post('/upload_avatar', avatarUpload.single('avatar'), async (req, res) => {
+    let user;
+    try {
+        user = await User.findOne({ _id: req.userId }, 'username password isSuperuser ' + settingsFields);
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+    if (!user) return res.sendStatus(500);
+
+    if (!req.file) return res.status(500).json({ error: 'Missing file' });
+
+    const avatarDirectory = path.join(parsedEnv.OUTPUT_DIRECTORY, 'users', 'avatars');
+    const avatar = uuidv4() + '.webp';
+    try {
+        fs.ensureDirSync(avatarDirectory);
+
+        // Resize uploaded image
+        const targetSize = await getTargetSquareSize(req.file.buffer, 256);
+        await sharp(req.file.buffer)
+            .resize({
+                fit: sharp.fit.cover,
+                width: targetSize,
+                height: targetSize,
+            })
+            .webp({ quality: 100, lossless: true })
+            .toFile(path.join(avatarDirectory, avatar));
+
+        // Remove old avatar image
+        if (user.avatar && fs.existsSync(path.join(avatarDirectory, user.avatar))) fs.unlinkSync(path.join(avatarDirectory, user.avatar));
+
+        // Save user
+        user.avatar = avatar;
+        await user.save();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Failed to upload avatar' });
+    }
+
+    return res.status(200).json({ avatar });
 });
 
 export default router;

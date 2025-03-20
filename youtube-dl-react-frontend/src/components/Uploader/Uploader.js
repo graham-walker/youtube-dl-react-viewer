@@ -15,6 +15,7 @@ import { getImage, defaultImage } from '../../utilities/image.utility';
 import axios from '../../utilities/axios.utility';
 import parsedEnv from '../../parse-env';
 import AvatarForm from '../Settings/AvatarForm/AvatarForm';
+import AlertModal from '../AlertModal/AlertModal';
 
 export default class UploaderPage extends Component {
     static contextType = UserContext;
@@ -25,8 +26,8 @@ export default class UploaderPage extends Component {
             loading: true,
             error: undefined,
             uploader: undefined,
-            uploaderAvatar: null,
             imageKey: 0,
+            showAlert: false,
         };
     }
 
@@ -46,26 +47,16 @@ export default class UploaderPage extends Component {
             });
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.uploaderAvatar && prevState.uploaderAvatar !== this.state.uploaderAvatar) this.onSubmit();
-    }
-
-    handleInputChange = (e) => {
-        var { value, name, type } = e.target;
-        if (type === 'file') value = e.target.files[0];
-        this.setState({ [name]: value });
-    }
-
-    onSubmit = () => {
+    uploadAvatar = (e) => {
         let formData = new FormData();
-        formData.append('avatar', this.state.uploaderAvatar);
+        formData.append('avatar', e.target.files[0]);
         axios
             .post(`/api/uploaders/${this.state.uploader.extractor}/${this.state.uploader.id}/upload_avatar`, formData).then(res => {
-                // Reload the avatar
+                // Reload the avatar image
                 this.setState((prevState) => ({ imageKey: prevState.imageKey + 1 }));
             }).catch(err => {
                 console.error(err);
-                alert('Failed to upload avatar');
+                this.setState({ showAlert: true });
             });
     }
 
@@ -90,7 +81,7 @@ export default class UploaderPage extends Component {
                                     height={145}
                                     src={getImage(uploader, 'avatar')}
                                     name="uploaderAvatar"
-                                    onChange={this.handleInputChange}
+                                    onChange={this.uploadAvatar}
                                     imageKey={this.state.imageKey}
                                 />
                                 : <Image
@@ -222,6 +213,11 @@ export default class UploaderPage extends Component {
                         location={this.props.location}
                         url={`uploaders/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                         hideUploader={true}
+                    />
+                    <AlertModal
+                        show={this.state.showAlert}
+                        message="Failed to upload avatar"
+                        onHide={() => this.setState({ showAlert: false })}
                     />
                 </>}
             </PageLoadWrapper>
