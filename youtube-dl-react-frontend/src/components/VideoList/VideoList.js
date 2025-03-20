@@ -132,7 +132,7 @@ export default class VideoList extends Component {
                     }
                     {!!!this.props.stats && this.context.getSetting('hideShorts') && this.state.totals.shorts > 0 &&
                         <>
-                            <h5 className="mb-4">{this.state.totals.shorts.toLocaleString()} shorts{this.state.totals.shorts !== 1 && 's'} hidden</h5>
+                            <h5 className="mb-4">{this.state.totals.shorts.toLocaleString()} short{this.state.totals.shorts !== 1 && 's'} hidden</h5>
                         </>
                     }
                     <Accordion className="mb-4">
