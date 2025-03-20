@@ -535,6 +535,16 @@ const PlayerSettingsForm = (props) => {
                         onChange={handleInputChange}
                     />
                 </Form.Group>
+                <Form.Group className="mb-3" controlId={viewport + 'enableDefaultAudioOnlyMode'}>
+                    <Form.Check
+                        type="checkbox"
+                        checked={settings.enableDefaultAudioOnlyMode}
+                        name={viewport + 'enableDefaultAudioOnlyMode'}
+                        label="Start playback in audio only mode"
+                        disabled={!settings.enabled}
+                        onChange={handleInputChange}
+                    />
+                </Form.Group>
                 <strong className='d-block mb-2'>Controls</strong>
                 <Form.Group className="mb-3" controlId={viewport + 'keepPlayerControlsVisible'}>
                     <Form.Label>Keep player controls visible</Form.Label>

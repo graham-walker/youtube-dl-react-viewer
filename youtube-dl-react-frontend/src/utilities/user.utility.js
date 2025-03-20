@@ -1,8 +1,9 @@
 const defaultPlayerSettings = {
     enabled: false,
     defaultPlaybackRate: 1,
-    enableDefaultTheaterMode: false,
     autoplayVideo: true,
+    enableDefaultTheaterMode: false,
+    enableDefaultAudioOnlyMode: false,
     keepPlayerControlsVisible: 'never',
     playerControlsPosition: 'on_video',
     playerControlsScale: 1,

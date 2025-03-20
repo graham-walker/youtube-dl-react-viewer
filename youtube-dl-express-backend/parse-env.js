@@ -110,6 +110,10 @@ const expected = {
         type: Boolean,
         default: false,
     },
+    'AUDIO_ONLY_MODE_BITRATE': {
+        type: Number,
+        default: 128000,
+    },
     'NODE_ENV': {
         type: String,
         default: 'production',

@@ -14,6 +14,7 @@ import jobRouter from './routes/job.route.js';
 import statisticRouter from './routes/statistic.route.js';
 import activityRouter from './routes/activity.route.js';
 import adminRouter from './routes/admin.route.js';
+import transcodeRouter from './routes/transcode.route.js';
 
 import authenticationMiddleware from './middleware/authentication.middleware.js';
 import globalPasswordMiddleware from './middleware/global-password.middleware.js';
@@ -56,6 +57,7 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     app.use('/api/statistics', globalPasswordMiddleware, statisticRouter);
     app.use('/api/activity', [globalPasswordMiddleware, authenticationMiddleware], activityRouter);
     app.use('/api/admin', [globalPasswordMiddleware, authenticationMiddleware, superuserMiddleware], adminRouter);
+    app.use('/api/transcode', globalPasswordMiddleware, transcodeRouter);
 
     const staticFolders = ['videos', 'thumbnails', 'avatars', 'users/avatars'];
     const outputDirectory = parsedEnv.OUTPUT_DIRECTORY;
@@ -95,7 +97,7 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     }
 
     // Spoof type
-    app.use('/transcoded/videos', globalPasswordMiddleware, (req, res, next) => { res.contentType('webm'); next(); }, express.static(path.join(outputDirectory, 'videos')));
+    app.use('/spoof/videos', globalPasswordMiddleware, (req, res, next) => { res.contentType('webm'); next(); }, express.static(path.join(outputDirectory, 'videos')));
 
     // Serve the react app build in production
     if (parsedEnv.NODE_ENV === 'production') {

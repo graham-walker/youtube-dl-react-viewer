@@ -21,6 +21,7 @@ import ConfirmModal from '../ConfirmModal/ConfirmModal';
 import AlertModal from '../AlertModal/AlertModal';
 import ScreenshotButton from './ScreenshotButton/ScreenshotButton';
 import TheaterModeButton from './TheaterModeButton/TheaterModeButton';
+import AudioOnlyModeButton from './AudioOnlyModeButton/AudioOnlyModeButton';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -54,11 +55,13 @@ export default class VideoPage extends Component {
             alertMessage: '',
             theaterMode: false,
             defaultVolumeSet: false,
+            audioOnlyMode: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
         this.playerRef = React.createRef();
         this.theaterModeButtonRef = React.createRef();
+        this.audioOnlyModeButtonRef = React.createRef();
     }
 
     componentDidMount() {
@@ -71,8 +74,11 @@ export default class VideoPage extends Component {
         this.handleResize = this.handleResize.bind(this);
         window.addEventListener('resize', this.handleResize);
 
-        // Use default theater mode
-        if (this.context.getPlayerSetting('enableDefaultTheaterMode')) this.setState({ theaterMode: true });
+        // Use default theater and audio only mode
+        this.setState({
+            theaterMode: this.context.getPlayerSetting('enableDefaultTheaterMode'),
+            audioOnlyMode: this.context.getPlayerSetting('enableDefaultAudioOnlyMode'),
+        });
     }
 
     componentWillUnmount() {
@@ -117,8 +123,16 @@ export default class VideoPage extends Component {
             this.theaterModeButtonRef.current.updateText(this.state.theaterMode);
         }
 
+        // Update the title of the audio only mode button to say disable if it is enabled
+        if (this.audioOnlyModeButtonRef.current) {
+            this.audioOnlyModeButtonRef.current.updateText(this.state.audioOnlyMode);
+        }
+
         // Resize player on theater mode change
         if (prevState.theaterMode !== this.state.theaterMode) this.handleResize();
+
+        // Reload player on audio only mode change
+        if (prevState.audioOnlyMode !== this.state.audioOnlyMode) this.videoReady();
     }
 
     getVideo() {
@@ -218,6 +232,12 @@ export default class VideoPage extends Component {
                                     onClick: () => this.setState({ theaterMode: !this.state.theaterMode }),
                                 });
                                 this.player.controlBar.el().insertBefore(this.theaterModeButtonRef.current.el(), fullScreenButton.el());
+
+                                // Add audio only mode button to controls
+                                this.audioOnlyModeButtonRef.current = this.player.controlBar.addChild('AudioOnlyModeButton', {
+                                    onClick: () => this.setState({ audioOnlyMode: !this.state.audioOnlyMode }),
+                                });
+                                this.player.controlBar.el().insertBefore(this.audioOnlyModeButtonRef.current.el(), fullScreenButton.el());
 
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) {
@@ -402,11 +422,17 @@ export default class VideoPage extends Component {
 
     videoReady() {
         const video = this.state.video;
-        const baseSrc = `/${this.state.spoofContentType ? 'transcoded' : 'static'}/videos/` + encodeURIComponent(video.directory) + '/';
+        if (!video) return;
+
+        const baseSrc = `/${this.state.spoofContentType ? 'spoof' : 'static'}/videos/` + encodeURIComponent(video.directory) + '/';
         this.player.poster(getImage(this.state.video, 'thumbnail', 'medium'));
         this.player.src({
-            src: baseSrc + encodeURIComponent(video.videoFile.name),
-            type: this.state.spoofContentType || video.videoFile.name.endsWith('.mkv')
+            src: (
+                this.state.audioOnlyMode
+                    ? `/api/transcode/${video.extractor}/${video.id}/audio_only`
+                    : baseSrc + encodeURIComponent(video.videoFile.name)
+            ),
+            type: this.state.spoofContentType || video.videoFile.name.endsWith('.mkv') || this.state.audioOnlyMode
                 ? 'video/webm'
                 : undefined
         });
