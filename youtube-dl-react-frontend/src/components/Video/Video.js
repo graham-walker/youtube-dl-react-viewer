@@ -204,9 +204,6 @@ export default class VideoPage extends Component {
                                         inline: this.context.getPlayerSetting('volumeControlPosition') === 'inline',
                                     },
                                 },
-                                durationDisplay: true,
-                                currentTimeDisplay: true,
-                                timeDivider: true,
                             }, () => {
                                 const fullScreenButton = this.player.controlBar.getChild('FullscreenToggle');
 
