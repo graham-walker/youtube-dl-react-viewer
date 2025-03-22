@@ -62,6 +62,7 @@ export default class VideoPage extends Component {
         this.playerRef = React.createRef();
         this.theaterModeButtonRef = React.createRef();
         this.audioOnlyModeButtonRef = React.createRef();
+        this.preservedTimeRef = React.createRef();
     }
 
     componentDidMount() {
@@ -130,7 +131,7 @@ export default class VideoPage extends Component {
         if (prevState.theaterMode !== this.state.theaterMode) this.handleResize();
 
         // Reload player on audio only mode change
-        if (prevState.audioOnlyMode !== this.state.audioOnlyMode) this.videoReady();
+        if (prevState.audioOnlyMode !== this.state.audioOnlyMode) this.videoReady(true);
     }
 
     getVideo() {
@@ -242,7 +243,7 @@ export default class VideoPage extends Component {
                                     const button = this.player.controlBar.addChild('ScreenshotButton', { behavior: this.context.getPlayerSetting('screenshotButtonBehavior') });
                                     this.player.controlBar.el().insertBefore(button.el(), fullScreenButton.el());
                                 }
-                                
+
                                 // Add audio only mode button
                                 this.audioOnlyModeButtonRef.current = this.player.controlBar.addChild('AudioOnlyModeButton', {
                                     onClick: () => this.setState({ audioOnlyMode: !this.state.audioOnlyMode }),
@@ -274,13 +275,13 @@ export default class VideoPage extends Component {
 
                                 // Show current time
                                 if (this.context.getPlayerSetting('showCurrentTime')) this.player.el().classList.add('show-current-time');
-                                
+
                                 // Hide remaining time
                                 if (!this.context.getPlayerSetting('showRemainingTime')) this.player.el().classList.add('hide-remaining-time');
 
                                 // Show/hide large play button
                                 document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));
-                                
+
                                 // Show/hide seek buttons
                                 document.querySelectorAll('.player-button.skip-back, .player-button.skip-forwards')
                                     .forEach(button => button.classList.toggle('d-none', !this.context.getPlayerSetting('seekButtonsEnabled')));
@@ -307,7 +308,10 @@ export default class VideoPage extends Component {
 
                                 this.player.on('loadedmetadata', () => {
                                     // Resume playback
-                                    if (this.state.resumeTime) {
+                                    if (this.preservedTimeRef.current) {
+                                        this.player.currentTime(this.preservedTimeRef.current);
+                                        this.preservedTimeRef.current = null;
+                                    } else if (this.state.resumeTime) {
                                         let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
                                         this.player.currentTime(resumeTime);
                                     }
@@ -454,9 +458,11 @@ export default class VideoPage extends Component {
         return undefined;
     }
 
-    videoReady() {
+    videoReady(preserveCurrentTime = false) {
         const video = this.state.video;
         if (!video) return;
+
+        if (preserveCurrentTime) this.preservedTimeRef.current = this.player.currentTime();
 
         const baseSrc = `/${this.state.spoofContentType ? 'spoof' : 'static'}/videos/` + encodeURIComponent(video.directory) + '/';
         this.player.poster(getImage(this.state.video, 'thumbnail', 'medium'));
@@ -505,7 +511,7 @@ export default class VideoPage extends Component {
         var { name, checked } = e.target;
         localStorage.setItem(name, checked);
         this.setState({ [name]: checked }, () => {
-            if (name === 'spoofContentType') this.videoReady();
+            if (name === 'spoofContentType') this.videoReady(true);
         });
     }
 
