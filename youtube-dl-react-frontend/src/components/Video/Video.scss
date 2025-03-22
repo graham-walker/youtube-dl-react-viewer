@@ -435,6 +435,17 @@ $progress-bar-height: 0.4em;
     }
 }
 
+// Ensure semi-transparent player controls background in fullscreen mode
+.video-js.vjs-fullscreen {
+    .vjs-control-bar {
+        background: rgba($player-background-color, 0.7) !important;
+
+        .vjs-progress-control {
+            background: rgba($player-background-color, 0.7) !important;
+        }
+    }
+}
+
 @media only screen and (max-width: 1199px) {
     // Add padding to the controls in fullscreen mode (because of mobile devices that may have rounded corners)
     .video-js.vjs-fullscreen {
