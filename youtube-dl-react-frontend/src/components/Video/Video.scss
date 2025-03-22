@@ -1,4 +1,8 @@
-// Desktop layout
+$player-background-color: #000;
+$player-highlight-color: #fff;
+$progress-bar-height: 0.4em;
+
+// Grid layout
 .video-grid {
     display: grid;
     gap: 0 1.5rem;
@@ -30,8 +34,8 @@
         "description recommendations";
 }
 
-// Mobile layout
-@media only screen and (width < 1200px) {
+// Collapse grid on mobile
+@media only screen and (max-width: 1199px) {
     .video-grid {
         grid-template-columns: 1fr !important;
         grid-template-rows: auto auto auto !important;
@@ -40,17 +44,9 @@
             "description"
             "recommendations" !important;
     }
-
-    .vjs-custom-theater-mode-button {
-        display: none !important;
-    }
 }
 
-// Video player
-[data-vjs-player="true"] {
-    margin: 0 auto;
-}
-
+// Poster
 .vjs-poster {
     background-size: cover !important;
 }
@@ -67,13 +63,13 @@
 
 // Position player controls below video
 .vjs-control-bar.positioned-below {
-    transform: translateY(100%);
+    transform: translateY(calc(100% + $progress-bar-height));
 }
 .vjs-fullscreen .vjs-control-bar.positioned-below {
     transform: unset;
 }
 
-// Highlight SponsorBlock segments
+// SponsorBlock segments
 .sponsor-segment {
     position: absolute;
     bottom: 0;
@@ -117,12 +113,11 @@
 // Chapter markers
 .chapter-section {
     position: absolute;
-    bottom: -14px;
-    top: -14px;
+    height: $progress-bar-height;
 }
 
 .chapter-marker {
-    background: #2b333f;
+    background: $player-background-color;
     position: absolute;
     bottom: 0;
     top: 0;
@@ -179,7 +174,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 1rem;
-            filter: drop-shadow(0 0 2px #2b333f);
+            filter: drop-shadow(0 0 2px $player-background-color);
         }
     }
 
@@ -206,7 +201,7 @@
 
     svg {
         font-size: 3rem;
-        filter: drop-shadow(0 0 2px #2b333f);
+        filter: drop-shadow(0 0 2px $player-background-color);
     }
 }
 
@@ -239,14 +234,6 @@
     text-align: center;
 }
 
-.vjs-current-time {
-    padding-right: 0 !important;
-}
-
-.vjs-duration {
-    padding-left: 0 !important;
-}
-
 .show-current-time {
     .vjs-current-time,
     .vjs-time-divider,
@@ -259,14 +246,207 @@
     display: none;
 }
 
-// Hide player error message on mobile (it is too long)
+// Hide total duration on mobile to free up more space
+@media screen and (max-width: 768px) {
+    .show-current-time {
+        .vjs-time-divider,
+        .vjs-duration {
+            display: none !important;
+        }
+    }
+}
+
+// Custom controls
+.custom-player-button-icon {
+    font-size: 1.25em !important;
+}
+
+// Hide redundant controls in fullscreen mode
+.vjs-fullscreen {
+    .custom-player-theater-mode-button {
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    // Theater mode is redundant once layout collapses
+    .custom-player-theater-mode-button {
+        display: none !important;
+    }
+}
+
+// Custom theme
+.video-js {
+    touch-action: none; // Prevent touch dragging from interfering with video controls
+    font-size: 10px !important;
+    margin: 0 auto;
+
+    .vjs-loading-spinner {
+        border: 6px solid $player-highlight-color;
+        filter: grayscale(1);
+    }
+
+    // Hide the big play button (it is still visible for a frame even though we bypass it)
+    .vjs-big-play-button {
+        display: none !important;
+    }
+
+    .vjs-control-bar {
+        background: rgba($player-background-color, 0.7) !important;
+
+        // Use solid background when player controls are positioned below video
+        &.positioned-below {
+            background: $player-background-color !important;
+
+            .vjs-progress-control {
+                background: $player-background-color !important;
+            }
+        }
+
+        // Move progress on top of the player controls
+        .vjs-progress-control {
+            position: absolute !important;
+            top: -$progress-bar-height;
+            left: 0;
+            right: 0;
+            width: 100% !important;
+            z-index: 0;
+            height: auto;
+            background: rgba($player-background-color, 0.7) !important;
+
+            .vjs-progress-holder {
+                margin: 0 !important;
+                height: $progress-bar-height !important;
+                font-size: 1em !important;
+
+                .vjs-load-progress {
+                    background: rgba($player-highlight-color, 0.3) !important;
+
+                    > div {
+                        background: rgba($player-highlight-color, 0.3) !important;
+                    }
+                }
+
+                // Progress knob
+                .vjs-play-progress {
+                    background: $logo-red;
+                    background: linear-gradient(to right, $logo-blue, $logo-red);
+
+                    &::before {
+                        color: $logo-red;
+                        font-size: 1em;
+                        right: -0.5em;
+                        top: -0.3em;
+                    }
+                }
+
+                // Fix tooltip animations since they were originally controlled by the parent font size
+                .vjs-mouse-display {
+                    display: initial;
+                }
+
+                .vjs-time-tooltip {
+                    font-size: 1em !important;
+                    transition: transform 0.2s;
+                    transform: scale(0);
+                    transform-origin: bottom center;
+                }
+
+                &:hover .vjs-time-tooltip {
+                    transform: scale(1);
+                }
+            }
+        }
+
+        // Separate left and right controls
+        .custom-spacer {
+            margin-right: auto;
+        }
+
+        // Set default control width
+        .vjs-control {
+            width: 2.5em;
+        }
+
+        // Menu panels
+        .js-focus-visible .vjs-menu li.vjs-menu-item:hover,
+        .vjs-menu li.vjs-menu-item:focus,
+        .vjs-menu li.vjs-menu-item:hover {
+            background-color: rgba($player-highlight-color, 0.25);
+        }
+
+        .js-focus-visible .vjs-menu li.vjs-selected:hover,
+        .vjs-menu li.vjs-selected,
+        .vjs-menu li.vjs-selected:focus,
+        .vjs-menu li.vjs-selected:hover {
+            background: $player-highlight-color;
+            color: $player-background-color;
+        }
+
+        .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+            background: rgba($player-background-color, 0.7) !important;
+        }
+
+        // Sliders
+        .vjs-slider {
+            background: rgba($player-highlight-color, 0.3) !important;
+        }
+
+        // Volume control
+        .vjs-volume-panel {
+            width: 2.5em !important;
+
+            .vjs-volume-control.vjs-volume-vertical {
+                background: rgba($player-background-color, 0.7) !important;
+                z-index: 1;
+            }
+
+            .vjs-volume-control.vjs-slider-active.vjs-volume-vertical,
+            .vjs-volume-control:active.vjs-volume-vertical,
+            &.vjs-hover .vjs-mute-control ~ .vjs-volume-control.vjs-volume-vertical,
+            &.vjs-hover .vjs-volume-control.vjs-volume-vertical,
+            &:active .vjs-volume-control.vjs-volume-vertical,
+            &:focus .vjs-volume-control.vjs-volume-vertical {
+                left: -2.667em !important;
+            }
+        }
+
+        .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-hover,
+        .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active,
+        .vjs-volume-panel.vjs-volume-panel-horizontal:active {
+            width: 8em !important;
+        }
+
+        // Reduce time control padding
+        .vjs-time-control {
+            padding: 0 0.25em;
+            width: auto;
+        }
+
+        // Reduce playback rate font size
+        .vjs-playback-rate {
+            width: 3em;
+
+            .vjs-playback-rate-value {
+                font-size: 1em;
+                line-height: 3;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    // Add padding to the controls in fullscreen mode (because of mobile devices that may have rounded corners)
+    .video-js.vjs-fullscreen {
+        .vjs-control-bar {
+            padding: 0 3em;
+        }
+    }
+}
+
+// Hide player error message X icon on mobile (the playback error message is too long and overlaps the icon)
 @media screen and (max-width: 768px) {
     .vjs-error .vjs-error-display::before {
         display: none;
     }
-}
-
-// Custom buttons
-.custom-player-button-icon {
-    font-size: 1.25em !important;
 }

@@ -68,12 +68,13 @@
     height: 0.25rem;
 
     .video-watchtimebar {
-        background-color: red;
+        background: $logo-red;
+        background: linear-gradient(to right, $logo-blue, $logo-red);
         position: absolute;
         top: 0;
         bottom: 0;
         left: 0;
-    }    
+    }
 }
 
 .video-thumbnail {

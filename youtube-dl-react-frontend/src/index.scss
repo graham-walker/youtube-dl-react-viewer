@@ -25,6 +25,9 @@ $container-max-widths: (
 
 $dark: #000; // Make dark OLED dark
 
+$logo-red: #ff002c;
+$logo-blue: #0d6efd;
+
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 
 @import "./components/Admin/Admin.scss";

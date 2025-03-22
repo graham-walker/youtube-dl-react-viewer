@@ -92,18 +92,16 @@ export default class VideoPage extends Component {
     handleResize() {
         const theaterMode = this.state.theaterMode && window.innerWidth >= 1200;
         if (this.playerRef.current && this.state.video.height && this.state.video.width) {
-            let newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - (window.innerWidth < 1200 ? 24 : 424); // Change width if sidebar visible
-            if (theaterMode) newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - 24;
+            let newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - (window.innerWidth < 1200 ? 0 : 424); // 424 = width of the sidebar + grid gap
+            if (theaterMode) newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth;
 
             let newHeight = (this.state.video.height / this.state.video.width) * newWidth;
 
-            // if (window.innerWidth > 1200) { // Only cap height on desktop view
             const maxHeight = window.innerHeight * (theaterMode ? 0.8 : 0.7);
             if (newHeight > maxHeight) {
                 newWidth = (maxHeight / newHeight) * newWidth;
                 newHeight = maxHeight;
             }
-            // }
 
             this.playerRef.current.style.width = newWidth + 'px';
             this.playerRef.current.style.height = newHeight + 'px';
@@ -219,65 +217,92 @@ export default class VideoPage extends Component {
                                     },
                                 },
                             }, () => {
+                                // Force the playback rate button to always show two decimal places so it does not shift the layout
+                                const playbackRateButton = this.player.controlBar.playbackRateMenuButton;
+                                playbackRateButton.updateLabel = function () {
+                                    if (this.playbackRateSupported()) {
+                                        const rate = this.player().playbackRate();
+                                        this.labelEl_.textContent = rate.toFixed(2) + 'x';
+                                    }
+                                };
+                                this.player.on('ratechange', function () {
+                                    playbackRateButton.updateLabel();
+                                });
+                                playbackRateButton.updateLabel();
+
+                                // Split the player control buttons into left and right groups
+                                const durationDisplay = this.player.controlBar.getChild('DurationDisplay');
+                                durationDisplay.el().insertAdjacentHTML('afterend', '<div class="custom-spacer"></div>');
+
+                                // Add custom buttons to the player controls
                                 const fullScreenButton = this.player.controlBar.getChild('FullscreenToggle');
 
-                                // Add screenshot button to controls
+                                // Add screenshot button
                                 if (this.context.getPlayerSetting('enableScreenshotButton')) {
                                     const button = this.player.controlBar.addChild('ScreenshotButton', { behavior: this.context.getPlayerSetting('screenshotButtonBehavior') });
                                     this.player.controlBar.el().insertBefore(button.el(), fullScreenButton.el());
                                 }
-
-                                // Add theater mode button to controls
-                                this.theaterModeButtonRef.current = this.player.controlBar.addChild('TheaterModeButton', {
-                                    onClick: () => this.setState({ theaterMode: !this.state.theaterMode }),
-                                });
-                                this.player.controlBar.el().insertBefore(this.theaterModeButtonRef.current.el(), fullScreenButton.el());
-
-                                // Add audio only mode button to controls
+                                
+                                // Add audio only mode button
                                 this.audioOnlyModeButtonRef.current = this.player.controlBar.addChild('AudioOnlyModeButton', {
                                     onClick: () => this.setState({ audioOnlyMode: !this.state.audioOnlyMode }),
                                 });
                                 this.player.controlBar.el().insertBefore(this.audioOnlyModeButtonRef.current.el(), fullScreenButton.el());
 
+                                // Add theater mode button
+                                this.theaterModeButtonRef.current = this.player.controlBar.addChild('TheaterModeButton', {
+                                    onClick: () => this.setState({ theaterMode: !this.state.theaterMode }),
+                                });
+                                this.player.controlBar.el().insertBefore(this.theaterModeButtonRef.current.el(), fullScreenButton.el());
+
                                 const playerControls = document.querySelector('.vjs-control-bar');
                                 if (playerControls) {
-                                    // Scale player UI
+                                    // Scale the player controls UI
                                     playerControls.style.fontSize = (this.context.getPlayerSetting('playerControlsScale') * 100) + '%';
 
-                                    // Position player controls below video
+                                    // Position the player controls below the video
                                     playerControls.classList.toggle('positioned-below', this.context.getPlayerSetting('playerControlsPosition') === 'under_video');
                                 }
 
-                                // Add margin below video player if controls are positioned below video
+                                // Add extra margin below the video player if the player controls are positioned below the video
                                 if (this.context.getPlayerSetting('playerControlsPosition') === 'under_video') {
-                                    this.player.el().style.setProperty('margin-bottom', `calc(${30 * this.context.getPlayerSetting('playerControlsScale')}px + 1rem)`, 'important'); // 30 = 10px (default video.js font size) * 3em (default video.js controls height)
-                                    this.player.el().classList.add('vjs-has-started'); // Show the player controls before playback starts
+                                    this.player.el().style.setProperty('margin-bottom', `calc(${34 * this.context.getPlayerSetting('playerControlsScale')}px + 1rem)`, 'important'); // 34 = 10px (default video.js font size) * 3.4em (default video.js controls height + progress control height)
                                 }
 
-                                // Show/hide current/remaining time
+                                // Bypass the Video.js large play button and show the player controls before playback starts
+                                this.player.el().classList.add('vjs-has-started');
+
+                                // Show current time
                                 if (this.context.getPlayerSetting('showCurrentTime')) this.player.el().classList.add('show-current-time');
+                                
+                                // Hide remaining time
                                 if (!this.context.getPlayerSetting('showRemainingTime')) this.player.el().classList.add('hide-remaining-time');
 
-                                // Show/hide large play/pause and seek buttons
+                                // Show/hide large play button
                                 document.querySelector('.player-button.play-pause').classList.toggle('d-none', !this.context.getPlayerSetting('largePlayButtonEnabled'));
+                                
+                                // Show/hide seek buttons
                                 document.querySelectorAll('.player-button.skip-back, .player-button.skip-forwards')
                                     .forEach(button => button.classList.toggle('d-none', !this.context.getPlayerSetting('seekButtonsEnabled')));
 
-                                // Default volume
+                                // Set the default volume
                                 if (!this.state.defaultVolumeSet) {
                                     this.player.volume(this.context.getPlayerSetting('defaultVolume'));
                                     this.setState({ defaultVolumeSet: true });
                                 }
 
-                                // Default playback rate
+                                // Set the default playback rate
                                 this.player.defaultPlaybackRate(this.context.getPlayerSetting('defaultPlaybackRate'));
 
+                                // Configure the Video.js hotkeys plugin
                                 this.player.hotkeys({
                                     volumeStep: 0.1,
                                     seekStep: 5,
                                     enableModifiersForNumbers: false,
+                                    enableVolumeScroll: false,
                                 });
 
+                                // Load the video src
                                 this.videoReady();
 
                                 this.player.on('loadedmetadata', () => {
@@ -309,7 +334,7 @@ export default class VideoPage extends Component {
                                         }
                                     }
 
-                                    // Add chapters
+                                    // Add chapter markers
                                     if (this.state.video.chapters && this.state.video.chapters.length > 0) {
                                         const duration = this.player.duration();
                                         for (let [i, chapter] of this.state.video.chapters.entries()) {
@@ -345,7 +370,7 @@ export default class VideoPage extends Component {
                                     if (this.sponsorRef.current) {
                                         let currentTime = this.player.currentTime();
 
-                                        if (Math.ceil(currentTime) < Math.ceil(this.player.duration())) { // Fix getting stuck in a loop when skipping outros
+                                        if (Math.ceil(currentTime) < Math.ceil(this.player.duration())) { // Fix playback getting stuck in a loop when skipping outros
 
                                             let skip = false;
                                             for (let sponsor of this.sponsorRef.current) {
@@ -378,7 +403,16 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('error', function (e) {
-                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = 'A playback error has occurred. The format code used to download videos can sometimes create videos with codecs individual browsers do not support. Try any of the following: open in VLC button, enable spoof type, use a different browser, change the format code and redownload.'
+                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = `
+                                    <div>
+                                        <p class="mb-0">A playback error has occurred, try:</p>
+                                        <ul class="d-inline-block text-start">
+                                            <li>Clicking the spoof type checkbox ${window.innerWidth < 1200 ? 'below the description' : 'in the sidebar'}</li>
+                                            <li>Using a different browser</li>
+                                            <li>Using the open in VLC button</li>
+                                            <li>Change the format code and redownload the video</li>
+                                        </ul>
+                                    </div>`
                                 });
 
                                 this.player.on('userinactive', function () {
@@ -909,25 +943,7 @@ export default class VideoPage extends Component {
                                                     checked={this.state.spoofContentType}
                                                     type="switch"
                                                     name="spoofContentType"
-                                                    label={
-                                                        <OverlayTrigger
-                                                            placement="bottom"
-                                                            overlay={
-                                                                <Tooltip>
-                                                                    Spoof the content type of .MKV files to attempt to play them. If this does not work try a different browser
-                                                                </Tooltip>
-                                                            }
-                                                        >
-                                                            <Form.Label className='mb-0'>
-                                                                Spoof type
-                                                                <FontAwesomeIcon
-                                                                    className="ms-1 text-muted"
-                                                                    icon="info-circle"
-                                                                />
-                                                            </Form.Label>
-                                                        </OverlayTrigger>
-
-                                                    }
+                                                    label="Spoof type"
                                                     id="spoofContentType"
                                                     onChange={this.handleInputChange}
                                                 />
