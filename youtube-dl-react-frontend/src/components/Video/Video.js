@@ -554,7 +554,7 @@ export default class VideoPage extends Component {
             >
                 {!this.state.loading && <>
                     <div className={`video-grid${this.state.theaterMode ? ' theater-mode' : ''}`}>
-                        <div className={`video-section keep-controls-open-${keepPlayerControlsVisible}`}>
+                        <div className={`video-section keep-controls-open-${keepPlayerControlsVisible}${this.context.getSetting('useGradientEffect') ? '' : ' no-gradient'}`}>
                             <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"

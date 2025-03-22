@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
     useLargeLayout: { type: Boolean, default: true },
     fitThumbnails: { type: Boolean, default: true },
     useCircularAvatars: { type: Boolean, default: true },
+    useGradientEffect: { type: Boolean, default: true },
     reportBytesUsingIec: { type: Boolean, default: true },
     recordWatchHistory: { type: Boolean, default: true },
     showWatchedHistory: { type: Boolean, default: true },

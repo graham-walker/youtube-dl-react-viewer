@@ -193,7 +193,7 @@ const VideoPreview = props => {
             </div>
             {!!props.stopTime &&
                 <div className="video-watchtime">
-                    <div className="video-watchtimebar" style={{ width: ((props.stopTime / video.duration) * 100) + '%' }}></div>
+                    <div className={`video-watchtimebar${userContext.getSetting('useGradientEffect') ? '' : ' no-gradient'}`} style={{ width: ((props.stopTime / video.duration) * 100) + '%' }}></div>
                 </div>
             }
         </>;

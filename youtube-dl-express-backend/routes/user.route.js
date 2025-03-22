@@ -14,7 +14,7 @@ import { getTargetSquareSize } from '../utilities/file.utility.js';
 const router = express.Router();
 const avatarUpload = multer({ storage: multer.memoryStorage() });
 
-export const settingsFields = 'avatar desktopPlayerSettings tabletPlayerSettings mobilePlayerSettings hideShorts useLargeLayout fitThumbnails useCircularAvatars reportBytesUsingIec recordWatchHistory showWatchedHistory resumeVideos enableSponsorblock onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic enableReturnYouTubeDislike';
+export const settingsFields = 'avatar desktopPlayerSettings tabletPlayerSettings mobilePlayerSettings hideShorts useLargeLayout fitThumbnails useCircularAvatars useGradientEffect reportBytesUsingIec recordWatchHistory showWatchedHistory resumeVideos enableSponsorblock onlySkipLocked skipSponsor skipSelfpromo skipInteraction skipIntro skipOutro skipPreview skipFiller skipMusicOfftopic enableReturnYouTubeDislike';
 
 router.get('/settings', async (req, res) => {
     let user;
@@ -46,6 +46,7 @@ router.post('/settings', async (req, res) => {
     user.useLargeLayout = req.body.useLargeLayout;
     user.fitThumbnails = req.body.fitThumbnails;
     user.useCircularAvatars = req.body.useCircularAvatars;
+    user.useGradientEffect = req.body.useGradientEffect;
     user.reportBytesUsingIec = req.body.reportBytesUsingIec;
     user.recordWatchHistory = req.body.recordWatchHistory;
     user.showWatchedHistory = req.body.showWatchedHistory;

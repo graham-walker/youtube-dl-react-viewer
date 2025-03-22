@@ -31,6 +31,7 @@ const defaultUserSettings = {
     useLargeLayout: true,
     fitThumbnails: true,
     useCircularAvatars: true,
+    useGradientEffect: true,
     reportBytesUsingIec: true,
     recordWatchHistory: true,
     showWatchedHistory: true,

@@ -256,6 +256,16 @@ class SettingsForm extends Component {
                             onChange={this.handleInputChange}
                         />
                     </Form.Group>
+                    <Form.Group className="mb-3" controlId="useGradientEffect">
+                        <Form.Check
+                            checked={this.state.useGradientEffect}
+                            type="checkbox"
+                            name="useGradientEffect"
+                            label="Use gradient effect"
+                            id="useGradientEffect"
+                            onChange={this.handleInputChange}
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="reportBytesUsingIec">
                         <Form.Check
                             checked={this.state.reportBytesUsingIec}

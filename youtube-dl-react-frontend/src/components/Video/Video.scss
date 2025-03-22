@@ -435,6 +435,11 @@ $progress-bar-height: 0.4em;
     }
 }
 
+// Disable gradient effect 
+.no-gradient .vjs-play-progress {
+    background: $logo-red !important;
+}
+
 @media only screen and (max-width: 1199px) {
     // Add padding to the controls in fullscreen mode (because of mobile devices that may have rounded corners)
     .video-js.vjs-fullscreen {
