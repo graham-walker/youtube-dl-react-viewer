@@ -309,7 +309,8 @@ export default class VideoPage extends Component {
                                 this.player.on('loadedmetadata', () => {
                                     // Resume playback
                                     if (this.preservedTimeRef.current) {
-                                        this.player.currentTime(this.preservedTimeRef.current);
+                                        // Step back an extra second because the estimated duration when transcoding audio doesn't exactly match the real duration
+                                        this.player.currentTime(Math.max(this.preservedTimeRef.current - 1, 0));
                                         this.preservedTimeRef.current = null;
                                     } else if (this.state.resumeTime) {
                                         let resumeTime = Math.min(Math.max(this.player.duration() - 10, 0), this.state.resumeTime);
