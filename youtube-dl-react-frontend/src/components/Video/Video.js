@@ -402,6 +402,10 @@ export default class VideoPage extends Component {
                                     this.setState({ playerTime: this.player.currentTime() })
                                 });
 
+                                this.player.on('pause', () => {
+                                    this.saveActivity();
+                                });
+
                                 this.player.on('ended', () => {
                                     this.onVideoEnd();
                                 });
