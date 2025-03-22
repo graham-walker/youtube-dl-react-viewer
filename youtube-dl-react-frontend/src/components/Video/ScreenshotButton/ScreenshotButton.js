@@ -9,12 +9,12 @@ class ScreenshotButton extends VjsButton {
     constructor(player, options) {
         super(player, options);
 
-        this.controlText('Screenshot');
-        
         this.el().classList.add('custom-player-screenshot-button');
         this.el().innerHTML = icon(faCamera, { classes: ['custom-player-button-icon'] }).html[0];
 
         const tooltipInstance = new Tooltip(this.el(), { trigger: 'manual', title: 'Copied to clipboard!' });
+
+        this.controlText('Screenshot'); // `this.controlText` must be called after `new Tooltip` otherwise bootstrap overrides the button title
 
         this.on('click', () => {
             captureScreenshot(player, options.behavior, tooltipInstance);
