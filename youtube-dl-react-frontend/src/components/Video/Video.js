@@ -547,6 +547,9 @@ export default class VideoPage extends Component {
             if (keepPlayerControlsVisible === 'fullscreen') keepPlayerControlsVisible = 'always';
         }
 
+        // video.isAudioOnly only tells us if the audio only checkbox was enabled for the job which is why we also check for a vcodec
+        const isAudioOnly = this.state.video?.isAudioOnly || this.state.video?.vcodec === 'none' || this.state.audioOnlyMode;
+
         return (
             <PageLoadWrapper
                 loading={this.state.loading}
@@ -554,7 +557,7 @@ export default class VideoPage extends Component {
             >
                 {!this.state.loading && <>
                     <div className={`video-grid${this.state.theaterMode ? ' theater-mode' : ''}`}>
-                        <div className={`video-section keep-controls-open-${keepPlayerControlsVisible}${this.context.getSetting('useGradientEffect') ? '' : ' no-gradient'}`}>
+                        <div className={`video-section keep-controls-open-${keepPlayerControlsVisible}${this.context.getSetting('useGradientEffect') ? '' : ' no-gradient'}${isAudioOnly ? ' is-audio-only' : ''}`}>
                             <div data-vjs-player ref={this.playerRef}>
                                 <div
                                     className="player-button play-pause"
