@@ -343,6 +343,7 @@ $progress-bar-height: 0.4em;
                 // Fix tooltip animations since they were originally controlled by the parent font size
                 .vjs-mouse-display {
                     display: initial;
+                    background: transparent;
                 }
 
                 .vjs-time-tooltip {
@@ -355,6 +356,10 @@ $progress-bar-height: 0.4em;
                 &:hover .vjs-time-tooltip {
                     transform: scale(1);
                 }
+            }
+
+            &:hover .vjs-mouse-display {
+                background: $player-background-color;
             }
         }
 
