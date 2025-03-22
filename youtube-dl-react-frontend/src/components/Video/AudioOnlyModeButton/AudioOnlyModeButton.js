@@ -1,6 +1,6 @@
 import videojs from 'video.js';
 import { icon } from '@fortawesome/fontawesome-svg-core';
-import { faCompactDisc } from '@fortawesome/free-solid-svg-icons';
+import { faHeadphones } from '@fortawesome/free-solid-svg-icons';
 
 const VjsButton = videojs.getComponent('Button');
 
@@ -11,7 +11,7 @@ class AudioOnlyModeButton extends VjsButton {
         this.controlText('Audio Only Mode');
 
         this.el().classList.add('custom-player-audio-only-mode-button');
-        this.el().innerHTML = icon(faCompactDisc, { classes: ['custom-player-button-icon'] }).html[0];
+        this.el().innerHTML = icon(faHeadphones, { classes: ['custom-player-button-icon'] }).html[0];
     }
 
     handleClick() {
