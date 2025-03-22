@@ -125,8 +125,8 @@ const Comment = props => {
             <div className="media-body ms-3">
                 <p className="mb-0"><span className="fw-bold text-break">{comment.author_is_uploader ? <Badge bg="secondary" pill style={{ fontSize: '100%' }}>{comment.author}</Badge> : comment.author}</span><small className="ms-2" title={'Comment posted ' + new Date(comment.timestamp * 1000).toLocaleString()}>{dateToTimeSinceString(new Date(comment.timestamp * 1000))}</small></p>
                 <Description text={comment.html ? comment.html : comment.text} player={props.player} type="comment" />
-                {!!comment.like_count && <><FontAwesomeIcon icon="thumbs-up" className="text-muted" /> <span title={comment.like_count.toLocaleString() + ' Likes'}>{abbreviateNumber(comment.like_count)}</span></>}{comment.is_favorited && <FontAwesomeIcon title={props.uploader ? '♥ by ' + props.uploader : ''} icon="heart" className="text-danger ms-3" />}
-                {comment.replies.length > 0 && <><br /><span className="fake-link" onClick={() => setShowReplies(!showReplies)}>{showReplies ? 'Hide' : 'Show'} {comment.replies.length.toLocaleString()} Replies</span></>}
+                {!!comment.like_count && <><FontAwesomeIcon icon="thumbs-up" className="text-muted" /> <span title={comment.like_count.toLocaleString() + ` Like${comment.like_count === 1 ? '' : 's'}`}>{abbreviateNumber(comment.like_count)}</span></>}{comment.is_favorited && <FontAwesomeIcon title={props.uploader ? '♥ by ' + props.uploader : ''} icon="heart" className="text-danger ms-3" />}
+                {comment.replies.length > 0 && <><br /><span className="fake-link" onClick={() => setShowReplies(!showReplies)}>{showReplies ? 'Hide' : 'Show'} {comment.replies.length.toLocaleString()} {comment.replies.length === 1 ? 'Reply' : 'Replies'}</span></>}
                 <div className="mt-3">{!!showReplies && <div className="comment-replies">{props.children}</div>}</div>
             </div>
         </div>
