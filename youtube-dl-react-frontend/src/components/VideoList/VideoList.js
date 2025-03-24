@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Spinner, Form, Button, InputGroup } from 'react-bootstrap';
+import { Row, Col, Spinner, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import VideoPreview from '../VideoPreview/VideoPreview';
@@ -146,9 +146,9 @@ export default class VideoList extends Component {
                         </>
                     }
                     <Row className="mb-4 justify-content-between">
-                        <Col xs="12" sm="auto">
-                            <InputGroup className="mb-3">
-                                <InputGroup.Text><FontAwesomeIcon className='me-1' icon="sort" />Sort by</InputGroup.Text>
+                        <Col xs="12" sm="auto" className='mb-3 mb-sm-0'>
+                            <Form.Group className="d-flex align-items-center" controlId="videoListSort">
+                                <Form.Label className="flex-shrink-0 mb-0 me-2">Sort by: </Form.Label>
                                 <Form.Select
                                     name="sort"
                                     onChange={this.handleInputChange}
@@ -172,7 +172,7 @@ export default class VideoList extends Component {
                                     <option value="newest_download">Date Downloaded (Newest)</option>
                                     <option value="oldest_download">Date Downloaded (Oldest)</option>
                                 </Form.Select>
-                            </InputGroup>
+                            </Form.Group>
                         </Col>
                         <Col className='ms-auto' xs="auto">
                             {!!this.state.randomVideo

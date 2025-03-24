@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Form, Badge, Row, Col, Spinner, InputGroup } from 'react-bootstrap';
+import { Form, Badge, Row, Col, Spinner } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import axios from '../../utilities/axios.utility';
 import { Link } from 'react-router-dom';
 import { createSearchLink } from '../../utilities/search.utility';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -128,9 +127,9 @@ export default class TagsList extends Component {
                             {this.state[this.state.show].length.toLocaleString()} {this.state.show.charAt(0).toUpperCase() + this.state.show.slice(1)}
                         </h1>
                         <Row className="mb-4">
-                            <Col xs="12" sm="auto">
-                                <InputGroup className="mb-3">
-                                    <InputGroup.Text><FontAwesomeIcon className='me-1' icon="sort" />Sort by</InputGroup.Text>
+                            <Col xs="12" sm="auto" className='mb-3 mb-sm-0'>
+                                <Form.Group className="d-flex align-items-center" controlId="tagsListSort">
+                                    <Form.Label className="flex-shrink-0 mb-0 me-2">Sort by: </Form.Label>
                                     <Form.Select
                                         name="sort"
                                         onChange={this.handleInputChange}
@@ -139,11 +138,11 @@ export default class TagsList extends Component {
                                         <option value="count">Count</option>
                                         <option value="alphabetical">Alphabetical</option>
                                     </Form.Select>
-                                </InputGroup>
+                                </Form.Group>
                             </Col>
                             <Col xs="12" sm="auto">
-                                <InputGroup className="mb-3">
-                                    <InputGroup.Text><FontAwesomeIcon className='me-1' icon="eye" />Show</InputGroup.Text>
+                                <Form.Group className="d-flex align-items-center" controlId="tagsListShow">
+                                    <Form.Label className="flex-shrink-0 mb-0 me-2">Show: </Form.Label>
                                     <Form.Select
                                         name="show"
                                         onChange={this.handleInputChange}
@@ -153,7 +152,7 @@ export default class TagsList extends Component {
                                         <option value="categories">Categories</option>
                                         <option value="hashtags">Hashtags</option>
                                     </Form.Select>
-                                </InputGroup>
+                                </Form.Group>
                             </Col>
                         </Row>
                         <InfiniteScroll
