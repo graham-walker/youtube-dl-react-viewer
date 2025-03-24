@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Badge, Accordion, Row, Col, Card, Spinner } from 'react-bootstrap';
+import { Form, Badge, Row, Col, Spinner, InputGroup } from 'react-bootstrap';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import axios from '../../utilities/axios.utility';
 import { Link } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import AccordionButton from '../AccordionButton/AccordionButton';
 import parsedEnv from '../../parse-env';
 
 export default class TagsList extends Component {
@@ -128,60 +127,35 @@ export default class TagsList extends Component {
                         <h1 className="mb-4">
                             {this.state[this.state.show].length.toLocaleString()} {this.state.show.charAt(0).toUpperCase() + this.state.show.slice(1)}
                         </h1>
-                        <Accordion className="mb-4">
-                            <Row>
-                                <Col className="mb-2 mb-sm-0">
-                                    <AccordionButton eventKey="0">
-                                        <><FontAwesomeIcon icon="filter" /> Filter</>
-                                    </AccordionButton>
-                                </Col>
-                            </Row>
-                            <Accordion.Collapse eventKey="0">
-                                <>
-                                    <Card className="mt-4">
-                                        <Card.Body>
-                                            <Form
-                                                className="me-2"
-                                                onSubmit={this.onSubmit}
-                                            ><Row>
-                                                    <Col>
-                                                        <Form.Group>
-                                                            <Form.Label>Show</Form.Label>
-                                                            <Form.Control
-                                                                as="select"
-                                                                name="show"
-                                                                onChange={this.handleInputChange}
-                                                                value={this.state.show}
-                                                                inline="true"
-                                                            >
-                                                                <option value="tags">Tags</option>
-                                                                <option value="categories">Categories</option>
-                                                                <option value="hashtags">Hashtags</option>
-                                                            </Form.Control>
-                                                        </Form.Group>
-                                                    </Col>
-                                                    <Col>
-                                                        <Form.Group>
-                                                            <Form.Label>Sort By</Form.Label>
-                                                            <Form.Control
-                                                                as="select"
-                                                                name="sort"
-                                                                onChange={this.handleInputChange}
-                                                                value={this.state['sort']}
-                                                                inline="true"
-                                                            >
-                                                                <option value="count">Count</option>
-                                                                <option value="alphabetical">Alphabetical</option>
-                                                            </Form.Control>
-                                                        </Form.Group>
-                                                    </Col>
-                                                </Row>
-                                            </Form>
-                                        </Card.Body>
-                                    </Card>
-                                </>
-                            </Accordion.Collapse>
-                        </Accordion>
+                        <Row className="mb-4">
+                            <Col xs="12" sm="auto">
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Text><FontAwesomeIcon className='me-1' icon="sort" />Sort by</InputGroup.Text>
+                                    <Form.Select
+                                        name="sort"
+                                        onChange={this.handleInputChange}
+                                        value={this.state['sort']}
+                                    >
+                                        <option value="count">Count</option>
+                                        <option value="alphabetical">Alphabetical</option>
+                                    </Form.Select>
+                                </InputGroup>
+                            </Col>
+                            <Col xs="12" sm="auto">
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Text><FontAwesomeIcon className='me-1' icon="eye" />Show</InputGroup.Text>
+                                    <Form.Select
+                                        name="show"
+                                        onChange={this.handleInputChange}
+                                        value={this.state.show}
+                                    >
+                                        <option value="tags">Tags</option>
+                                        <option value="categories">Categories</option>
+                                        <option value="hashtags">Hashtags</option>
+                                    </Form.Select>
+                                </InputGroup>
+                            </Col>
+                        </Row>
                         <InfiniteScroll
                             dataLength={this.state.display.length}
                             next={this.getTags}
