@@ -85,7 +85,7 @@ export default class VideoList extends Component {
                         loading: false,
                         videos: this.state.videos.concat(res.data.videos),
                         totals: res.data.totals ? res.data.totals : this.state.totals,
-                        randomVideo: res.data?.randomVideo ?? this.state.randomVideo,
+                        randomVideo: res.data?.randomVideo ?? undefined,
                         hasMore: (this.state.videos.length + res.data.videos.length) < (res.data.totals?.count ?? this.state.totals.count)
                     });
                 }
@@ -174,16 +174,16 @@ export default class VideoList extends Component {
                                 </Form.Select>
                             </InputGroup>
                         </Col>
-
-                        {this.state.randomVideo && (
-                            <Col className='ms-auto' xs="auto">
-                                <Link to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`}>
-                                    <Button>
-                                        <FontAwesomeIcon icon="random" /> Random
-                                    </Button>
-                                </Link>
-                            </Col>
-                        )}
+                        <Col className='ms-auto' xs="auto">
+                            {!!this.state.randomVideo
+                                ? <Button as={Link} to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`} >
+                                    <FontAwesomeIcon icon="random" /> Random
+                                </Button>
+                                : <Button disabled={true}>
+                                    <FontAwesomeIcon icon="random" /> Random
+                                </Button>
+                            }
+                        </Col>
                     </Row>
                     <InfiniteScroll
                         dataLength={videos.length}
