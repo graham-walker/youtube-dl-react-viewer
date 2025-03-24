@@ -29,7 +29,11 @@ export const search = async (query, page, user, filter = {}, relevanceMeans = 'u
     if (sortField.name !== 'videoFile.filesize') fields[sortField.name] = 1;
 
     let pipeline = [
-        { $match: filter },
+        {
+            $match: query.search
+                ? Object.assign({ $text: { $search: query.search } }, filter)
+                : filter,
+        },
         {
             $project: fields,
         },
@@ -45,9 +49,6 @@ export const search = async (query, page, user, filter = {}, relevanceMeans = 'u
         { $skip: page * parsedEnv.PAGE_SIZE },
         { $limit: parsedEnv.PAGE_SIZE },
     ];
-
-    // Add the search query to the pipeline
-    if (query.search) pipeline.unshift({ $match: Object.assign({ $text: { $search: query.search } }, filter) });
 
     let videos = await Video.aggregate(pipeline);
 
@@ -140,15 +141,20 @@ export const getTotals = async (query, filter = {}) => {
     return totals;
 }
 
-export const getRandomVideo = async (query, count, filter = {}) => {
-    return (await Video.findOne(
-        query.search ? { $text: { $search: query.search } } : filter,
-        query.search ? { score: { $meta: 'textScore' } } : {},
-    )
-        .select('extractor id')
-        .skip(Math.random() * count)
-    )?.toJSON();
-}
+export const getRandomVideo = async (query, filter = {}) => {
+    const pipeline = [
+        {
+            $match: query.search
+                ? Object.assign({ $text: { $search: query.search } }, filter)
+                : filter,
+        },
+        { $project: { extractor: 1, id: 1 } },
+        { $sample: { size: 1 } }, // Select one randomly
+    ];
+
+    const result = await Video.aggregate(pipeline);
+    return result[0] || null;
+};
 
 const weightedFields = {
     extractor: { weight: 3, type: 'exact' },
@@ -352,4 +358,16 @@ export const stripIds = (videos) => {
     });
 
     return videos;
+}
+
+export const escapeRegex = (value) => {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export const isQuoted = (value) => {
+    return /^["'].*["']$/.test(value);
+}
+
+export const stripQuotes = (value) => {
+    return value.replace(/^["']|["']$/g, '');
 }

@@ -5,8 +5,12 @@ import axios from 'axios';
 import fs from 'fs-extra';
 import crypto from 'crypto';
 
+import mongoose from 'mongoose';
 import Video from '../models/video.model.js';
 import Activity from '../models/activity.model.js';
+import Job from '../models/job.model.js';
+import Uploader from '../models/uploader.model.js';
+import Playlist from '../models/playlist.model.js';
 
 import {
     search,
@@ -17,6 +21,9 @@ import {
     limitVideoList,
     attachWatchHistory,
     stripIds,
+    isQuoted,
+    stripQuotes,
+    escapeRegex,
 } from '../utilities/video.utility.js';
 import { parsedEnv } from '../parse-env.js';
 import { logError } from '../utilities/logger.utility.js';
@@ -28,6 +35,31 @@ router.get('/search/:page', async function (req, res) {
 
     const filter = req.user?.hideShorts ? { isShort: false } : {}
 
+    // Advanced search filtering
+    if (mongoose.Types.ObjectId.isValid(req.query.job)) filter.jobDocument = new mongoose.Types.ObjectId(req.query.job);
+    if (req.query.extractor && typeof req.query.extractor === 'string') filter.extractor = req.query.extractor;
+    
+    if (req.query.uploadStart || req.query.uploadEnd) filter.uploadDate = {};
+    if (req.query.uploadStart && typeof req.query.uploadStart === 'string' && !isNaN(new Date(req.query.uploadStart).getTime())) filter.uploadDate.$gte = new Date(req.query.uploadStart);
+    if (req.query.uploadEnd && typeof req.query.uploadEnd === 'string' && !isNaN(new Date(req.query.uploadEnd).getTime())) filter.uploadDate.$lte = new Date(req.query.uploadEnd);
+    
+    let uploader = req.query.uploader;
+    if (uploader && typeof uploader === 'string') {
+        const uploaderIds = await Uploader.find({
+            name: isQuoted(uploader) ? stripQuotes(uploader) : { $regex: escapeRegex(uploader), $options: 'i' }
+        }, '_id');
+        filter.uploaderDocument = { $in: uploaderIds.map(doc => doc._id) }
+    }
+
+    let playlist = req.query.playlist;
+    if (playlist && typeof playlist === 'string') {
+        const playlistIds = await Playlist.find({
+            name: isQuoted(playlist) ? stripQuotes(playlist) : { $regex: escapeRegex(playlist), $options: 'i' }
+        }, '_id');
+        filter.playlistDocument = { $in: playlistIds.map(doc => doc._id) }
+    }
+
+    // Process search
     let videos;
     try {
         videos = await search(req.query, page, req.user, filter);
@@ -47,7 +79,7 @@ router.get('/search/:page', async function (req, res) {
             return res.sendStatus(500);
         }
         try {
-            randomVideo = await getRandomVideo(req.query, totals.count, filter);
+            randomVideo = await getRandomVideo(req.query, filter);
         } catch (err) {
             if (parsedEnv.VERBOSE) logError(err);
             return res.sendStatus(500);
@@ -133,7 +165,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
     let similarVideos;
     try {
-        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled')  {
+        if (parsedEnv.DISPLAY_SIMILAR_VIDEOS !== 'disabled') {
             similarVideos = await getSimilarVideos(video, filter);
             similarVideos = await attachWatchHistory(similarVideos, req.user);
         }
@@ -377,6 +409,17 @@ router.get('/:extractor/:id/livechat', async (req, res) => {
         }
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
+        return res.sendStatus(500);
+    }
+});
+
+router.get('/advanced_search_options', async (req, res) => {
+    try {
+        let jobs = await Job.find({}, '_id name').sort({ name: 1 }).lean().exec();
+        let extractors = await Video.distinct('extractor');
+
+        return res.status(200).json({ jobs, extractors });
+    } catch (err) {
         return res.sendStatus(500);
     }
 });

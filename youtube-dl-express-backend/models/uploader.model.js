@@ -13,5 +13,6 @@ const uploaderSchema = new mongoose.Schema({
 });
 
 uploaderSchema.index({ extractor: 1, id: 1 }, { unique: true });
+uploaderSchema.index({ name: 1 });
 
 export default mongoose.model('Uploader', uploaderSchema);

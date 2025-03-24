@@ -50,7 +50,7 @@ router.get('/:_id/:page', async (req, res) => {
 
     let randomVideo;
     try {
-        randomVideo = await getRandomVideo({}, totals.count, filter);
+        randomVideo = await getRandomVideo({}, filter);
     } catch (err) {
         return res.sendStatus(500);
     }

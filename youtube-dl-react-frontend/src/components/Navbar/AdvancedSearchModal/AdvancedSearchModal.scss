@@ -1,0 +1,29 @@
+#advanced-search-form {
+    gap: 1rem 0.5rem;
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0 !important;
+
+        &.half {
+            width: calc(50% - 0.25rem);
+        }
+
+        .input-group-text svg {
+            margin-right: 0.25rem;
+        }
+
+        label {
+            margin-bottom: 0;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+    }
+}
+
+@media screen and (max-width: 991px) {
+    #advanced-search-form .input-group.half {
+        width: 100%;
+    }
+}

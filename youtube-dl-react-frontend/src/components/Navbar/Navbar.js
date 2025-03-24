@@ -10,13 +10,14 @@ import queryString from 'query-string';
 import { defaultImage } from '../../utilities/image.utility';
 import ThemeController from '../ThemeController/ThemeController';
 import parsedEnv from '../../parse-env';
+import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
 
 class AppNavbar extends Component {
     static contextType = UserContext;
 
     constructor(props) {
         super(props);
-        this.state = { search: '', theme: 'auto' };
+        this.state = { search: '', theme: 'auto', showAdvancedSearch: false };
     }
 
     handleInputChange = (e) => {
@@ -127,6 +128,14 @@ class AppNavbar extends Component {
                                         <FontAwesomeIcon icon="search" />
                                     </Button>
                                 </Form>
+                                <Button
+                                    variant="secondary"
+                                    className="w-100 w-md-auto ms-2 mb-2 mb-xl-0"
+                                    onClick={() => this.setState({ showAdvancedSearch: true })}
+                                >
+                                    <FontAwesomeIcon icon="filter" />
+                                </Button>
+                                <AdvancedSearchModal show={this.state.showAdvancedSearch} onHide={() => this.setState({ showAdvancedSearch: false })} />
                             </Nav>
                             <Nav className="ms-auto w-100 justify-content-end">
                                 {this.context.user ?

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Spinner, Form, Button, Accordion, Card } from 'react-bootstrap';
+import { Row, Col, Spinner, Form, Button, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import VideoPreview from '../VideoPreview/VideoPreview';
@@ -10,7 +10,6 @@ import { bytesToSizeString, secondsToDetailedString } from '../../utilities/form
 import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import axios from '../../utilities/axios.utility';
-import AccordionButton from '../AccordionButton/AccordionButton';
 import parsedEnv from '../../parse-env';
 
 export default class VideoList extends Component {
@@ -31,10 +30,21 @@ export default class VideoList extends Component {
     }
 
     componentDidMount() {
-        let parsed = queryString.parse(this.props.location.search);
+        const parsed = queryString.parse(this.props.location.search);
         this.setState({ sort: parsed['sort'] }, () => {
             this.getVideos();
         });
+
+        this.unlisten = history.listen((location) => {
+            const parsed = queryString.parse(location.search);
+            this.setState({ sort: parsed['sort'] || 'relevance' });
+        });
+    }
+
+    componentWillUnmount() {
+        if (this.unlisten) {
+            this.unlisten();
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -54,7 +64,7 @@ export default class VideoList extends Component {
         }
     }
 
-    onChangeSubmit = (e) => {
+    handleInputChange = (e) => {
         e.preventDefault();
         this.setState({ [e.target.name]: e.target.value }, () => {
             const parsed = queryString.parse(this.props.location.search);
@@ -135,65 +145,46 @@ export default class VideoList extends Component {
                             <h5 className="mb-4">{this.state.totals.shorts.toLocaleString()} short{this.state.totals.shorts !== 1 && 's'} hidden</h5>
                         </>
                     }
-                    <Accordion className="mb-4">
-                        <Row>
-                            <Col className="mb-2 mb-sm-0">
-                                <AccordionButton eventKey="0">
-                                    <><FontAwesomeIcon icon="filter" /> Filter</>
-                                </AccordionButton>
+                    <Row className="mb-4 justify-content-between">
+                        <Col xs="12" sm="auto">
+                            <InputGroup className="mb-3">
+                                <InputGroup.Text><FontAwesomeIcon className='me-1' icon="sort" />Sort by</InputGroup.Text>
+                                <Form.Select
+                                    name="sort"
+                                    onChange={this.handleInputChange}
+                                    value={this.state['sort']}
+                                >
+                                    <option value="relevance">Relevance</option>
+                                    <option value="newest_date">Date Uploaded (Newest)</option>
+                                    <option value="oldest_date">Date Uploaded (Oldest)</option>
+                                    <option value="longest_duration">Duration (Longest)</option>
+                                    <option value="shortest_duration">Duration (Shortest)</option>
+                                    <option value="largest_size">Filesize (Largest)</option>
+                                    <option value="smallest_size">Filesize (Smallest)</option>
+                                    <option value="most_views">Views (Most)</option>
+                                    <option value="least_views">Views (Least)</option>
+                                    <option value="most_likes">Likes (Most)</option>
+                                    <option value="least_likes">Likes (Least)</option>
+                                    <option value="most_dislikes">Dislikes (Most)</option>
+                                    <option value="least_dislikes">Dislikes (Least)</option>
+                                    <option value="ratio_likes">Likes to Dislikes (Ratio)</option>
+                                    <option value="ratio_dislikes">Dislikes to Likes (Ratio)</option>
+                                    <option value="newest_download">Date Downloaded (Newest)</option>
+                                    <option value="oldest_download">Date Downloaded (Oldest)</option>
+                                </Form.Select>
+                            </InputGroup>
+                        </Col>
+
+                        {this.state.randomVideo && (
+                            <Col className='ms-auto' xs="auto">
+                                <Link to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`}>
+                                    <Button>
+                                        <FontAwesomeIcon icon="random" /> Random
+                                    </Button>
+                                </Link>
                             </Col>
-                            {this.state.randomVideo &&
-                                <Col className="col-12 col-sm-auto">
-                                    <Link to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`}>
-                                        <Button>
-                                            <FontAwesomeIcon icon="random" /> Random
-                                        </Button>
-                                    </Link>
-                                </Col>
-                            }
-                        </Row>
-                        <Accordion.Collapse eventKey="0">
-                            <>
-                                <Card className="mt-4">
-                                    <Card.Body>
-                                        <Form
-                                            className="me-2"
-                                            onSubmit={this.onSubmit}
-                                        >
-                                            <Form.Group>
-                                                <Form.Label>Sort By</Form.Label>
-                                                <Form.Control
-                                                    as="select"
-                                                    id="a"
-                                                    name="sort"
-                                                    onChange={this.onChangeSubmit}
-                                                    value={this.state['sort']}
-                                                >
-                                                    <option value="relevance">Relevance</option>
-                                                    <option value="newest_date">Date Uploaded (Newest)</option>
-                                                    <option value="oldest_date">Date Uploaded (Oldest)</option>
-                                                    <option value="longest_duration">Duration (Longest)</option>
-                                                    <option value="shortest_duration">Duration (Shortest)</option>
-                                                    <option value="largest_size">Filesize (Largest)</option>
-                                                    <option value="smallest_size">Filesize (Smallest)</option>
-                                                    <option value="most_views">Views (Most)</option>
-                                                    <option value="least_views">Views (Least)</option>
-                                                    <option value="most_likes">Likes (Most)</option>
-                                                    <option value="least_likes">Likes (Least)</option>
-                                                    <option value="most_dislikes">Dislikes (Most)</option>
-                                                    <option value="least_dislikes">Dislikes (Least)</option>
-                                                    <option value="ratio_likes">Likes to Dislikes (Ratio)</option>
-                                                    <option value="ratio_dislikes">Dislikes to Likes (Ratio)</option>
-                                                    <option value="newest_download">Date Downloaded (Newest)</option>
-                                                    <option value="oldest_download">Date Downloaded (Oldest)</option>
-                                                </Form.Control>
-                                            </Form.Group>
-                                        </Form>
-                                    </Card.Body>
-                                </Card>
-                            </>
-                        </Accordion.Collapse>
-                    </Accordion>
+                        )}
+                    </Row>
                     <InfiniteScroll
                         dataLength={videos.length}
                         next={this.getVideos}

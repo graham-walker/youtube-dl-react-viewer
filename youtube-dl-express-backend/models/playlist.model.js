@@ -14,5 +14,6 @@ const playlistSchema = new mongoose.Schema({
 });
 
 playlistSchema.index({ extractor: 1, id: 1 }, { unique: true });
+playlistSchema.index({ name: 1 });
 
 export default mongoose.model('Playlist', playlistSchema);
