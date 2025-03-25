@@ -19,7 +19,7 @@ const playerSettingsSchema = new mongoose.Schema({
         enum: ['on_video', 'under_video'],
         default: 'on_video',
     },
-    playerControlsScale: { type: Number, default: 1 },
+    playerControlsScale: { type: Number, default: 1.25 },
     defaultVolume: { type: Number, default: 1 },
     volumeControlPosition: {
         type: String,

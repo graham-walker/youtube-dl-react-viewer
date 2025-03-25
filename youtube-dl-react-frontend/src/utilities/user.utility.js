@@ -6,7 +6,7 @@ const defaultPlayerSettings = {
     enableDefaultAudioOnlyMode: false,
     keepPlayerControlsVisible: 'never',
     playerControlsPosition: 'on_video',
-    playerControlsScale: 1,
+    playerControlsScale: 1.25,
     defaultVolume: 1,
     volumeControlPosition: 'vertical',
     largePlayButtonEnabled: true,
