@@ -976,45 +976,36 @@ export default class VideoPage extends Component {
                                                     className="flex-column"
                                                 >
                                                     {!!video.uploaderDocument &&
-                                                        <Nav.Item
-                                                            className="w-100"
-                                                            style={{ whiteSpace: 'nowrap' }}
-                                                        >
+                                                        <Nav.Item>
                                                             <Nav.Link
                                                                 eventKey="uploader"
-                                                                onClick={(e) => { this.setState({ activeTab: 'uploader' }) }}
-                                                                style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                                                onClick={() => { this.setState({ activeTab: 'uploader' }) }}
                                                                 title={'Videos by ' + video.uploaderDocument.name}
+                                                                className='video-list-tab'
                                                             >
                                                                 <FontAwesomeIcon icon="user" /> Videos by {video.uploaderDocument.name}
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     }
                                                     {!!video.playlistDocument &&
-                                                        <Nav.Item
-                                                            className="w-100"
-                                                            style={{ whiteSpace: 'nowrap' }}
-                                                        >
+                                                        <Nav.Item>
                                                             <Nav.Link
                                                                 eventKey="playlist"
-                                                                onClick={(e) => { this.setState({ activeTab: 'playlist' }) }}
-                                                                style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                                                onClick={() => { this.setState({ activeTab: 'playlist' }) }}
                                                                 title={video.playlistDocument.name}
+                                                                className='video-list-tab'
                                                             >
                                                                 <FontAwesomeIcon icon="list" /> {video.playlistDocument.name}
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     }
                                                     {!!video.jobDocument &&
-                                                        <Nav.Item
-                                                            className="w-100"
-                                                            style={{ whiteSpace: 'nowrap' }}
-                                                        >
+                                                        <Nav.Item>
                                                             <Nav.Link
                                                                 eventKey="job"
-                                                                onClick={(e) => { this.setState({ activeTab: 'job' }) }}
-                                                                style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                                                onClick={() => { this.setState({ activeTab: 'job' }) }}
                                                                 title={'Downloaded by ' + video.jobDocument.name}
+                                                                className='video-list-tab'
                                                             >
                                                                 <FontAwesomeIcon icon="briefcase" /> Downloaded by {video.jobDocument.name}
                                                             </Nav.Link>

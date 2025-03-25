@@ -479,3 +479,13 @@ $progress-bar-height: 0.4em;
         display: none;
     }
 }
+
+// Ensure video list tabs do not cause overflow on small devices
+.video-list-tab {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    max-width: calc(100vw - 4rem);
+    display: block;
+}
