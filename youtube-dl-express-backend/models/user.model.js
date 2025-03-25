@@ -55,8 +55,14 @@ const userSchema = new mongoose.Schema({
         type: playerSettingsSchema,
         default: () => ({ enabled: true }), // Desktop player settings should always be enabled
     },
-    tabletPlayerSettings: playerSettingsSchema,
-    mobilePlayerSettings: playerSettingsSchema,
+    tabletPlayerSettings: {
+        type: playerSettingsSchema,
+        default: () => ({}),
+    },
+    mobilePlayerSettings: {
+        type: playerSettingsSchema,
+        default: () => ({}),
+    },
     hideShorts: { type: Boolean, default: false },
     useLargeLayout: { type: Boolean, default: true },
     fitThumbnails: { type: Boolean, default: true },
