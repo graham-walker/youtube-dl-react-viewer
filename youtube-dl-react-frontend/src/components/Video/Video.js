@@ -478,7 +478,7 @@ export default class VideoPage extends Component {
                     : baseSrc + encodeURIComponent(video.videoFile.name)
             ),
             type: this.state.spoofContentType || video.videoFile.name.endsWith('.mkv') || this.state.audioOnlyMode
-                ? 'video/webm'
+                ? (this.state.audioOnlyMode ? 'audio/mpeg' : 'video/webm')
                 : undefined
         });
 
