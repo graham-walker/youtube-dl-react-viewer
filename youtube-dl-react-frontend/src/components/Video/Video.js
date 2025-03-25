@@ -609,6 +609,7 @@ export default class VideoPage extends Component {
                                     ref={this.videoRef}
                                     loop={this.state.loop}
                                     autoPlay={this.context.getPlayerSetting('autoplayVideo')}
+                                    playsInline={true}
                                 >
                                 </video>
                             </div>
