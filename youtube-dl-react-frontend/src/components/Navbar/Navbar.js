@@ -8,7 +8,7 @@ import { UserContext } from '../../contexts/user.context';
 import history from '../../utilities/history.utility';
 import queryString from 'query-string';
 import { defaultImage } from '../../utilities/image.utility';
-import ThemeController from '../ThemeController/ThemeController';
+import ThemeController from './ThemeController/ThemeController';
 import parsedEnv from '../../parse-env';
 import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
 
@@ -17,7 +17,11 @@ class AppNavbar extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { search: '', theme: 'auto', showAdvancedSearch: false };
+        this.state = {
+            search: '',
+            theme: localStorage.getItem('theme') || 'auto',
+            showAdvancedSearch: false
+        };
     }
 
     handleInputChange = (e) => {
@@ -36,16 +40,36 @@ class AppNavbar extends Component {
     componentDidMount() {
         let parsed = queryString.parse(this.props.location.search);
         if (parsed.search) this.setState({ search: parsed.search });
+        this.setTheme();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         if (prevProps.location.search !== this.props.location.search) {
             let parsed = queryString.parse(this.props.location.search);
             this.setState({ search: parsed.search ?? '' });
         }
+
+        if (prevState.theme !== this.state.theme) this.setTheme();
+    }
+
+    setTheme() {
+        localStorage.setItem('theme', this.state.theme);
+        if (this.state.theme === 'auto') {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', this.state.theme);
+        }
     }
 
     render() {
+        const videoPageActive = history.location.pathname === '/' || history.location.pathname === '/videos';
+        const loginPageActive = history.location.pathname === '/login';
+        const registerPageActive = history.location.pathname === '/register';
+
         if (history.location.pathname !== '/global'
             && history.location.pathname !== '/global/') {
             const avatar = this.context.getAvatar();
@@ -53,159 +77,228 @@ class AppNavbar extends Component {
                 <Navbar
                     sticky="top"
                     bg="light"
-                    expand="xl"
-                    className="justify-content-center"
+                    className={this.context.getSetting('useGradientEffect') ? undefined : 'no-gradient'}
                 >
-                    <Container>
-                        <LinkContainer to="/">
-                            <Navbar.Brand className="d-xl-none me-auto">
-                                <NavbarBrandContent theme={this.state.theme} />
-                            </Navbar.Brand>
-                        </LinkContainer>
-
-                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                        <Navbar.Collapse
-                            id="basic-navbar-nav"
-                            className="w-100"
-                        >
-                            <Nav className="w-100 justify-content-left">
-                                <LinkContainer to="/">
-                                    <Navbar.Brand className="d-none d-xl-block">
-                                        <NavbarBrandContent theme={this.state.theme} />
-                                    </Navbar.Brand>
-                                </LinkContainer>
+                    <Container className='gap-3'>
+                        <Nav id="desktop-nav" className="nav-segment">
+                            <LinkContainer to="/">
+                                <Navbar.Brand>
+                                    <NavbarBrandContent theme={this.state.theme} />
+                                </Navbar.Brand>
+                            </LinkContainer>
+                            {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="version-tag d-flex d-lg-none"><Badge bg="light">v{window.appVersion}</Badge></small>}
+                            <div className='d-none d-lg-flex'>
                                 <Nav.Item>
                                     <Nav.Link
                                         as={NavLink}
                                         to="/videos"
+                                        title="Videos"
+                                        aria-label="Videos"
+                                        active={videoPageActive}
                                     >
-                                        Videos
+                                        <FontAwesomeIcon icon="video" /><span className='ms-1 d-none d-xl-inline'>Videos</span>
                                     </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link
                                         as={NavLink}
                                         to="/uploaders"
+                                        title="Uploaders"
+                                        aria-label="Uploaders"
                                     >
-                                        Uploaders
+                                        <FontAwesomeIcon icon="user" /><span className='ms-1 d-none d-xl-inline'>Uploaders</span>
                                     </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link
                                         as={NavLink}
                                         to="/tags"
+                                        title="Tags"
+                                        aria-label="Tags"
                                     >
-                                        Tags
+                                        <FontAwesomeIcon icon="tag" /><span className='ms-1 d-none d-xl-inline'>Tags</span>
                                     </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link
                                         as={NavLink}
                                         to="/statistics"
+                                        title="Statistics"
+                                        aria-label="Statistics"
                                     >
-                                        Statistics
+                                        <FontAwesomeIcon icon="chart-pie" /><span className='ms-1 d-none d-xl-inline'>Stats</span>
                                     </Nav.Link>
                                 </Nav.Item>
-                            </Nav>
-                            <Nav className="w-100 justify-content-center">
-                                <Form
-                                    className="form-inline"
-                                    onSubmit={this.onSubmit}
-                                >
-                                    <FormControl
-                                        type="text"
-                                        placeholder="Search"
-                                        className="me-md-2 w-100 w-md-auto mb-2 mb-xl-0"
-                                        name="search"
-                                        value={this.state.search}
-                                        onChange={this.handleInputChange}
-                                    />
-                                    <Button
-                                        variant="primary"
-                                        type="submit"
-                                        className="w-100 w-md-auto mb-2 mb-xl-0"
-                                    >
-                                        <FontAwesomeIcon icon="search" />
-                                    </Button>
-                                </Form>
+                            </div>
+                        </Nav>
+                        <Nav id="search-nav" className="d-none d-lg-flex nav-segment">
+                            <Form
+                                className="form-inline flex-nowrap"
+                                onSubmit={this.onSubmit}
+                            >
+                                <FormControl
+                                    type="text"
+                                    placeholder="Search"
+                                    className="me-2"
+                                    name="search"
+                                    value={this.state.search}
+                                    onChange={this.handleInputChange}
+                                />
                                 <Button
-                                    variant="secondary"
-                                    className="w-100 w-md-auto ms-2 mb-2 mb-xl-0"
-                                    onClick={() => this.setState({ showAdvancedSearch: true })}
+                                    variant="primary"
+                                    type="submit"
+                                    title="Search"
+                                    aria-label="Search"
                                 >
-                                    <FontAwesomeIcon icon="filter" />
+                                    <FontAwesomeIcon icon="search" />
                                 </Button>
-                                <AdvancedSearchModal show={this.state.showAdvancedSearch} onHide={() => this.setState({ showAdvancedSearch: false })} />
-                            </Nav>
-                            <Nav className="ms-auto w-100 justify-content-end">
-                                {this.context.user ?
-                                    <>
-                                        <NavDropdown
-                                            title={
-                                                <>
-                                                    <span title={this.context.getSetting('username')}>{this.context.getSetting('username')}</span>
-                                                    <Image
-                                                        width={36}
-                                                        height={36}
-                                                        src={avatar}
-                                                        onError={(e) => { defaultImage(e, 'avatar') }}
-                                                        roundedCircle={this.context.getSetting('useCircularAvatars')}
-                                                        style={{ marginLeft: '0.5em' }}
-                                                    />
-                                                </>
+                            </Form>
+                            <Button
+                                variant="link"
+                                title="Advanced search"
+                                aria-label="Advanced search"
+                                onClick={() => this.setState({ showAdvancedSearch: true })}
+                            >
+                                <FontAwesomeIcon icon="filter" />
+                            </Button>
+                            <AdvancedSearchModal show={this.state.showAdvancedSearch} onHide={() => this.setState({ showAdvancedSearch: false })} />
+                        </Nav>
+                        <Nav id="account-nav" className="nav-segment">
+                            {this.context.user ?
+                                <>
+                                    <NavDropdown
+                                        id="user-dropdown"
+                                        title={
+                                            <>
+                                                <span className='username' title={this.context.getSetting('username')}>{this.context.getSetting('username')}</span>
+                                                <Image
+                                                    width={36}
+                                                    height={36}
+                                                    src={avatar}
+                                                    onError={(e) => { defaultImage(e, 'avatar') }}
+                                                    roundedCircle={this.context.getSetting('useCircularAvatars')}
+                                                    style={{ marginLeft: '0.5em' }}
+                                                />
+                                            </>
 
-                                            }
-                                            align="end"
-                                            className="user-dropdown"
+                                        }
+                                        align="end"
+                                    >
+                                        <NavDropdown.Item
+                                            as={NavLink}
+                                            to="/activity"
                                         >
+                                            Activity
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Item
+                                            as={NavLink}
+                                            to="/settings"
+                                        >
+                                            Settings
+                                        </NavDropdown.Item>
+                                        {this.context.getSetting('isSuperuser') &&
                                             <NavDropdown.Item
                                                 as={NavLink}
-                                                to="/activity"
+                                                to="/admin"
                                             >
-                                                Activity
+                                                Admin
                                             </NavDropdown.Item>
-                                            <NavDropdown.Item
-                                                as={NavLink}
-                                                to="/settings"
-                                            >
-                                                Settings
-                                            </NavDropdown.Item>
-                                            {this.context.getSetting('isSuperuser') &&
-                                                <NavDropdown.Item
-                                                    as={NavLink}
-                                                    to="/admin"
-                                                >
-                                                    Admin
-                                                </NavDropdown.Item>
-                                            }
-                                            <NavDropdown.Divider />
-                                            <NavDropdown.Item onClick={() => history.push('/logout')}>
-                                                Log Out
-                                            </NavDropdown.Item>
-                                        </NavDropdown>
-                                    </>
-                                    :
-                                    <>
-                                        <NavDropdown
-                                            title="Login"
-                                            align="end"
+                                        }
+                                        <NavDropdown.Divider />
+                                        <NavDropdown.Item onClick={() => history.push('/logout')}>
+                                            Log Out
+                                        </NavDropdown.Item>
+                                    </NavDropdown>
+                                </>
+                                :
+                                <>
+                                    <NavDropdown
+                                        title="Login"
+                                        align="end"
+                                        className='d-none d-sm-block'
+                                    >
+                                        <NavDropdown.ItemText
+                                            style={{ width: '100vw', maxWidth: '350px' }}
                                         >
-                                            <NavDropdown.ItemText
-                                                style={{ width: '100vw', maxWidth: '350px' }}
-                                            >
-                                                <LoginForm inDropdown={true} />
-                                            </NavDropdown.ItemText>
-                                        </NavDropdown>
-                                        <LinkContainer to="/register">
-                                            <Nav.Link>Register</Nav.Link>
-                                        </LinkContainer>
-                                    </>
-                                }
-                                <ThemeController onThemeChange={(theme) => { this.setState({ theme }) }} />
-                                {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="d-flex ms-xl-3 align-items-center"><Badge bg="secondary">v{window.appVersion}</Badge></small>}
-                            </Nav>
-                        </Navbar.Collapse>
+                                            <LoginForm inDropdown={true} />
+                                        </NavDropdown.ItemText>
+                                    </NavDropdown>
+                                    <LinkContainer
+                                        to="/login"
+                                        className='d-sm-none'
+                                        active={loginPageActive}
+                                    >
+                                        <Nav.Link>Login</Nav.Link>
+                                    </LinkContainer>
+                                    <LinkContainer
+                                        className='d-none d-sm-block'
+                                        to="/register"
+                                        active={registerPageActive}
+                                    >
+                                        <Nav.Link>Register</Nav.Link>
+                                    </LinkContainer>
+                                </>
+                            }
+                            <ThemeController
+                                className="ms-3 d-none d-lg-flex"
+                                theme={this.state.theme}
+                                onThemeChange={(theme) => { this.setState({ theme }) }}
+                            />
+                            {parsedEnv.REACT_APP_SHOW_VERSION_TAG && <small className="version-tag d-none d-lg-flex ms-3"><Badge bg="primary">v{window.appVersion}</Badge></small>}
+                        </Nav>
                     </Container>
+                    <Nav id="mobile-nav" className="w-100 d-flex d-lg-none">
+                        <Nav.Item>
+                            <Nav.Link
+                                as={NavLink}
+                                to="/videos"
+                                title="Videos"
+                                aria-label="Videos"
+                                active={videoPageActive}
+                            >
+                                <FontAwesomeIcon icon="video" />
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link
+                                as={NavLink}
+                                to="/uploaders"
+                                title="Uploaders"
+                                aria-label="Uploaders"
+                            >
+                                <FontAwesomeIcon icon="user" />
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link
+                                as={NavLink}
+                                to="/tags"
+                                title="Tags"
+                                aria-label="Tags"
+                            >
+                                <FontAwesomeIcon icon="tag" />
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link
+                                as={NavLink}
+                                to="/statistics"
+                                title="Statistics"
+                                aria-label="Statistics"
+                            >
+                                <FontAwesomeIcon icon="chart-pie" />
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Button
+                            title="Search"
+                            aria-label="Search"
+                            onClick={() => this.setState({ showAdvancedSearch: true })}
+                        >
+                            <FontAwesomeIcon icon="search" />
+                        </Button>
+                        <ThemeController theme={this.state.theme} onThemeChange={(theme) => { this.setState({ theme }) }} />
+                    </Nav>
+
                 </Navbar>
             );
         } else {
@@ -215,23 +308,24 @@ class AppNavbar extends Component {
 }
 
 const NavbarBrandContent = props => {
+    const theme = props.theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : props.theme;
     return (
         <>
             {
-                ((props.theme === 'light' && parsedEnv.REACT_APP_LIGHT_THEME_LOGO) || (props.theme === 'dark' && parsedEnv.REACT_APP_DARK_THEME_LOGO)) &&
+                ((theme === 'light' && parsedEnv.REACT_APP_LIGHT_THEME_LOGO) || (theme === 'dark' && parsedEnv.REACT_APP_DARK_THEME_LOGO)) &&
                 <Image
                     width={36}
                     height={36}
                     className="brand-image"
                     src={
-                        props.theme === 'light'
+                        theme === 'light'
                             ? parsedEnv.REACT_APP_LIGHT_THEME_LOGO
                             : parsedEnv.REACT_APP_DARK_THEME_LOGO
                     }
                     onError={(e) => { e.target.src = '/logo.svg'; }}
                 />
             }
-            {parsedEnv.REACT_APP_BRAND}
+            <span className='brand-text'>{parsedEnv.REACT_APP_BRAND}</span>
         </>
     );
 }

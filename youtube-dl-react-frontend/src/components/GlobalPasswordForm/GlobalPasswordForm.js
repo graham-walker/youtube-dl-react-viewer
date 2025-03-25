@@ -3,7 +3,6 @@ import { Card, Form, Alert, Button } from 'react-bootstrap';
 import { UserContext } from '../../contexts/user.context';
 import AuthService from '../../services/auth.service';
 import { getErrorMessage } from '../../utilities/format.utility';
-import ThemeController from '../ThemeController/ThemeController';
 
 export default class GlobalPasswordForm extends Component {
     static contextType = UserContext;
@@ -32,7 +31,6 @@ export default class GlobalPasswordForm extends Component {
     render() {
         return (
             <>
-                <div className="d-none"><ThemeController onThemeChange={() => { }} /></div>
                 <Card.Title>Global Site Password</Card.Title>
                 {!!this.state.error &&
                     <Alert variant="danger">{this.state.error}</Alert>

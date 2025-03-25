@@ -1,0 +1,21 @@
+.theme-controller {
+    padding: 0.333rem;
+    border: 0;
+    background: transparent !important;
+    width: 40px;
+    text-align: right;
+    color: var(--bs-nav-link-color) !important;
+
+    &:hover,
+    &.show {
+        color: var(--bs-nav-link-hover-color) !important;
+    }
+}
+
+#mobile-nav .theme-controller {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: center;
+    border-radius: 0;
+}

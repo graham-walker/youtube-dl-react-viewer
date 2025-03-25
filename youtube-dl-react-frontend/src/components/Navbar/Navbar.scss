@@ -1,25 +1,173 @@
-.user-dropdown .dropdown-toggle.nav-link {
-    padding-top: 2px;
-    padding-bottom: 2px;
+.navbar {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 
-    span {
-        max-width: 156px;
-        overflow: hidden;
-        display: inline-block;
-        text-overflow: ellipsis;
+    // All buttons
+    .btn.btn-link {
+        color: var(--bs-nav-link-color) !important;
+
+        &:hover {
+            color: var(--bs-nav-link-hover-color) !important;
+        }
+    }
+
+    // All links
+    .nav-link.active {
+        position: relative;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -0.5rem;
+            height: 0.25rem;
+            background: $logo-red;
+            background: linear-gradient(to right, $logo-blue, $logo-red);
+        }
+    }
+
+    // Version tag
+    .version-tag {
+        align-items: center;
+        .badge {
+            background: $white !important;
+            color: var(--bs-body-color) !important;
+        }
+    }
+
+    // Disable gradient effect
+    .no-gradient .nav-link.active::before {
+        background: $logo-red !important;
+    }
+
+    // Style nav sections
+    .nav-segment {
+        width: 33.333%;
+    }
+
+    @media only screen and (max-width: 1599px) {
+        .nav-segment {
+            width: auto;
+        }
+    }
+
+    #desktop-nav {
+        .navbar-brand {
+            padding-left: calc(36px + 0.5rem);
+            position: relative;
+
+            @media only screen and (max-width: 349px) {
+                .brand-text {
+                    display: none;
+                }
+            }
+
+            .brand-image {
+                left: 0;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+        .nav-item {
+            white-space: nowrap;
+            min-width: 3rem;
+            text-align: center;
+        }
+    }
+
+    #search-nav {
+        justify-content: center;
+        min-width: 0;
+        flex-shrink: 1;
+
+        form {
+            min-width: 0;
+            flex-shrink: 1;
+
+            .form-control {
+                min-width: 0;
+            }
+        }
+    }
+
+    #mobile-nav {
+        .nav-item,
+        .dropdown,
+        button {
+            flex: 1;
+            text-align: center;
+        }
+
+        button {
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
+            border: 0;
+            color: var(--bs-nav-link-color) !important;
+
+            &:hover {
+                color: var(--bs-nav-link-hover-color) !important;
+            }
+        }
+    }
+
+    #account-nav {
+        justify-content: end;
+
+        @media only screen and (max-width: 991px) {
+            min-width: 0;
+            flex-shrink: 1;
+
+            .nav-link.active::before {
+                bottom: 0 !important;
+            }
+        }
+
+        #user-dropdown {
+            padding: 0;
+
+            @media only screen and (max-width: 419px) {
+                .username {
+                    display: none;
+                }
+
+                img {
+                    margin-left: 0 !important;
+                }
+            }
+        }
+
+        .dropdown {
+            min-width: 0;
+
+            .dropdown-toggle.nav-link {
+                display: flex;
+                align-items: center;
+
+                span {
+                    max-width: 132px;
+                    overflow: hidden;
+                    display: inline-block;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    // Display mobile nav edge to edge
+    @media only screen and (max-width: 991px) {
+        .container {
+            max-width: unset;
+        }
     }
 }
 
-.navbar-brand {
-    padding-left: calc(36px + 0.5rem);
-    position: relative;
-
-    .brand-image {
-        left: 0;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+// Dark theme overrides
+[data-bs-theme="dark"] {
+    .version-tag .badge {
+        background: $black !important;
     }
 }

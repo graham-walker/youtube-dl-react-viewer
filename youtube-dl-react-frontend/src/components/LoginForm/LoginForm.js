@@ -5,6 +5,7 @@ import AuthService from '../../services/auth.service';
 import { getErrorMessage } from '../../utilities/format.utility';
 import history from '../../utilities/history.utility';
 import queryString from 'query-string';
+import { Link } from 'react-router-dom';
 
 export default class LoginForm extends Component {
     static contextType = UserContext;
@@ -78,6 +79,16 @@ export default class LoginForm extends Component {
                         />
                     </Form.Group>
                     <Button type="submit">Login</Button>
+                    {!this.props.inDropdown &&
+                        <Button
+                            as={Link}
+                            variant='link'
+                            to="/register"
+                            className="ms-2"
+                        >
+                            Register
+                        </Button>
+                    }
                 </Form>
             </>
         );
