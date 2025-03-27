@@ -83,6 +83,7 @@ export default class UploaderPage extends Component {
                                     name="uploaderAvatar"
                                     onChange={this.uploadAvatar}
                                     imageKey={this.state.imageKey}
+                                    className="mb-1 mb-lg-0"
                                 />
                                 : <Image
                                     width={145}

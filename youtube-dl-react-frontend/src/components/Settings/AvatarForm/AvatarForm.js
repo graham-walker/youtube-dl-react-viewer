@@ -23,7 +23,6 @@ const AvatarForm = (props) => {
                     src={props.src + (props.imageKey ? ('?i=' + props.imageKey) : '')}
                     onError={(e) => { defaultImage(e, 'avatar') }}
                     roundedCircle={userContext.getSetting('useCircularAvatars')}
-                    className="mb-1 mb-lg-0"
                 />
                 <Form.Control
                     type="file"
