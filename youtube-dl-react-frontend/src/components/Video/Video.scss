@@ -286,6 +286,11 @@ $progress-bar-height: 0.4em;
         filter: grayscale(1);
     }
 
+    // Make playback error message easier to read
+    .vjs-modal-dialog {
+        background: rgba(0, 0, 0, 0.8) !important;
+    }
+
     // Hide the big play button (it is still visible for a frame even though we bypass it)
     .vjs-big-play-button {
         display: none !important;
