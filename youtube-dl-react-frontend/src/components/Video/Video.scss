@@ -279,7 +279,10 @@ $progress-bar-height: 0.4em;
 .video-js {
     touch-action: none; // Prevent touch dragging from interfering with video controls
     font-size: 10px !important;
+    width: var(--player-width);
+    height: var(--player-height);
     margin: 0 auto;
+    margin-bottom: calc(1rem + var(--player-controls-offset)) !important;
 
     .vjs-loading-spinner {
         border: 6px solid $player-highlight-color;
@@ -499,5 +502,19 @@ $progress-bar-height: 0.4em;
     .description-section table tr {
         display: flex;
         flex-direction: column;
+    }
+}
+
+// Keep player controls visible if positioned below and an error message is shown 
+.vjs-error-display.vjs-modal-dialog {
+    height: calc(var(--player-height) + var(--player-controls-offset)) !important;
+}
+.vjs-controls-disabled .vjs-control-bar.positioned-below,
+.vjs-error .vjs-control-bar.positioned-below {
+    display: flex !important;
+    pointer-events: none !important;
+
+    .vjs-play-progress::before {
+        display: none;
     }
 }

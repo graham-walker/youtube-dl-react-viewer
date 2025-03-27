@@ -91,21 +91,26 @@ export default class VideoPage extends Component {
     }
 
     handleResize() {
-        const theaterMode = this.state.theaterMode && window.innerWidth >= 1200;
-        if (this.playerRef.current && this.state.video.height && this.state.video.width) {
+        if (this.playerRef.current && this.state.video) {
+            const theaterMode = this.state.theaterMode && window.innerWidth >= 1200;
+
+            // Treat videos without a defined width and height as 16:9
+            const videoWidth = this.state.video.width || 1920;
+            const videoHeight = this.state.video.height || 1080;
+
             let newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth - (window.innerWidth < 1200 ? 0 : 424); // 424 = width of the sidebar + grid gap
             if (theaterMode) newWidth = this.playerRef.current.parentNode.parentNode.offsetWidth;
 
-            let newHeight = (this.state.video.height / this.state.video.width) * newWidth;
+            let newHeight = (videoHeight / videoWidth) * newWidth;
 
-            const maxHeight = window.innerHeight * (theaterMode ? 0.8 : 0.7);
+            const maxHeight = document.documentElement.clientHeight * (theaterMode ? 0.78 : 0.7);
             if (newHeight > maxHeight) {
                 newWidth = (maxHeight / newHeight) * newWidth;
                 newHeight = maxHeight;
             }
 
-            this.playerRef.current.style.width = newWidth + 'px';
-            this.playerRef.current.style.height = newHeight + 'px';
+            this.playerRef.current.style.setProperty('--player-width', `${newWidth}px`);
+            this.playerRef.current.style.setProperty('--player-height', `${newHeight}px`);
         }
     }
 
@@ -208,7 +213,7 @@ export default class VideoPage extends Component {
 
                         if (!this.player) {
                             this.player = videojs(this.videoRef.current, {
-                                fluid: (this.state.video.width && this.state.video.height) ? undefined : true,
+                                fluid: false,
                                 autoplay: this.context.getPlayerSetting('autoplayVideo'),
                                 playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
                                 techOrder: ['html5'],
@@ -266,9 +271,11 @@ export default class VideoPage extends Component {
                                 }
 
                                 // Add extra margin below the video player if the player controls are positioned below the video
-                                if (this.context.getPlayerSetting('playerControlsPosition') === 'under_video') {
-                                    this.player.el().style.setProperty('margin-bottom', `calc(${34 * this.context.getPlayerSetting('playerControlsScale')}px + 1rem)`, 'important'); // 34 = 10px (default video.js font size) * 3.4em (default video.js controls height + progress control height)
-                                }
+                                this.player.el().style.setProperty('--player-controls-offset',
+                                    this.context.getPlayerSetting('playerControlsPosition') === 'under_video'
+                                        ? `${34 * this.context.getPlayerSetting('playerControlsScale')}px` // 34 = 10px (default video.js font size) * 3.4em (default video.js controls height + progress control height)
+                                        : '0px'
+                                );
 
                                 // Bypass the Video.js large play button and show the player controls before playback starts
                                 this.player.el().classList.add('vjs-has-started');
