@@ -518,3 +518,8 @@ $progress-bar-height: 0.4em;
         display: none;
     }
 }
+
+// Always hide live display (is incorrectly shown when iOS fails to load audio only mode)
+.vjs-live-display {
+    display: none !important;
+}
