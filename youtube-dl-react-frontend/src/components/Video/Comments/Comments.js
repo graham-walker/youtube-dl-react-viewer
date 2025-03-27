@@ -34,7 +34,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
     return (
         <div className={`card mb-3${visible ? ' p-3' : ''}${visible && !loading ? ' pb-0' : ''}`}>
             {!visible
-                ? <Button onClick={() => setVisible(true)} variant="none">Show {props.commentCount.toLocaleString()} comment{props.commentCount !== 1 ? 's' : ''}</Button>
+                ? <Button onClick={() => setVisible(true)} variant="link">Show {props.commentCount.toLocaleString()} comment{props.commentCount !== 1 ? 's' : ''}</Button>
                 : (
                     loading
                         ? <div className="text-center"><Spinner animation="border" /></div>

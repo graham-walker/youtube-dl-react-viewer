@@ -59,7 +59,7 @@ const ChatReplay = (props) => {
     return (
         <div className="card mb-3">
             {!visible
-                ? <Button onClick={() => setVisible(true)} variant="none">Show chat replay</Button>
+                ? <Button onClick={() => setVisible(true)} variant="link">Show chat replay</Button>
                 : <>
                     <div className="p-3"><p className="mb-0"><strong>Chat replay</strong></p></div>
                     {loading
@@ -90,7 +90,7 @@ const ChatReplay = (props) => {
                                         : <p className="text-center"><strong>{error}</strong></p>
                                     )}
                             </div >
-                            <Button onClick={() => setVisible(false)} variant="none">Hide chat replay</Button>
+                            <Button onClick={() => setVisible(false)} variant="link">Hide chat replay</Button>
                         </>
                     }
                 </>
