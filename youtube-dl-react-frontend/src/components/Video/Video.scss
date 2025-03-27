@@ -247,7 +247,7 @@ $progress-bar-height: 0.4em;
 }
 
 // Hide total duration on mobile to free up more space
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
     .show-current-time {
         .vjs-time-divider,
         .vjs-duration {
@@ -479,18 +479,25 @@ $progress-bar-height: 0.4em;
 }
 
 // Hide player error message X icon on mobile (the playback error message is too long and overlaps the icon)
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
     .vjs-error .vjs-error-display::before {
         display: none;
     }
 }
 
-// Ensure video list tabs do not cause overflow on small devices
+// Fix page overflow on small devices
 .video-list-tab {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
-    max-width: calc(100vw - 4rem);
+    max-width: calc(100vw - 3.5rem);
     display: block;
+}
+
+@media screen and (max-width: 575px) {
+    .description-section table tr {
+        display: flex;
+        flex-direction: column;
+    }
 }
