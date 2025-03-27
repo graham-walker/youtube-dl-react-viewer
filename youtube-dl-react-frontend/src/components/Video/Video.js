@@ -419,14 +419,17 @@ export default class VideoPage extends Component {
                                 });
 
                                 this.player.on('error', function (e) {
+                                    const isSafariOrIos = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
                                     document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = `
                                     <div>
+                                        ${isSafariOrIos ? `<p>Playback in Safari/iOS is especially limited. <a href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more<a/></p>` : ''}
                                         <p class="mb-0">A playback error has occurred, try:</p>
                                         <ul class="d-inline-block text-start">
-                                            <li>Clicking the spoof type checkbox ${window.innerWidth < 1200 ? 'below the description' : 'in the sidebar'}</li>
+                                            <li>Clicking the spoof type checkbox</li>
                                             <li>Using a different browser</li>
-                                            <li>Using the open in VLC button</li>
-                                            <li>Change the format code and redownload the video</li>
+                                            <li>Clicking the open in VLC button</li>
+                                            <li>Changing the format code and redownloading the video</li>
                                         </ul>
                                     </div>`
                                 });
