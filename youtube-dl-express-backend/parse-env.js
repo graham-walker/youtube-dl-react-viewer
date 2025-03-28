@@ -110,6 +110,10 @@ const expected = {
         type: Boolean,
         default: false,
     },
+    'AUDIO_ONLY_MODE_ENABLED': {
+        type: Boolean,
+        default: true,
+    },
     'AUDIO_ONLY_MODE_BITRATE': {
         type: Number,
         default: 128000,

@@ -246,6 +246,7 @@ router.get('/:extractor/:id', async (req, res) => {
         resumeTime,
         sponsorSegments,
         returnYouTubeDislikeVotes,
+        audioOnlyModeDisabled: req.query?.metadata === 'true' ? undefined : !parsedEnv.AUDIO_ONLY_MODE_ENABLED,
     });
 });
 

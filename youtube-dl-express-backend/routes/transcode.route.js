@@ -11,6 +11,8 @@ ffmpeg.setFfprobePath(parsedEnv.FFPROBE_PATH);
 const router = Router();
 
 router.get('/:extractor/:id/audio_only', async (req, res) => {
+    if (!parsedEnv.AUDIO_ONLY_MODE_ENABLED) return res.sendStatus(403);
+
     const video = await Video.findOne({ extractor: req.params.extractor, id: req.params.id }, '-_id directory duration videoFile.name');
     if (!video) return res.sendStatus(404);
 

@@ -55,6 +55,7 @@ export default class VideoPage extends Component {
             theaterMode: false,
             defaultVolumeSet: false,
             audioOnlyMode: false,
+            audioOnlyModeDisabled: false,
         };
         this.videoRef = React.createRef();
         this.sponsorRef = React.createRef();
@@ -62,6 +63,7 @@ export default class VideoPage extends Component {
         this.theaterModeButtonRef = React.createRef();
         this.audioOnlyModeButtonRef = React.createRef();
         this.preservedTimeRef = React.createRef();
+        this.isAudioOnlyModeDisabledError = React.createRef();
     }
 
     componentDidMount() {
@@ -196,6 +198,7 @@ export default class VideoPage extends Component {
                             : this.state.activeTab,
                         localVideoPath: res.data.localVideoPath,
                         resumeTime: res.data.resumeTime,
+                        audioOnlyModeDisabled: res.data.audioOnlyModeDisabled,
                     }, () => {
                         this.handleResize();
                         document.title = `${res.data.video.title} - ${parsedEnv.REACT_APP_BRAND}`;
@@ -416,20 +419,29 @@ export default class VideoPage extends Component {
                                     this.onVideoEnd();
                                 });
 
-                                this.player.on('error', function (e) {
-                                    const isSafariOrIos = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-                                    document.querySelector('.vjs-error-display .vjs-modal-dialog-content').innerHTML = `
-                                    <div>
-                                        ${isSafariOrIos ? `<p>Playback in Safari/iOS is especially limited. <a href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more<a/></p>` : ''}
-                                        <p class="mb-0">A playback error has occurred, try:</p>
-                                        <ul class="d-inline-block text-start">
-                                            <li>Clicking the spoof type checkbox</li>
-                                            <li>Using a different browser</li>
-                                            <li>Clicking the open in VLC button</li>
-                                            <li>Changing the format code and redownloading the video</li>
-                                        </ul>
-                                    </div>`
+                                this.player.on('error', () => {
+                                    const errorElement = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
+                                    if (this.isAudioOnlyModeDisabledError) {
+                                        errorElement.innerHTML = `
+                                            <div>
+                                                <p class="mb-0">Audio only mode is disabled</p>
+                                            </div>
+                                        `;
+                                    } else {
+                                        const isSafariOrIos = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                                        errorElement.innerHTML = `
+                                            <div>
+                                                ${isSafariOrIos ? `<p>Playback in Safari/iOS is especially limited. <a href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more<a/></p>` : ''}
+                                                <p class="mb-0">A playback error has occurred, try:</p>
+                                                <ul class="d-inline-block text-start">
+                                                    <li>Clicking the spoof type checkbox</li>
+                                                    <li>Using a different browser</li>
+                                                    <li>Clicking the open in VLC button</li>
+                                                    <li>Changing the format code and redownloading the video</li>
+                                                </ul>
+                                            </div>
+                                        `;
+                                    }
                                 });
 
                                 this.player.on('userinactive', function () {
@@ -474,6 +486,8 @@ export default class VideoPage extends Component {
     videoReady(preserveCurrentTime = false) {
         const video = this.state.video;
         if (!video) return;
+
+        this.isAudioOnlyModeDisabledError = this.state.audioOnlyMode && this.state.audioOnlyModeDisabled;
 
         if (preserveCurrentTime) this.preservedTimeRef.current = this.player.currentTime();
 
