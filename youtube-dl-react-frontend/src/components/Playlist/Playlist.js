@@ -94,6 +94,7 @@ export default class Playlist extends Component {
                                 layout="playlist"
                                 filter="relevance"
                                 query={{ playlist: `"${this.state.playlist.name}"`, extractor: this.state.playlist.extractor }}
+                                sidebar={true}
                             />
                         </Col>
                     </Row>

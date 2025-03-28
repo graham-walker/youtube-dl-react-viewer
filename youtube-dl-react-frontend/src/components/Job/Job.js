@@ -90,6 +90,7 @@ export default class Job extends Component {
                                 layout="playlist"
                                 filter="relevance"
                                 query={{ job: this.state.job._id }}
+                                sidebar={true}
                             />
                         </Col>
                     </Row>

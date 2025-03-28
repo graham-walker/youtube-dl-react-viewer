@@ -149,8 +149,8 @@ export default class VideoList extends Component {
                             <h5 className="mb-4">{this.state.totals.shorts.toLocaleString()} short{this.state.totals.shorts !== 1 && 's'} hidden</h5>
                         </>
                     }
-                    <Row className="mb-4 justify-content-between">
-                        <Col xs="12" sm="auto" className='mb-3 mb-sm-0'>
+                    <div id="video-list-controls" className={`${this.props.query ? 'three' : 'two'}-controls${this.props.sidebar ? ' has-sidebar' : ''}`}>
+                        <div className="video-list-sort">
                             <Form.Group className="d-flex align-items-center" controlId="videoListSort">
                                 <Form.Label className="flex-shrink-0 mb-0 me-2">Sort by: </Form.Label>
                                 <Form.Select
@@ -177,13 +177,13 @@ export default class VideoList extends Component {
                                     <option value="oldest_download">Date Downloaded (Oldest)</option>
                                 </Form.Select>
                             </Form.Group>
-                        </Col>
+                        </div>
                         {this.props.query &&
-                            <Col xs="auto">
+                            <div className="video-list-search">
                                 <AdvancedSearchButton query={this.props.query} ><FontAwesomeIcon icon="search" /> Search</AdvancedSearchButton>
-                            </Col>
+                            </div>
                         }
-                        <Col  xs="auto">
+                        <div className="video-list-random">
                             {!!this.state.randomVideo
                                 ? <Button as={Link} to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`} >
                                     <FontAwesomeIcon icon="random" /> Random
@@ -192,8 +192,8 @@ export default class VideoList extends Component {
                                     <FontAwesomeIcon icon="random" /> Random
                                 </Button>
                             }
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                     <InfiniteScroll
                         dataLength={videos.length}
                         next={this.getVideos}
