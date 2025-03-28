@@ -89,7 +89,7 @@ export default class AdminPage extends Component {
                         />
                         <JobEditor jobs={this.state.jobs} defaultActivejobId={this.state.defaultActivejobId} onJobsChange={(jobs) => this.setState({ jobs })} />
                         <VideoImporter jobs={this.state.jobs} />
-                        <VideoDeleter extractors={this.state.extractors} />
+                        <VideoDeleter extractors={this.state.extractors} jobs={this.state.jobs} />
                         <ChannelIconDownloader />
                         <HashVerifier />
                         <RecalcStatistics />

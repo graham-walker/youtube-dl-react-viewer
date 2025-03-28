@@ -1,4 +1,5 @@
-#advanced-search-form {
+#advanced-search-form,
+#mass-delete-form {
     gap: 1rem 0.5rem;
 
     .input-group {
@@ -23,7 +24,10 @@
 }
 
 @media screen and (max-width: 991px) {
-    #advanced-search-form .input-group.half {
-        width: 100%;
+    #advanced-search-form,
+    #mass-delete-form {
+        .input-group.half {
+            width: 100%;
+        }
     }
 }

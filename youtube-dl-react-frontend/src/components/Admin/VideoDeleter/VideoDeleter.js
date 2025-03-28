@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Form, Button, Card, Alert, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Form, Button, Card, Alert, InputGroup } from 'react-bootstrap';
 import { getErrorMessage } from '../../../utilities/format.utility';
 import axios from '../../../utilities/axios.utility';
 import { scrollToElement } from '../../../utilities/scroll.utility';
 import ConfirmModal from '../../ConfirmModal/ConfirmModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class VideoDeleter extends Component {
     constructor(props) {
@@ -64,9 +65,22 @@ class VideoDeleter extends Component {
                     <Card.Body>
                         {!!this.state.success && <Alert variant="success">{this.state.success}</Alert>}
                         {!!this.state.error && <Alert variant="danger">{this.state.error}</Alert>}
-                        <Form className="form-inline mb-1" id="delete-form">
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="uploader">
-                                <Form.Label className="mb-0 me-2">Uploader: </Form.Label>
+                        <Form className="form-inline mb-1" id="mass-delete-form">
+                            <div className='w-100 text-secondary' style={{ marginBottom: '-0.5rem' }}>
+                                <small><FontAwesomeIcon icon="circle-info" className='me-1' />Surround text in quotes "like this" to look for an exact match</small>
+                            </div>
+                            <InputGroup className="w-100">
+                                <InputGroup.Text><FontAwesomeIcon icon="database" />Video ID</InputGroup.Text>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Any"
+                                    name="id"
+                                    value={this.state.id}
+                                    onChange={this.handleInputChange}
+                                />
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="user" />Uploader</InputGroup.Text>
                                 <Form.Control
                                     type="text"
                                     placeholder="Any"
@@ -74,9 +88,9 @@ class VideoDeleter extends Component {
                                     value={this.state.uploader}
                                     onChange={this.handleInputChange}
                                 />
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="playlist">
-                                <Form.Label className="mb-0 me-2">Playlist ID: </Form.Label>
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="list" />Playlist</InputGroup.Text>
                                 <Form.Control
                                     type="text"
                                     placeholder="Any"
@@ -84,19 +98,20 @@ class VideoDeleter extends Component {
                                     value={this.state.playlist}
                                     onChange={this.handleInputChange}
                                 />
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="job">
-                                <Form.Label className="mb-0 me-2">Job: </Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Any"
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="briefcase" />Job</InputGroup.Text>
+                                <Form.Select
                                     name="job"
-                                    value={this.state.job}
                                     onChange={this.handleInputChange}
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="extractor">
-                                <Form.Label className="mb-0 me-2">Extractor: </Form.Label>
+                                    value={this.state.job}
+                                >
+                                    <option value="">Any</option>
+                                    {this.props.jobs.map((job, i) => <option value={job._id} key={i}>{job.name}</option>)}
+                                </Form.Select>
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="globe" />Website</InputGroup.Text>
                                 <Form.Select
                                     name="extractor"
                                     onChange={this.handleInputChange}
@@ -105,37 +120,27 @@ class VideoDeleter extends Component {
                                     <option value="">Any</option>
                                     {this.props.extractors.map((extractor, i) => <option value={extractor} key={i}>{extractor}</option>)}
                                 </Form.Select>
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="id">
-                                <Form.Label className="mb-0 me-2">Video ID: </Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Any"
-                                    name="id"
-                                    value={this.state.id}
-                                    onChange={this.handleInputChange}
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="uploadStart">
-                                <Form.Label className="mb-0 me-2">Between: </Form.Label>
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="calendar-alt" />After</InputGroup.Text>
                                 <Form.Control
                                     type="datetime-local"
                                     name="uploadStart"
                                     value={this.state.uploadStart}
                                     onChange={this.handleInputChange}
                                 />
-                            </Form.Group>
-                            <Form.Group className="mb-3 d-flex align-items-center" controlId="uploadEnd">
-                                <Form.Label className="mb-0 me-2">And: </Form.Label>
+                            </InputGroup>
+                            <InputGroup className="half">
+                                <InputGroup.Text><FontAwesomeIcon icon="calendar-alt" />Before</InputGroup.Text>
                                 <Form.Control
                                     type="datetime-local"
                                     name="uploadEnd"
                                     value={this.state.uploadEnd}
                                     onChange={this.handleInputChange}
                                 />
-                            </Form.Group>
+                            </InputGroup>
                         </Form>
-                        <Form.Group className="mb-3" controlId="preventRedownload">
+                        <Form.Group className="mt-2 mb-3" controlId="preventRedownload">
                             <Form.Check
                                 checked={this.state.preventRedownload}
                                 type="checkbox"

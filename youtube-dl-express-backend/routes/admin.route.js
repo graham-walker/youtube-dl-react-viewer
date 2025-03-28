@@ -3,6 +3,7 @@ import axios from 'axios';
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 
 import Job from '../models/job.model.js';
 import DownloadError from '../models/error.model.js';
@@ -21,6 +22,7 @@ import { parsedEnv } from '../parse-env.js';
 import { logLine, logError, history, historyUpdated } from '../utilities/logger.utility.js';
 import { updateYoutubeDl, getYoutubeDlVersion } from '../utilities/job.utility.js';
 import { makeSafe } from '../utilities/file.utility.js';
+import { isQuoted, stripQuotes, escapeRegex } from '../utilities/video.utility.js';
 
 const router = express.Router();
 
@@ -387,38 +389,31 @@ router.post('/delete', async (req, res) => {
         const preventRedownload = !!req.body.preventRedownload;
 
         let pipeline = [];
-        let match = {};
+        const match = {};
 
-        if (req.body.uploader) match.uploader = req.body.uploader;
-        if (req.body.extractor) match.extractor = req.body.extractor;
         if (req.body.id) match.id = req.body.id;
 
-        if (req.body.uploadStart || req.body.uploadEnd) match.uploadDate = {};
-        if (req.body.uploadStart) match.uploadDate.$gte = new Date(req.body.uploadStart);
-        if (req.body.uploadEnd) match.uploadDate.$lte = new Date(req.body.uploadEnd);
+        if (mongoose.Types.ObjectId.isValid(req.body.job)) match.jobDocument = new mongoose.Types.ObjectId(req.body.job);
+        if (req.body.extractor) match.extractor = req.body.extractor;
 
-        if (req.body.playlist) {
-            pipeline.push({
-                $lookup: {
-                    from: Playlist.collection.name,
-                    localField: 'playlistDocument',
-                    foreignField: '_id',
-                    as: 'lookupPlaylist'
-                }
-            });
-            match['lookupPlaylist.id'] = req.body.playlist;
+        if (req.body.uploadStart || req.body.uploadEnd) match.uploadDate = {};
+        if (req.body.uploadStart && typeof req.body.uploadStart === 'string' && !isNaN(new Date(req.body.uploadStart).getTime())) match.uploadDate.$gte = new Date(req.body.uploadStart);
+        if (req.body.uploadEnd && typeof req.body.uploadEnd === 'string' && !isNaN(new Date(req.body.uploadEnd).getTime())) match.uploadDate.$lte = new Date(req.body.uploadEnd);
+
+        let uploader = req.body.uploader;
+        if (uploader && typeof uploader === 'string') {
+            const uploaderIds = await Uploader.find({
+                name: isQuoted(uploader) ? stripQuotes(uploader) : { $regex: escapeRegex(uploader), $options: 'i' }
+            }, '_id');
+            match.uploaderDocument = { $in: uploaderIds.map(doc => doc._id) }
         }
 
-        if (req.body.job) {
-            pipeline.push({
-                $lookup: {
-                    from: Job.collection.name,
-                    localField: 'jobDocument',
-                    foreignField: '_id',
-                    as: 'lookupJob'
-                }
-            });
-            match['lookupJob.name'] = req.body.job;
+        let playlist = req.body.playlist;
+        if (playlist && typeof playlist === 'string') {
+            const playlistIds = await Playlist.find({
+                name: isQuoted(playlist) ? stripQuotes(playlist) : { $regex: escapeRegex(playlist), $options: 'i' }
+            }, '_id');
+            match.playlistDocument = { $in: playlistIds.map(doc => doc._id) }
         }
 
         pipeline.push({ $match: match }, { $project: { _id: 0, extractor: 1, id: 1, directory: 1 } });
@@ -426,7 +421,7 @@ router.post('/delete', async (req, res) => {
         const videos = await Video.aggregate(pipeline).exec();
 
         if (videos.length === 0) return res.status(500).json({ error: 'No videos match the query' });
-        if (req.query.preview === 'true') return res.json({ success: `${videos.length} video${videos.length !== 1 ? 's' : ''} will be deleted` });
+        if (req.query.preview === 'true') return res.json({ success: `${videos.length} video${videos.length !== 1 ? 's' : ''} would be deleted` });
 
         // Delete videos
         const [busy, reason] = isBusy(['repairing', 'deleting', 'downloading', 'importing', 'verifying']);
@@ -513,6 +508,7 @@ router.post('/delete', async (req, res) => {
         }
     } catch (err) {
         if (parsedEnv.VERBOSE) logError(err);
+        return res.sendStatus(500);
     }
 });
 
