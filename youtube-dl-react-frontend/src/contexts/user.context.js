@@ -7,7 +7,7 @@ const defaultUserSettings = getDefaultUserSettings();
 
 export const UserContext = createContext();
 
-class Context extends Component {
+class UserProvider extends Component {
     state = {
         user: AuthService.getCurrentUser(),
         updateUser: (user) => {
@@ -69,4 +69,4 @@ class Context extends Component {
     }
 }
 
-export default Context;
+export default UserProvider;

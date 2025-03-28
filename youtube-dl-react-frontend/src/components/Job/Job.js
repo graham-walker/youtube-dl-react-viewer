@@ -64,7 +64,7 @@ export default class Job extends Component {
                                     <Image
                                         src={getImage(video, 'thumbnail', 'medium')}
                                         onError={(e) => defaultImage(e, 'thumbnail')}
-                                        style={{borderRadius: this.context.getSetting('useCircularAvatars') ? '0.5rem' : 0}}
+                                        style={{ borderRadius: this.context.getSetting('useCircularAvatars') ? '0.5rem' : 0 }}
                                     />
                                 </div>
                                 <h3>{name}</h3>
@@ -89,6 +89,7 @@ export default class Job extends Component {
                                 url={`jobs/${this.props.match.params._id}`}
                                 layout="playlist"
                                 filter="relevance"
+                                query={{ job: this.state.job._id }}
                             />
                         </Col>
                     </Row>

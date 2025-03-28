@@ -11,6 +11,7 @@ import queryString from 'query-string';
 import history from '../../utilities/history.utility';
 import axios from '../../utilities/axios.utility';
 import parsedEnv from '../../parse-env';
+import AdvancedSearchButton from '../AdvancedSearchButton/AdvancedSearchButton';
 
 export default class VideoList extends Component {
     static contextType = UserContext;
@@ -66,11 +67,14 @@ export default class VideoList extends Component {
 
     handleInputChange = (e) => {
         e.preventDefault();
-        this.setState({ [e.target.name]: e.target.value }, () => {
+        const name = e.target.name;
+        const value = e.target.value;
+
+        this.setState({ [name]: value }, () => {
             const parsed = queryString.parse(this.props.location.search);
             const stringified = queryString.stringify({
-                search: parsed?.search,
-                sort: this.state['sort']
+                ...parsed,
+                [name]: this.state[name]
             });
             history.push(`${this.props.location.pathname}${stringified ? '?' + stringified : ''}`);
         });
@@ -174,7 +178,12 @@ export default class VideoList extends Component {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col className='ms-auto' xs="auto">
+                        {this.props.query &&
+                            <Col xs="auto">
+                                <AdvancedSearchButton query={this.props.query} ><FontAwesomeIcon icon="search" /> Search</AdvancedSearchButton>
+                            </Col>
+                        }
+                        <Col  xs="auto">
                             {!!this.state.randomVideo
                                 ? <Button as={Link} to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`} >
                                     <FontAwesomeIcon icon="random" /> Random

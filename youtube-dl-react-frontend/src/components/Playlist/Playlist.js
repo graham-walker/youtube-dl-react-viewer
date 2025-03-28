@@ -93,6 +93,7 @@ export default class Playlist extends Component {
                                 url={`playlists/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                                 layout="playlist"
                                 filter="relevance"
+                                query={{ playlist: `"${this.state.playlist.name}"`, extractor: this.state.playlist.extractor }}
                             />
                         </Col>
                     </Row>

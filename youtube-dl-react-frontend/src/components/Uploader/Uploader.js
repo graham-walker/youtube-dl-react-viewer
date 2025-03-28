@@ -214,6 +214,7 @@ export default class UploaderPage extends Component {
                         location={this.props.location}
                         url={`uploaders/${this.props.match.params.extractor}/${this.props.match.params.id}`}
                         hideUploader={true}
+                        query={{ uploader: `"${this.state.uploader.name}"`, extractor: this.state.uploader.extractor }}
                     />
                     <AlertModal
                         show={this.state.showAlert}

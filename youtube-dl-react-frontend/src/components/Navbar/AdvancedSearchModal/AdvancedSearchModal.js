@@ -1,83 +1,30 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
-import axios from '../../../utilities/axios.utility';
 import history from '../../../utilities/history.utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-const initialQuery = {
-    search: '',
-    uploader: '',
-    playlist: '',
-    job: '',
-    extractor: '',
-    uploadStart: '',
-    uploadEnd: '',
-    sort: 'relevance'
-};
+import { AdvancedSearchContext } from '../../../contexts/advancedsearch.context';
 
 export default class AdvancedSearchModal extends Component {
+    static contextType = AdvancedSearchContext;
+
     constructor(props) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
-        this.state = {
-            query: { ...initialQuery },
-            jobs: [],
-            extractors: [],
-        };
-    }
-
-    componentDidMount() {
-        this.getSearchOptions();
-        this.getStateFromSearch();
-        
-        this.unlisten = history.listen(() => {
-            this.getStateFromSearch();
-        });
-    }
-
-    componentWillUnmount() {
-        if (this.unlisten) {
-            this.unlisten();
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.show !== this.props.show && this.props.show) this.getSearchOptions();
-    }
-
-    getStateFromSearch() {
-        if (history.location.pathname === '/' || history.location.pathname === '/videos') {
-            this.setState({ query: Object.assign(initialQuery, Object.fromEntries(new URLSearchParams(window.location.search))) });
-        }
-    }
-
-    getSearchOptions() {
-        axios
-            .get(`/api/videos/advanced_search_options`)
-            .then(res => {
-                if (res.status === 200) {
-                    this.setState({
-                        jobs: res.data.jobs,
-                        extractors: res.data.extractors,
-                    });
-                }
-            }).catch(err => {
-                console.error(err);
-            });
+        this.searchInputRef = React.createRef();
     }
 
     handleInputChange = (e) => {
         var { value, name, type } = e.target;
         if (type === 'checkbox') value = e.target.checked;
-        this.setState((prevState) => ({ query: { ...prevState.query, [name]: value } }));
+        this.context.setQueryParam(name, value);
     }
 
     onSubmit(e) {
         e.preventDefault();
 
         const newParams = new URLSearchParams();
-        Object.keys(this.state.query).forEach((key) => {
-            const value = this.state.query[key];
+        Object.keys(this.context.query).forEach((key) => {
+            const value = this.context.query[key];
             if (value === "") {
                 newParams.delete(key);
             } else {
@@ -88,12 +35,20 @@ export default class AdvancedSearchModal extends Component {
         const newSearch = newParams.toString();
         history.push('/videos' + (newSearch ? `?${newSearch}` : ''));
 
-        this.props.onHide();
+        this.context.setShow(false);
     }
+
+    handleShow = () => {
+        setTimeout(() => {
+            if (this.searchInputRef.current) {
+                this.searchInputRef.current.focus();
+            }
+        }, 0);
+    };
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.onHide} size="lg" centered>
+            <Modal show={this.context.show} onHide={() => this.context.setShow(false)} onShow={this.handleShow} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Advanced search</Modal.Title>
                 </Modal.Header>
@@ -108,8 +63,9 @@ export default class AdvancedSearchModal extends Component {
                                 type="text"
                                 placeholder="Any"
                                 name="search"
-                                value={this.state.query.search}
+                                value={this.context.query.search}
                                 onChange={this.handleInputChange}
+                                ref={this.searchInputRef}
                             />
                         </InputGroup>
                         <InputGroup className="half">
@@ -118,7 +74,7 @@ export default class AdvancedSearchModal extends Component {
                                 type="text"
                                 placeholder="Any"
                                 name="uploader"
-                                value={this.state.query.uploader}
+                                value={this.context.query.uploader}
                                 onChange={this.handleInputChange}
                             />
                         </InputGroup>
@@ -128,7 +84,7 @@ export default class AdvancedSearchModal extends Component {
                                 type="text"
                                 placeholder="Any"
                                 name="playlist"
-                                value={this.state.query.playlist}
+                                value={this.context.query.playlist}
                                 onChange={this.handleInputChange}
                             />
                         </InputGroup>
@@ -137,10 +93,10 @@ export default class AdvancedSearchModal extends Component {
                             <Form.Select
                                 name="job"
                                 onChange={this.handleInputChange}
-                                value={this.state.query.job}
+                                value={this.context.query.job}
                             >
                                 <option value="">Any</option>
-                                {this.state.jobs.map((job, i) => <option value={job._id} key={i}>{job.name}</option>)}
+                                {this.context.jobs.map((job, i) => <option value={job._id} key={i}>{job.name}</option>)}
                             </Form.Select>
                         </InputGroup>
                         <InputGroup className="half">
@@ -148,10 +104,10 @@ export default class AdvancedSearchModal extends Component {
                             <Form.Select
                                 name="extractor"
                                 onChange={this.handleInputChange}
-                                value={this.state.query.extractor}
+                                value={this.context.query.extractor}
                             >
                                 <option value="">Any</option>
-                                {this.state.extractors.map((extractor, i) => <option value={extractor} key={i}>{extractor}</option>)}
+                                {this.context.extractors.map((extractor, i) => <option value={extractor} key={i}>{extractor}</option>)}
                             </Form.Select>
                         </InputGroup>
                         <InputGroup className="half">
@@ -159,7 +115,7 @@ export default class AdvancedSearchModal extends Component {
                             <Form.Control
                                 type="datetime-local"
                                 name="uploadStart"
-                                value={this.state.query.uploadStart}
+                                value={this.context.query.uploadStart}
                                 onChange={this.handleInputChange}
                             />
                         </InputGroup>
@@ -168,7 +124,7 @@ export default class AdvancedSearchModal extends Component {
                             <Form.Control
                                 type="datetime-local"
                                 name="uploadEnd"
-                                value={this.state.query.uploadEnd}
+                                value={this.context.query.uploadEnd}
                                 onChange={this.handleInputChange}
                             />
                         </InputGroup>
@@ -177,7 +133,7 @@ export default class AdvancedSearchModal extends Component {
                             <Form.Select
                                 name="sort"
                                 onChange={this.handleInputChange}
-                                value={this.state.query.sort}
+                                value={this.context.query.sort}
                             >
                                 <option value="relevance">Relevance</option>
                                 <option value="newest_date">Date Uploaded (Newest)</option>

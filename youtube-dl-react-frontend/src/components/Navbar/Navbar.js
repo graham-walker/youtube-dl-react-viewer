@@ -11,6 +11,7 @@ import { defaultImage } from '../../utilities/image.utility';
 import ThemeController from './ThemeController/ThemeController';
 import parsedEnv from '../../parse-env';
 import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
+import AdvancedSearchButton from '../AdvancedSearchButton/AdvancedSearchButton';
 
 class AppNavbar extends Component {
     static contextType = UserContext;
@@ -20,7 +21,6 @@ class AppNavbar extends Component {
         this.state = {
             search: '',
             theme: localStorage.getItem('theme') || 'auto',
-            showAdvancedSearch: false
         };
     }
 
@@ -32,8 +32,12 @@ class AppNavbar extends Component {
     onSubmit = (e) => {
         e.preventDefault();
         let parsed = queryString.parse(this.props.location.search);
-        parsed.search = this.state.search || undefined;
-        let stringified = queryString.stringify(parsed);
+        // The basic search box removes all params except search and sort
+        parsed = {
+            search: this.state.search || undefined,
+            sort: parsed.sort,
+        }
+        const stringified = queryString.stringify(parsed);
         history.push(`/videos${stringified ? '?' + stringified : ''}`);
     }
 
@@ -153,15 +157,9 @@ class AppNavbar extends Component {
                                     <FontAwesomeIcon icon="search" />
                                 </Button>
                             </Form>
-                            <Button
-                                variant="link"
-                                title="Advanced search"
-                                aria-label="Advanced search"
-                                onClick={() => this.setState({ showAdvancedSearch: true })}
-                            >
+                            <AdvancedSearchButton variant="link" title="Advanced search">
                                 <FontAwesomeIcon icon="filter" />
-                            </Button>
-                            <AdvancedSearchModal show={this.state.showAdvancedSearch} onHide={() => this.setState({ showAdvancedSearch: false })} />
+                            </AdvancedSearchButton>
                         </Nav>
                         <Nav id="account-nav" className="nav-segment">
                             {this.context.user ?
@@ -289,16 +287,10 @@ class AppNavbar extends Component {
                                 <FontAwesomeIcon icon="chart-pie" />
                             </Nav.Link>
                         </Nav.Item>
-                        <Button
-                            title="Search"
-                            aria-label="Search"
-                            onClick={() => this.setState({ showAdvancedSearch: true })}
-                        >
-                            <FontAwesomeIcon icon="search" />
-                        </Button>
+                        <AdvancedSearchButton title="Advanced search" />
                         <ThemeController theme={this.state.theme} onThemeChange={(theme) => { this.setState({ theme }) }} />
                     </Nav>
-
+                    <AdvancedSearchModal />
                 </Navbar>
             );
         } else {
