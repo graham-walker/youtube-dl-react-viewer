@@ -181,10 +181,9 @@ router.get('/:extractor/:id', async (req, res) => {
         }
     } catch (err) { return res.sendStatus(500); }
 
-    let activity;
     try {
         if (req.user?.recordWatchHistory) {
-            activity = await new Activity({
+            await new Activity({
                 eventType: 'watched',
                 stopTime: resumeTime ?? 0,
                 userDocument: req.user._id,
@@ -193,7 +192,7 @@ router.get('/:extractor/:id', async (req, res) => {
         }
     } catch (err) { return res.sendStatus(500); }
 
-    delete video._id;
+    if (req.query?.metadata === 'true') delete video._id;
 
     // Get sponsor segments
     let sponsorSegments = null;
@@ -245,7 +244,6 @@ router.get('/:extractor/:id', async (req, res) => {
         similarVideos: stripIds(similarVideos),
         localVideoPath: parsedEnv.EXPOSE_LOCAL_VIDEO_PATH ? slash(path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.videoFile.name)) : null,
         resumeTime,
-        activityDocument: activity?._id,
         sponsorSegments,
         returnYouTubeDislikeVotes,
     });

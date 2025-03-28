@@ -55,7 +55,7 @@ router.post('/clear', async (req, res) => {
     }
 });
 
-router.post('/record', async (req, res) => {
+router.post('/update', async (req, res) => {
     let user;
     try {
         user = await User.findOne({ _id: req.userId });
@@ -68,7 +68,11 @@ router.post('/record', async (req, res) => {
         case 'watched':
             if (!user.recordWatchHistory) return res.sendStatus(405);
             try {
-                let activity = await Activity.findOne({ _id: req.body.activityDocument, userDocument: user._id });
+                let activity = await Activity.findOne({
+                    videoDocument: req.body.videoId,
+                    userDocument: user._id,
+                    eventType: req.body.eventType
+                }).sort({ createdAt: -1 }).exec();
                 let video = await Video.findOne({ _id: activity.videoDocument }, 'duration');
                 activity.stopTime = Math.max(Math.min(req.body.stopTime, video.duration), 0);
                 await activity.save();

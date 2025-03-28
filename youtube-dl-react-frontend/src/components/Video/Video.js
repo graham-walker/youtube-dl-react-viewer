@@ -44,7 +44,6 @@ export default class VideoPage extends Component {
             firstVideos: undefined,
             localVideoPath: undefined,
             resumeTime: undefined,
-            activityDocument: undefined,
             loop: localStorage.getItem('loop') === null ? false : localStorage.getItem('loop') === 'true',
             playNext: localStorage.getItem('playNext') === null ? false : localStorage.getItem('playNext') === 'true',
             spoofContentType: localStorage.getItem('spoofContentType') === null ? false : localStorage.getItem('spoofContentType') === 'true',
@@ -197,7 +196,6 @@ export default class VideoPage extends Component {
                             : this.state.activeTab,
                         localVideoPath: res.data.localVideoPath,
                         resumeTime: res.data.resumeTime,
-                        activityDocument: res.data.activityDocument,
                     }, () => {
                         this.handleResize();
                         document.title = `${res.data.video.title} - ${parsedEnv.REACT_APP_BRAND}`;
@@ -531,12 +529,12 @@ export default class VideoPage extends Component {
     }
 
     saveActivity() {
-        if (this.context.getSetting('recordWatchHistory') && this.state.activityDocument && this.player) {
+        if (this.context.getSetting('recordWatchHistory') && this.state.video && this.player) {
             let stopTime = this.player.currentTime();
             axios
-                .post(`/api/activity/record`, {
+                .post(`/api/activity/update`, {
                     eventType: 'watched',
-                    activityDocument: this.state.activityDocument,
+                    videoId: this.state.video._id,
                     stopTime,
                 })
                 .catch(err => {
