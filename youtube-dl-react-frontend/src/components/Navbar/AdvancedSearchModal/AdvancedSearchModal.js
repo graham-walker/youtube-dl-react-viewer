@@ -1,41 +1,57 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
-import { UserContext } from '../../../contexts/user.context';
 import axios from '../../../utilities/axios.utility';
 import history from '../../../utilities/history.utility';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-export default class AdvancedSearchModal extends Component {
-    static contextType = UserContext;
+const initialQuery = {
+    search: '',
+    uploader: '',
+    playlist: '',
+    job: '',
+    extractor: '',
+    uploadStart: '',
+    uploadEnd: '',
+    sort: 'relevance'
+};
 
+export default class AdvancedSearchModal extends Component {
     constructor(props) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
         this.state = {
-            query: {
-                search: '',
-                uploader: '',
-                playlist: '',
-                job: '',
-                extractor: '',
-                uploadStart: '',
-                uploadEnd: '',
-                sort: 'relevance'
-            },
+            query: { ...initialQuery },
             jobs: [],
             extractors: [],
         };
     }
 
     componentDidMount() {
-        this.getOptions();
+        this.getSearchOptions();
+        this.getStateFromSearch();
+        
+        this.unlisten = history.listen(() => {
+            this.getStateFromSearch();
+        });
+    }
+
+    componentWillUnmount() {
+        if (this.unlisten) {
+            this.unlisten();
+        }
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.show !== this.props.show) this.getOptions();
+        if (prevProps.show !== this.props.show && this.props.show) this.getSearchOptions();
     }
 
-    getOptions() {
+    getStateFromSearch() {
+        if (history.location.pathname === '/' || history.location.pathname === '/videos') {
+            this.setState({ query: Object.assign(initialQuery, Object.fromEntries(new URLSearchParams(window.location.search))) });
+        }
+    }
+
+    getSearchOptions() {
         axios
             .get(`/api/videos/advanced_search_options`)
             .then(res => {
