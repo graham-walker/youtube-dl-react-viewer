@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Alert, Image, Tab, Card, Nav } from 'react-bootstrap';
+import { Form, Button, Alert, Tab, Card, Nav } from 'react-bootstrap';
 import AuthService from '../../services/auth.service';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import { UserContext } from '../../contexts/user.context';

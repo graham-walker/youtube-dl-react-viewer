@@ -56,7 +56,7 @@ const LogFileList = (props) => {
             <Card className="mb-4">
                 <Card.Body>
                     {adminFiles && adminFiles.length > 0 && adminFiles.map((file, i) => {
-                        return <Button key={i} href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/static/admin/${file}`} target="_blank" variant="outline-secondary" className="me-2 mb-2"><FontAwesomeIcon className="text-primary" icon="file" /> {file}</Button>
+                        return <Button key={i} href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/static/admin/${file}`} target="_blank" rel="noopener noreferrer" variant="outline-secondary" className="me-2 mb-2"><FontAwesomeIcon className="text-primary" icon="file" /> {file}</Button>
                     })}
                     <Form.Group className="mb-3">
                         <Form.Label>Console output</Form.Label>

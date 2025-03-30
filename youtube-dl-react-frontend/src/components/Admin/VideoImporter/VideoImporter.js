@@ -88,7 +88,7 @@ class VideoImporter extends Component {
                         <Form onSubmit={this.onSubmit}>
                             <Form.Group className="mb-3" controlId="folder">
                                 <Form.Label>Folder to import</Form.Label>
-                                {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker videos must be copied into the output directory before they can be imported. <a href={parsedEnv.REACT_APP_REPO_URL + '#importing-already-downloaded-videos'} target='_blank'>Learn more</a></Alert>}
+                                {parsedEnv.REACT_APP_RUNNING_IN_DOCKER && <Alert variant='warning'>When installed using Docker videos must be copied into the output directory before they can be imported. <a href={parsedEnv.REACT_APP_REPO_URL + '#importing-already-downloaded-videos'} target="_blank" rel="noopener noreferrer">Learn more</a></Alert>}
                                 <Form.Control
                                     type="text"
                                     placeholder={parsedEnv.REACT_APP_RUNNING_IN_DOCKER ? '/youtube-dl/TEMP' : 'C:\\Your Existing Downloads'}

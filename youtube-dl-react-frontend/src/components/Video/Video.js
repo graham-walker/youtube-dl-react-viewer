@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { Row, Col, Image, Table, Badge, Tab, Nav, Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Image, Table, Badge, Tab, Nav, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MiniStatisticColumn from '../MiniStatisticsColumn/MiniStatisticsColumn';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
 import VideoPreview from '../VideoPreview/VideoPreview';
 import Description from './Description/Description';
 import { UserContext } from '../../contexts/user.context';
-import { bytesToSizeString, abbreviateNumber, resolutionToBadge, getErrorMessage } from '../../utilities/format.utility';
+import { bytesToSizeString, abbreviateNumber, resolutionToBadge } from '../../utilities/format.utility';
 import { getImage, defaultImage } from '../../utilities/image.utility';
 import history from '../../utilities/history.utility';
 import { createSearchLink } from '../../utilities/search.utility';
@@ -19,9 +19,9 @@ import parsedEnv from '../../parse-env';
 import ChatReplay from './ChatReplay/ChatReplay';
 import ConfirmModal from '../ConfirmModal/ConfirmModal';
 import AlertModal from '../AlertModal/AlertModal';
-import ScreenshotButton from './ScreenshotButton/ScreenshotButton';
-import TheaterModeButton from './TheaterModeButton/TheaterModeButton';
-import AudioOnlyModeButton from './AudioOnlyModeButton/AudioOnlyModeButton';
+import './ScreenshotButton/ScreenshotButton';
+import './TheaterModeButton/TheaterModeButton';
+import './AudioOnlyModeButton/AudioOnlyModeButton';
 
 export default class VideoPage extends Component {
     static contextType = UserContext;
@@ -431,7 +431,7 @@ export default class VideoPage extends Component {
                                         const isSafariOrIos = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
                                         errorElement.innerHTML = `
                                             <div>
-                                                ${isSafariOrIos ? `<p>Playback support in Safari/iOS is limited. <a class="text-nowrap" href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more</a></p>` : ''}
+                                                ${isSafariOrIos ? `<p>Playback support in Safari/iOS is limited. <a class="text-nowrap" href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank" rel="noopener noreferrer">Learn more</a></p>` : ''}
                                                 <p class="mb-0">A playback error has occurred, try:</p>
                                                 <ul class="d-inline-block text-start">
                                                     <li><a id="spoofContentTypeLink" href="#">${document.getElementById('spoofContentType').checked ? 'Disabling' : 'Enabling'} spoof type</a></li>
@@ -887,6 +887,7 @@ export default class VideoPage extends Component {
                                 className="mb-2 me-2"
                                 href={`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/api/videos/${this.props.match.params.extractor}/${this.props.match.params.id}/?metadata=true`}
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <FontAwesomeIcon icon="database" /> Metadata
                             </Button>
@@ -898,7 +899,7 @@ export default class VideoPage extends Component {
                                 onClick={() => {
                                     let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
                                     if (!warned && window.innerWidth > 768) {
-                                        this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target='_blank'>Learn more</a></> });
+                                        this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target="_blank" rel="noopener noreferrer">Learn more</a></> });
                                         localStorage.setItem('seenVLCWarning', 'true');
                                     }
                                 }}
@@ -913,7 +914,7 @@ export default class VideoPage extends Component {
                                     onClick={() => {
                                         let warned = localStorage.getItem('seenVLCWarning') === null ? false : localStorage.getItem('seenVLCWarning') === 'true';
                                         if (!warned && window.innerWidth > 768) {
-                                            this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target='_blank'>Learn more</a></> });
+                                            this.setState({ showAlert: true, alertMessage: <>To open videos using the open in VLC button on PC/Mac you must register the vlc:// URL protocol. <a href={parsedEnv.REACT_APP_REPO_URL + '#how-do-i-open-videos-in-vlc'} target="_blank" rel="noopener noreferrer">Learn more</a></> });
                                             localStorage.setItem('seenVLCWarning', 'true');
                                         }
                                     }}

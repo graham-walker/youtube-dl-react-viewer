@@ -52,7 +52,7 @@ const RetryImports = (props) => {
             <h5 id="failed-to-parse-anchor" className="mb-4">Failed to parse</h5>
             <Card className="mb-4">
                 <Card.Body>
-                    <Alert variant="info">Videos that the web app failed to parse. Videos that yt-dlp failed to download will not be listed here. If you are expecting to see a failed video here but do not, refresh the page or check errors.txt or unknown_errors.txt. <a href={parsedEnv.REACT_APP_REPO_URL + '#handling-download-errors'} target='_blank'>Learn more</a></Alert>
+                    <Alert variant="info">Videos that the web app failed to parse. Videos that yt-dlp failed to download will not be listed here. If you are expecting to see a failed video here but do not, refresh the page or check errors.txt or unknown_errors.txt. <a href={parsedEnv.REACT_APP_REPO_URL + '#handling-download-errors'} target="_blank" rel="noopener noreferrer">Learn more</a></Alert>
                     {!!successMessage && <Alert variant="success">{successMessage}</Alert>}
                     {!!errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
                     <Button
