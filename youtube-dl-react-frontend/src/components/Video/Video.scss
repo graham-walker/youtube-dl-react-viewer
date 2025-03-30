@@ -500,8 +500,12 @@ $progress-bar-height: 0.4em;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
-    max-width: calc(100vw - 3.5rem);
+    max-width: calc(398px - 2rem);
     display: block;
+
+    @media screen and (max-width: 1199px) {
+        max-width: calc(100vw - 3.5rem);
+    }
 }
 
 @media screen and (max-width: 575px) {
