@@ -56,7 +56,7 @@
 
 2. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-3. Select the release tag of the version you want to install `git checkout tags/v1.4.1`
+3. Run `git checkout tags/v1.5.0` to select the latest release
 
 4. Copy `.env.sample` to `.env`
 
@@ -76,9 +76,9 @@ Because `.env` is copied to the container during the build step the Docker image
 
 1. Run `git pull`
 
-2. Select the latest release `git checkout tags/v1.4.1`
+2. Run `git checkout tags/v1.5.0` to select the latest release
 
-3. Rebuild and restart the container `docker compose build --no-cache && docker compose up -d`
+3. Run `docker compose build --no-cache && docker compose up -d` to rebuild and restart the container 
 
 ### Manual Installation
 1. [Install Node.js 18.x.x (LTS)](https://nodejs.org/en/download/current/)
@@ -93,7 +93,7 @@ Because `.env` is copied to the container during the build step the Docker image
 
 6. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-7. Select the release tag of the version you want to install `git checkout tags/v1.4.1`
+7. Run `git checkout tags/v1.5.0` to select the latest release
 
 8. Copy `.env.sample` to `.env`
 
@@ -115,7 +115,7 @@ Usage:
 #### Updating a Manual Installation
 1. Run `git pull`
 
-2. Select the latest release `git checkout tags/v1.4.1`
+2. Run `git checkout tags/v1.5.0` to select the latest release
 
 3. Rerun the install script located in `./youtube-dl-react-viewer/scripts`
 
@@ -209,6 +209,15 @@ YOUTUBE_DL_UPDATE_COMMAND           Command run when updating yt-dlp from the
 UPDATE_YOUTUBE_DL_ON_JOB_START      Automatically update yt-dlp when a download
                                     job is started
                                     (true|false, default: false)
+
+AUDIO_ONLY_MODE_ENABLED             Enable usage of audio only mode. Audio
+                                    transcription is done live which may have
+                                    a performance impact on the server
+                                    (true|false, default: true)
+
+AUDIO_ONLY_MODE_BITRATE             Bitrate to use when transcoding the audio
+                                    stream in audio only mode
+                                    (number, default: 128000)
 
 VERBOSE                             Print detailed error messages to the
                                     console
@@ -367,9 +376,20 @@ Override ext                        Sometimes the video file extension cannot
 ## Issues & Limitations
 
 ### Video Browser Playback
-The default format code used to download videos is `bestvideo*+bestaudio/best`. This can sometimes create a video that cannot be played in the web browser, although this is dependent on the specific web browser and device. If a playback error occurs try: [opening the video in VLC](#how-do-i-open-videos-in-vlc), using a different browser, or changing the format code and redownloading.
+The default format code used to download videos is `bestvideo*+bestaudio/best`. This can sometimes create a video that cannot be played in the browser, although this is dependent on the specific browser and device. If a playback error occurs try: 
+- Enabling spoof type
+- [Opening the video in VLC](#how-do-i-open-videos-in-vlc)
+- Using a different browser
+- Changing the format code and redownloading the video
 
-To download videos that may have a greater chance of playing in the web browser try using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best` instead, or enable recode video in the download job settings (may reduce quality).
+To download videos that may have a greater chance of playing in the browser try:
+- Using the format code `(bestvideo[vcodec^=h264]+bestaudio[acodec^=aac])/mp4/best`
+- Enabling recode video in the download job settings. This will reencode the video into a mp4 container if necessary
+
+#### Safari/iOS Playback
+Safari and iOS have limited support for video playback. Generally only mp4 videos downloaded with the h264 vcodec and aac acodec will play correctly. You can try either:
+- Installing the VLC app and [opening videos in VLC](#how-do-i-open-videos-in-vlc)
+- Adding `--postprocessor-args "-c:v libx264 -c:a aac -b:a 192k -movflags +faststart"` to arguments under advanced options in the download job settings. This will reencode the video taking time and reducing quality and therefore is not recommended
 
 ### Missing Videos in Playlists
 yt-dlp only downloads playlist metadata for videos if they were downloaded as part of a playlist. If you have already downloaded a video and then download a playlist that includes the same video it will not appear in the playlist in the web app. To prevent this it is recommended to download playlists before downloading individual videos.
@@ -397,9 +417,9 @@ You can attempt to retry parsing the video from the Failed to parse section of t
 
 ## FAQ
 ### How do I open videos in VLC?
-To open videos from the web app in VLC on PC/Mac you must register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/).
+Videos can be opened in VLC from the web app using the Open in VLC button on the video page. 
 
-No additional configuration is required for iOS/Android devices.
+On PC/Mac you must first register the `vlc://` URL protocol. You can do this with [stefansundin/vlc-protocol](https://github.com/stefansundin/vlc-protocol/). No additional configuration is required on iOS/Android devices.
 
 ### How do I download from websites that require a login?
 
@@ -417,9 +437,9 @@ You can update yt-dlp from the yt-dlp section of the admin panel. This will run 
 
 ### How can I add channel/uploader icons to the web app?
 
-Channel/uploader icons can be downloaded from the Uploader icons section of the admin panel. Icons are downloaded using the third-party service [unavatar.io](https://unavatar.io/). The icon downloader currently only supports YouTube and SoundCloud, other icons must be added manually.
+Navigate to the page of the channel/uploader and click the current icon to replace it.
 
-Icons can be added manually to the `./avatars` folder in the output directory. Use the Network tab of the browser DevTools to find the expected filename. 
+Channel/uploader icons can be automatically downloaded from the Uploader icons section of the admin panel. Icons are downloaded using the third-party service [unavatar.io](https://unavatar.io/). The icon downloader currently only supports YouTube and SoundCloud.
 
 ### I am running out of space. How can I change where videos are downloaded?
 
@@ -438,7 +458,7 @@ If you are deleting videos because you are running low on storage be aware that 
 These files are located at the root of the output directory. You can also view them from the Logs section of the admin panel.
 
 ### How can I watch videos on my phone or other devices?
-You can access the web app from other devices on your local network by replacing `localhost` with the ip address of the device the web app is running on. You can find this by running `ipconfig` on Windows or `ip addr` on Linux. If the web app does not load check if your firewall settings are blocking Node.js or if your router is blocking communication between devices.
+You can access the web app from other devices on your local network by replacing `localhost` with the ip address of the device the web app is running on. You can find this by running `ipconfig` on Windows or `ip addr` on Linux. If the web app does not load check if your firewall settings are blocking Node.js or Docker Desktop Backend, or if your router is blocking communication between devices.
 
 ### How do I backup my database?
 #### Manual Installation
@@ -476,13 +496,15 @@ Planned features in no particular order. There is no timeline or guarantee featu
 **In release 1.4.1**
 - [x] API key system
 
-**For future releases:**
+**In release 1.5.0**
+- [x] Search and sort for uploaders, playlists, and jobs
+- [x] Audio only playback mode
+
+**Planned for future releases:**
 - [ ] Create custom playlists, favorites, comments
-- [ ] Search and sort for uploaders
 - [ ] 3D/VR video playback
 - [ ] Refetch updated metadata for downloaded videos
 - [ ] Twitch chat replay
-- [ ] Stream audio only option
 - [ ] API documentation
 
 ## License/Credits
