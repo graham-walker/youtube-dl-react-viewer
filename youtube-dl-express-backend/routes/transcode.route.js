@@ -47,7 +47,7 @@ router.get('/:extractor/:id/audio_only', async (req, res) => {
         .format('mp3')
         .audioCodec('libmp3lame') // MP3 codec
         .on('error', (err) => {
-            if (parsedEnv.VERBOSE) logError(err);
+            if (parsedEnv.VERBOSE && err?.message !== 'Output stream closed') logError(err);
         })
         .outputOptions([
             `-b:a ${audioBitrate}`,
