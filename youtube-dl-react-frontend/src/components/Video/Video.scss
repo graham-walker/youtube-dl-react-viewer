@@ -481,6 +481,12 @@ $progress-bar-height: 0.4em;
     }
 }
 
+// Style error links
+.vjs-error-display a {
+    color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1)) !important;
+    text-decoration: underline !important;
+}
+
 // Hide player error message X icon on mobile (the playback error message is too long and overlaps the icon)
 @media screen and (max-width: 767px) {
     .vjs-error .vjs-error-display::before {

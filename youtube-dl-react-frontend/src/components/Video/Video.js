@@ -434,13 +434,33 @@ export default class VideoPage extends Component {
                                                 ${isSafariOrIos ? `<p>Playback in Safari/iOS is especially limited. <a href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more<a/></p>` : ''}
                                                 <p class="mb-0">A playback error has occurred, try:</p>
                                                 <ul class="d-inline-block text-start">
-                                                    <li>Clicking the spoof type checkbox</li>
+                                                    <li><a id="spoofContentTypeLink" href="#">Enabling spoof type</a></li>
+                                                    <li><a id="openInVlcLink" href="#">Opening the video in VLC</a></li>
                                                     <li>Using a different browser</li>
-                                                    <li>Clicking the open in VLC button</li>
                                                     <li>Changing the format code and redownloading the video</li>
                                                 </ul>
                                             </div>
                                         `;
+
+                                        const spoofContentTypeLink = document.getElementById('spoofContentTypeLink');
+                                        const openInVlcLink = document.getElementById('openInVlcLink');
+
+                                        const handleSpoofContentTypeLinkClick = (e) => {
+                                            e.preventDefault();
+                                            document.getElementById('spoofContentType').click();
+                                        };
+                                        const handleOpenInVlcLinkClick = (e) => {
+                                            e.preventDefault();
+                                            document.getElementById('openInVlc').click();
+                                        };
+
+                                        spoofContentTypeLink.addEventListener('click', handleSpoofContentTypeLinkClick);
+                                        openInVlcLink.addEventListener('click', handleOpenInVlcLinkClick);
+
+                                        this.player.on('dispose', () => {
+                                            spoofContentTypeLink?.removeEventListener('click', handleSpoofContentTypeLinkClick);
+                                            openInVlcLink?.removeEventListener('click', handleOpenInVlcLinkClick);
+                                        });
                                     }
                                 });
 
@@ -871,6 +891,7 @@ export default class VideoPage extends Component {
                                 <FontAwesomeIcon icon="database" /> Metadata
                             </Button>
                             <Button
+                                id="openInVlc"
                                 variant="primary"
                                 className="mb-2 me-2"
                                 href={'vlc://' + window.location.origin + '/static/videos/' + encodeURIComponent(video.directory).replace(/!/g, '%21') + '/' + encodeURIComponent(video.videoFile.name).replace(/!/g, '%21')}
