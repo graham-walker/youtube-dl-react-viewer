@@ -431,10 +431,10 @@ export default class VideoPage extends Component {
                                         const isSafariOrIos = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
                                         errorElement.innerHTML = `
                                             <div>
-                                                ${isSafariOrIos ? `<p>Playback in Safari/iOS is especially limited. <a href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more<a/></p>` : ''}
+                                                ${isSafariOrIos ? `<p>Playback support in Safari/iOS is limited. <a class="text-nowrap" href="${parsedEnv.REACT_APP_REPO_URL}#safariios-playback" target="_blank">Learn more</a></p>` : ''}
                                                 <p class="mb-0">A playback error has occurred, try:</p>
                                                 <ul class="d-inline-block text-start">
-                                                    <li><a id="spoofContentTypeLink" href="#">Enabling spoof type</a></li>
+                                                    <li><a id="spoofContentTypeLink" href="#">${document.getElementById('spoofContentType').checked ? 'Disabling' : 'Enabling'} spoof type</a></li>
                                                     <li><a id="openInVlcLink" href="#">Opening the video in VLC</a></li>
                                                     <li>Using a different browser</li>
                                                     <li>Changing the format code and redownloading the video</li>
