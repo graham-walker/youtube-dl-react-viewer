@@ -563,7 +563,7 @@ export default class VideoPage extends Component {
     }
 
     saveActivity() {
-        if (this.context.getSetting('recordWatchHistory') && this.state.video && this.player) {
+        if (this.context.user && this.context.getSetting('recordWatchHistory') && this.state.video && this.player) {
             let stopTime = this.player.currentTime();
             axios
                 .post(`/api/activity/update`, {
