@@ -310,7 +310,7 @@ router.get('/:extractor/:id/comments', async (req, res) => {
                 }
                 break;
             default:
-                return res.status(500).json({ error: 'Comment parser for extractor not implemented' });
+                return res.status(500).json({ error: `Comment parser for ${infojsonData?.extractor || 'extractor'} not implemented yet` });
         }
         return res.json({ comments: infojsonData.comments });
     } catch (err) {

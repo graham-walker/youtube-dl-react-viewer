@@ -91,7 +91,7 @@ const VideoPreview = props => {
         }
     } else {
         const uploaderLink = `/uploaders/${video.uploaderDocument?.extractor}/${video.uploaderDocument?.id}`;
-        const videoLink = `/videos/${video.extractor}/${video.id}`;
+        const videoLink = `/videos/${encodeURIComponent(video.extractor)}/${encodeURIComponent(video.id)}`;
 
         const videoInfo = <>
             <div className="media-container">

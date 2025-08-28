@@ -21,7 +21,7 @@ const ChatReplay = (props) => {
 
     useEffect(() => {
         axios
-            .get(`/api/videos/${props.extractor}/${props.id}/livechat`)
+            .get(`/api/videos/${encodeURIComponent(props.extractor)}/${encodeURIComponent(props.id)}/livechat`)
             .then(res => {
                 setLoading(false);
                 setComments(res.data.comments);

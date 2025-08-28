@@ -18,7 +18,7 @@ const CommentsLoader = memo(function CommentsLoader(props) {
     useEffect(() => {
         if (visible) {
             axios
-                .get(`/api/videos/${props.extractor}/${props.id}/comments`)
+                .get(`/api/videos/${encodeURIComponent(props.extractor)}/${encodeURIComponent(props.id)}/comments`)
                 .then(res => {
                     setLoading(false);
                     setComments(res.data.comments);

@@ -185,7 +185,7 @@ export default class VideoList extends Component {
                         }
                         <div className="video-list-random">
                             {!!this.state.randomVideo
-                                ? <Button as={Link} to={`/videos/${this.state.randomVideo.extractor}/${this.state.randomVideo.id}`} >
+                                ? <Button as={Link} to={`/videos/${encodeURIComponent(this.state.randomVideo.extractor)}/${encodeURIComponent(this.state.randomVideo.id)}`} >
                                     <FontAwesomeIcon icon="random" /> Random
                                 </Button>
                                 : <Button disabled={true}>
