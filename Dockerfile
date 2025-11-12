@@ -1,4 +1,4 @@
-FROM node:18.16.0-alpine3.18
+FROM node:20.19.5-alpine3.22
 USER 0
 
 # Get arguments from docker-compose.yaml

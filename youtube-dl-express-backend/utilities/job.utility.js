@@ -84,6 +84,7 @@ export default class Downloader {
                 path.join(parsedEnv.OUTPUT_DIRECTORY, 'archive.txt'),
                 '--cache-dir',
                 path.join(parsedEnv.OUTPUT_DIRECTORY, '.cache'),
+                '--js-runtimes', 'node',
             ];
             if (parsedEnv.VERBOSE) jobArguments.push('--verbose');
             if (parsedEnv.FFMPEG_PATH !== 'ffmpeg') jobArguments.push('--ffmpeg-location', parsedEnv.FFMPEG_PATH);
