@@ -6,7 +6,11 @@ ARG BACKEND_PORT=5000
 ARG YOUTUBE_DL_UPDATE_COMMAND
 
 # Fetch packages required for building, as well as ffmpeg and python3 pip
-RUN apk add --no-cache make build-base python3 ffmpeg py3-pip attr
+RUN apk add --no-cache make build-base python3 ffmpeg py3-pip attr \
+    && pip install --no-cache-dir --break-system-packages pipx
+
+# Add pipx's bin directory to PATH
+ENV PATH="/root/.local/bin:$PATH"
 
 # Add yt-dlp using the update command if specified 
 RUN if [ -n "$YOUTUBE_DL_UPDATE_COMMAND" ]; then eval "$YOUTUBE_DL_UPDATE_COMMAND"; fi
