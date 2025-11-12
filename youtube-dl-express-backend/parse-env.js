@@ -110,6 +110,10 @@ const expected = {
         type: Boolean,
         default: false,
     },
+    'AUTO_DISABLE_DEPRECATED_OPTIONS': {
+        type: Boolean,
+        default: true,
+    },
     'AUDIO_ONLY_MODE_ENABLED': {
         type: Boolean,
         default: true,

@@ -9,6 +9,44 @@ import Tag from '../models/tag.model.js';
 import { incrementStatistics } from './statistic.utility.js';
 import { logLine, logStdout } from './logger.utility.js';
 import { detectShort } from './video.utility.js';
+import { parsedEnv } from '../parse-env.js';
+
+const ytDlpDeprecatedOptions = [
+    '--xattr-set-filesize',
+    '--dump-user-agent',
+    '--youtube-skip-dash-manifest',
+    '--no-youtube-include-dash-manifest',
+    '--youtube-skip-hls-manifest',
+    '--no-youtube-include-hls-manifest',
+    '--youtube-include-dash-manifest',
+    '--no-youtube-skip-dash-manifest',
+    '--youtube-include-hls-manifest',
+    '--no-youtube-skip-hls-manifest',
+    '--youtube-print-sig-code',
+    '--dump-headers',
+    '--dump-intermediate-pages',
+    '--sponskrub',
+    '--no-sponskrub',
+    '--sponskrub-cut',
+    '--no-sponskrub-cut',
+    '--sponskrub-force',
+    '--no-sponskrub-force',
+    '--sponskrub-location',
+    '--sponskrub-args',
+    '--avconv-location',
+    '--prefer-avconv',
+    '--no-prefer-ffmpeg',
+    '--no-prefer-avconv',
+    '--prefer-ffmpeg',
+    '-C',
+    '--call-home',
+    '--no-call-home',
+    '--include-ads',
+    '--no-include-ads',
+    '--write-annotations',
+    '--no-write-annotations',
+    '--cn-verification-proxy',
+]
 
 const updateIds = {
     '1.3.0': 1,
@@ -250,6 +288,32 @@ const applyUpdates = async () => {
     if (hasUpdates) {
         logLine('Completed database upgrade');
         console.timeEnd('Took');
+    }
+
+    // Automatically disable deprecated yt-dlp options in job arguments
+    if (parsedEnv.AUTO_DISABLE_DEPRECATED_OPTIONS) {
+        let jobs = await Job.find({}, 'name arguments');
+        for (let job of jobs) {
+            if (job.arguments) {
+                for (const deprecatedOption of ytDlpDeprecatedOptions) {
+                    let disabledOption = false;
+
+                    job.arguments = job.arguments
+                        .split(/\r?\n/)
+                        .map(line => {
+                            if (line.includes(deprecatedOption) && !/^[#;\]]/.test(line.trimStart())) {
+                                disabledOption = true;
+                                return `#${line} (automatically disabled deprecated yt-dlp option)`;
+                            }
+                            return line;
+                        })
+                        .join('\n');
+
+                    if (disabledOption) logLine(`Disabled deprecated yt-dlp option "${deprecatedOption}" in job "${job.name}"`);
+                }
+                await job.save();
+            }
+        }
     }
 }
 

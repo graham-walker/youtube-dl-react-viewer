@@ -210,6 +210,10 @@ UPDATE_YOUTUBE_DL_ON_JOB_START      Automatically update yt-dlp when a download
                                     job is started
                                     (true|false, default: false)
 
+AUTO_DISABLE_DEPRECATED_OPTIONS     Automatically disable deprecated yt-dlp
+                                    options when the web app is started
+                                    (true|false, default: true)
+
 AUDIO_ONLY_MODE_ENABLED             Enable usage of audio only mode. Audio
                                     transcription is done live which may have
                                     a performance impact on the server

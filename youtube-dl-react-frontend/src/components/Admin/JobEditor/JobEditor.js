@@ -332,7 +332,6 @@ $COOKIES
 # These options are controlled by the web app, any value set here will be overridden:
 #--exec
 #--write-info-json
-#--prefer-ffmpeg
 #--ffmpeg-location 
 #--output
 #--format

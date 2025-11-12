@@ -75,7 +75,6 @@ export default class Downloader {
                 '--exec',
                 execCommand,
                 '--write-info-json',
-                '--prefer-ffmpeg',
                 '--output',
                 `${parsedEnv.OUTPUT_DIRECTORY}/videos/%(extractor)s/%(id)s/${Math.floor(new Date().getTime() / 1000)}/%(title)s - %(uploader)s - %(upload_date)s.%(ext)s`, // %(epoch)s
                 '--format',
@@ -158,7 +157,7 @@ export default class Downloader {
 
 const parseArguments = (text) => {
     let parsedArguments = text.split(/\r?\n/)
-        .filter(argument => (!argument.startsWith('#') && !argument.startsWith(';') && !argument.startsWith(']')))
+        .filter(argument => (!argument.trimStart().startsWith('#') && !argument.trimStart().startsWith(';') && !argument.trimStart().startsWith(']')))
         .map(line => tokenizeArgString(line))
         .filter(argument => argument.length != 0);
 
