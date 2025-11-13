@@ -346,12 +346,10 @@ $COOKIES
 #--all-subs can be replaced with --write-sub or --write-auto-sub
 #--merge-output-format can cause downloads to fail depending on the format code combination used
 --write-description
---write-annotations
 --write-thumbnail
 --all-subs
 --add-metadata
 --xattrs
---xattr-set-filesize
 --no-overwrites
 --no-continue
 --ignore-errors
