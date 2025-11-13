@@ -56,7 +56,7 @@
 
 2. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-3. Run `git checkout tags/v1.5.0` to select the latest release
+3. Run `git checkout tags/v1.5.1` to select the latest release
 
 4. Copy `.env.sample` to `.env`
 
@@ -74,34 +74,39 @@ Because `.env` is copied to the container during the build step the Docker image
 > [!CAUTION]
 > If you are updating a Docker installation from a version prior to 1.4.0 see the [v1.4.0 Docker Update Guide](./docs/v1.4.0-docker-update-guide.md)
 
+> [!CAUTION]
+> When updating a Docker installation to 1.5.1 you may need to also [update the `YOUTUBE_DL_UPDATE_COMMAND` environment variable](https://github.com/graham-walker/youtube-dl-react-viewer/releases/tag/v1.5.1)
+
 1. Run `git pull`
 
-2. Run `git checkout tags/v1.5.0` to select the latest release
+2. Run `git checkout tags/v1.5.1` to select the latest release
 
 3. Run `docker compose build --no-cache && docker compose up -d` to rebuild and restart the container 
 
 ### Manual Installation
-1. [Install Node.js 18.x.x (LTS)](https://nodejs.org/en/download/current/)
+1. [Install Node.js 20.x.x (LTS)](https://nodejs.org/en/download/current/)
 
 2. [Install MongoDB 6.0.x](https://www.mongodb.com/try/download/community)
 
 3. [Install yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation) and add `yt-dlp` to PATH
 
-4. [Install FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
+4. [Install the latest version of Deno](https://docs.deno.com/runtime/getting_started/installation/) and add `deno` to PATH
 
-5. Clone this repository
+5. [Install FFmpeg and FFprobe](https://ffmpeg.org/download.html) and add `ffmpeg` and `ffprobe` to PATH
 
-6. Open the repository directory `cd ./youtube-dl-react-viewer`
+6. Clone this repository
 
-7. Run `git checkout tags/v1.5.0` to select the latest release
+7. Open the repository directory `cd ./youtube-dl-react-viewer`
 
-8. Copy `.env.sample` to `.env`
+8. Run `git checkout tags/v1.5.1` to select the latest release
 
-9. Edit `.env` and [configure the required environment variables](#required-environment-variables)
+9. Copy `.env.sample` to `.env`
 
-10. Run the install script located in `./youtube-dl-react-viewer/scripts`
+10. Edit `.env` and [configure the required environment variables](#required-environment-variables)
 
-11. The web app will be accessible in the browser at `http://localhost:5000`
+11. Run the install script located in `./youtube-dl-react-viewer/scripts`
+
+12. The web app will be accessible in the browser at `http://localhost:5000`
 
 #### Managing the Web App Process
 When installed manually the web app process is managed by [pm2](https://github.com/Unitech/pm2).
@@ -115,7 +120,7 @@ Usage:
 #### Updating a Manual Installation
 1. Run `git pull`
 
-2. Run `git checkout tags/v1.5.0` to select the latest release
+2. Run `git checkout tags/v1.5.1` to select the latest release
 
 3. Rerun the install script located in `./youtube-dl-react-viewer/scripts`
 
@@ -503,6 +508,9 @@ Planned features in no particular order. There is no timeline or guarantee featu
 **In release 1.5.0**
 - [x] Search and sort for uploaders, playlists, and jobs
 - [x] Audio only playback mode
+
+**In release 1.5.1**
+- [x] Support JavaScript runtimes for yt-dlp
 
 **Planned for future releases:**
 - [ ] Create custom playlists, favorites, comments
