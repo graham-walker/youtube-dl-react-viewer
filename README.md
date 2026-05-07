@@ -67,7 +67,7 @@
 7. The web app will be accessible in the browser at `http://localhost:5000`
 
 #### Editing environment variables
-Because `.env` is copied to the container during the build step the Docker image must be rebuilt in order to change environment variables. After editing `.env` run `docker compose build --no-cache app && docker compose up -d` to rebuild.
+Because `.env` is copied to the container during the build step the Docker image must be rebuilt in order to change environment variables. After editing `.env` run `docker compose down --remove-orphans && docker compose build --no-cache && docker compose up -d --force-recreate` to rebuild.
 
 #### Updating a Docker Installation
 
@@ -81,7 +81,7 @@ Because `.env` is copied to the container during the build step the Docker image
 
 2. Run `git checkout tags/v1.5.1` to select the latest release
 
-3. Run `docker compose build --no-cache && docker compose up -d` to rebuild and restart the container 
+3. Run `docker compose down --remove-orphans && docker compose build --no-cache && docker compose up -d --force-recreate` to rebuild and restart the container 
 
 ### Manual Installation
 1. [Install Node.js 20.x.x (LTS)](https://nodejs.org/en/download/current/)
@@ -277,7 +277,7 @@ REACT_APP_LATEST_RELEASE_LINK       Link to the latest release page
 PORT                                Port used by the web app frontend in
                                     development mode
 ```
-If the web app was installed using Docker you will need to rebuild the image after changing any environment variables by running `docker compose build --no-cache app && docker compose up -d`.
+If the web app was installed using Docker you will need to rebuild the image after changing any environment variables by running `docker compose down --remove-orphans && docker compose build --no-cache && docker compose up -d --force-recreate`.
 
 If the web app was installed manually you will need to rebuild the web app frontend after changing environment variables that start with `REACT_APP_`.
 

@@ -356,7 +356,8 @@ $COOKIES
 
 # These options may improve download stability, but are not required:
 #--geo-bypass
-#--force-ipv4
+#--force-ipv4 or --force-ipv6
+#--impersonate Firefox
 #--sleep-interval 5
 #--max-sleep-interval 30
 #--sleep-requests 1
