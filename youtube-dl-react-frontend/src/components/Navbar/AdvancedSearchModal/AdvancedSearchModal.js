@@ -128,7 +128,7 @@ export default class AdvancedSearchModal extends Component {
                                 onChange={this.handleInputChange}
                             />
                         </InputGroup>
-                        <InputGroup className="w-100">
+                        <InputGroup className="half">
                             <InputGroup.Text><FontAwesomeIcon className='me-1' icon="sort" />Sort by</InputGroup.Text>
                             <Form.Select
                                 name="sort"
@@ -152,6 +152,19 @@ export default class AdvancedSearchModal extends Component {
                                 <option value="ratio_dislikes">Dislikes to Likes (Ratio)</option>
                                 <option value="newest_download">Date Downloaded (Newest)</option>
                                 <option value="oldest_download">Date Downloaded (Oldest)</option>
+                            </Form.Select>
+                        </InputGroup>
+                        <InputGroup className="half">
+                            <InputGroup.Text><FontAwesomeIcon className='me-1' icon="video" />Video type</InputGroup.Text>
+                            <Form.Select
+                                name="type"
+                                onChange={this.handleInputChange}
+                                value={this.context.query.type}
+                            >
+                                <option value="all">All</option>
+                                <option value="video">Video</option>
+                                <option value="live">Live stream</option>
+                                <option value="short">Short</option>
                             </Form.Select>
                         </InputGroup>
                         <div className="w-100 mb-0 text-end">

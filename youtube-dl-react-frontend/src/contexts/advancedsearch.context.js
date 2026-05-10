@@ -11,6 +11,7 @@ const initialQuery = {
     uploadStart: '',
     uploadEnd: '',
     sort: 'relevance',
+    type: 'all',
 };
 
 export const AdvancedSearchContext = createContext();

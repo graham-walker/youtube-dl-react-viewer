@@ -23,10 +23,10 @@ import UploaderList from './components/UploaderList/UploaderList';
 import UserProvider from './contexts/user.context';
 import AdvancedSearchProvider from './contexts/advancedsearch.context';
 import history from './utilities/history.utility';
-import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause, faPencil, faHeadphones, faCheck, faSort, faGlobe, faTag, faChartPie } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause, faPencil, faHeadphones, faCheck, faSort, faGlobe, faTag, faChartPie, faBroadcastTower, faBolt } from '@fortawesome/free-solid-svg-icons';
 import parsedEnv from './parse-env';
 
-library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause, faPencil, faHeadphones, faCheck, faSort, faGlobe, faTag, faChartPie);
+library.add(faEye, faCamera, faTachometerAlt, faFile, faExternalLinkAlt, faCaretRight, faUser, faList, faVideo, faClock, faThumbsUp, faThumbsDown, faHourglassEnd, faRandom, faSearch, faFilter, faCalendarAlt, faPlus, faBriefcase, faDownload, faPlay, faHandPaper, faMapMarkerAlt, faTv, faBalanceScale, faHistory, faHeart, faInfoCircle, faDatabase, faCircleHalfStroke, faSun, faMoon, faRotateRight, faRotateLeft, faTrash, faPause, faPencil, faHeadphones, faCheck, faSort, faGlobe, faTag, faChartPie, faBroadcastTower, faBolt);
 
 function App() {
 	return (

@@ -4,7 +4,7 @@ import { Row, Col, Image, Table, Badge, Tab, Nav, Form, Button } from 'react-boo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MiniStatisticColumn from '../MiniStatisticsColumn/MiniStatisticsColumn';
 import PageLoadWrapper from '../PageLoadWrapper/PageLoadWrapper';
-import VideoPreview from '../VideoPreview/VideoPreview';
+import VideoPreview, { VideoTypeBadge } from '../VideoPreview/VideoPreview';
 import Description from './Description/Description';
 import { UserContext } from '../../contexts/user.context';
 import { bytesToSizeString, abbreviateNumber, resolutionToBadge } from '../../utilities/format.utility';
@@ -675,7 +675,7 @@ export default class VideoPage extends Component {
                                 )
                             }
 
-                            <h3 className="text-break">{video.title}</h3>
+                            <h3 className="text-break"><VideoTypeBadge video={video}/>{video.title}</h3>
                             {video.altTitle && <h5 className="text-break text-muted">{video.altTitle}</h5>}
                             <hr />
                             <Row>

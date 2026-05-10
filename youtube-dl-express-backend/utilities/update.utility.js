@@ -1,3 +1,5 @@
+import path from 'path';
+
 import Version from '../models/version.model.js';
 import Video from '../models/video.model.js';
 import Statistic from '../models/statistic.model.js';
@@ -10,6 +12,7 @@ import { incrementStatistics } from './statistic.utility.js';
 import { logLine, logStdout } from './logger.utility.js';
 import { detectShort } from './video.utility.js';
 import { parsedEnv } from '../parse-env.js';
+import { parseInfoJson } from './file.utility.js';
 
 const ytDlpDeprecatedOptions = [
     '--xattr-set-filesize',
@@ -54,6 +57,7 @@ const updateIds = {
     '1.3.1_uploader_use_channel': 3,
     '1.3.1_detect_shorts': 4,
     '1.5.0_detect_three_minute_shorts': 5,
+    '1.5.2_detect_past_livestreams': 6,
 };
 
 const applyUpdates = async () => {
@@ -285,6 +289,33 @@ const applyUpdates = async () => {
         await version.save();
     }
 
+    if (updateIds['1.5.2_detect_past_livestreams'] > version.lastUpdateCompleted) {
+        const total = await Video.countDocuments({});
+        await Video.find({}, 'duration uploadDate width height isShort isLive directory infoFile').cursor().eachAsync(async (video, i) => {
+            const infoFilePath = path.join(parsedEnv.OUTPUT_DIRECTORY, 'videos', video.directory, video.infoFile.name);
+            let infojsonData;
+            try {
+                infojsonData = await parseInfoJson(infoFilePath);
+            } catch (err) {
+                console.error(`Failed to parse video metadata file: ${infoFilePath}`);
+                return;
+            }
+
+            const isShort = detectShort(video); // Short detection was also updated again
+            const isLive = infojsonData.is_live || infojsonData.was_live || false;
+            if (video.isLive !== isLive || video.isShort !== isShort) {
+                video.isLive = isLive;
+                video.isShort = isShort;
+                await video.save();
+            }
+
+            printProgress(`Doing version 1.5.2 migrations 1/1... ${(((i + 1) / total) * 100).toFixed(2)}%`);
+        });
+
+        version.lastUpdateCompleted = updateIds['1.5.2_detect_past_livestreams'];
+        await version.save();
+    }
+
     if (hasUpdates) {
         logLine('Completed database upgrade');
         console.timeEnd('Took');
@@ -435,8 +466,10 @@ const printProgress = (message) => {
     if (process.stdout.isTTY) { // clearLine & cursorTo are not available if there is no TTY (notably in the Docker console)
         process.stdout.clearLine(1);
         process.stdout.cursorTo(0);
+        logStdout(message, true);
+    } else {
+        logStdout(message + '\r\n', true);
     }
-    logStdout(message, true);
 }
 
 export { applyUpdates, recalculateStatistics };

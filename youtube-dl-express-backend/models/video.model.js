@@ -85,7 +85,7 @@ const videoSchema = new mongoose.Schema({
     webpageUrl: { type: String, default: null },
     categories: [{ type: String }],
     tags: [{ type: String }],
-    isLive: { type: Boolean, default: null },
+    isLive: { type: Boolean, default: false },
     startTime: { type: Number, default: null },
     endTime: { type: Number, default: null },
     chapters: [{ type: chapterSchema }],

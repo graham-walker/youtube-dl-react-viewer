@@ -416,6 +416,13 @@ router.post('/delete', async (req, res) => {
             match.playlistDocument = { $in: playlistIds.map(doc => doc._id) }
         }
 
+        if (req.body.type === 'live') match.isLive = true;
+        if (req.body.type === 'short') match.isShort = true;
+        if (req.body.type === 'video') {
+            match.isLive = false;
+            match.isShort = false;
+        }
+
         pipeline.push({ $match: match }, { $project: { _id: 0, extractor: 1, id: 1, directory: 1 } });
 
         const videos = await Video.aggregate(pipeline).exec();

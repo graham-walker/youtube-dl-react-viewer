@@ -25,6 +25,8 @@ export const search = async (query, page, user, filter = {}, relevanceMeans = 'u
         uploaderDocument: 1,
         likeCount: 1,
         dislikeCount: 1,
+        isShort: 1,
+        isLive: 1,
     }
     if (sortField.name !== 'videoFile.filesize') fields[sortField.name] = 1;
 
@@ -119,7 +121,7 @@ export const getTotals = async (query, filter = {}) => {
                 count: { $sum: 1 },
             }
         }]))[0];
-    if (!totals) return {
+    if (!totals) totals = {
         duration: 0,
         filesize: 0,
         count: 0,
@@ -208,7 +210,7 @@ export const getSimilarVideos = async (video, filter = {}) => {
     let videos = await Video
         .find(
             filter,
-            'id extractor duration directory smallResizedThumbnailFile uploadDate videoFile viewCount width height uploaderDocument '
+            'id extractor duration directory smallResizedThumbnailFile uploadDate videoFile viewCount width height uploaderDocument isShort isLive '
             + fields
         )
         .sort({ uploadDate: -1 })

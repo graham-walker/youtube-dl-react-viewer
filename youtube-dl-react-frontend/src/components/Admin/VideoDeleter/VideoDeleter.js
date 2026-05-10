@@ -19,6 +19,7 @@ class VideoDeleter extends Component {
             id: '',
             uploadStart: '',
             uploadEnd: '',
+            type: 'all',
             preventRedownload: false,
             showConfirm: false,
         };
@@ -36,6 +37,7 @@ class VideoDeleter extends Component {
                     id: this.state.id,
                     uploadStart: this.state.uploadStart,
                     uploadEnd: this.state.uploadEnd,
+                    type: this.state.type,
                     preventRedownload: this.state.preventRedownload,
                 }
                 ).then(res => {
@@ -138,6 +140,19 @@ class VideoDeleter extends Component {
                                     value={this.state.uploadEnd}
                                     onChange={this.handleInputChange}
                                 />
+                            </InputGroup>
+                            <InputGroup className="w-100">
+                                <InputGroup.Text><FontAwesomeIcon className='me-1' icon="video" />Video type</InputGroup.Text>
+                                <Form.Select
+                                    name="type"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.type}
+                                >
+                                    <option value="all">All</option>
+                                    <option value="video">Video</option>
+                                    <option value="live">Live stream</option>
+                                    <option value="short">Short</option>
+                                </Form.Select>
                             </InputGroup>
                         </Form>
                         <Form.Group className="mt-2 mb-3" controlId="preventRedownload">

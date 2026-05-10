@@ -38,11 +38,11 @@ router.get('/search/:page', async function (req, res) {
     // Advanced search filtering
     if (mongoose.Types.ObjectId.isValid(req.query.job)) filter.jobDocument = new mongoose.Types.ObjectId(req.query.job);
     if (req.query.extractor && typeof req.query.extractor === 'string') filter.extractor = req.query.extractor;
-    
+
     if (req.query.uploadStart || req.query.uploadEnd) filter.uploadDate = {};
     if (req.query.uploadStart && typeof req.query.uploadStart === 'string' && !isNaN(new Date(req.query.uploadStart).getTime())) filter.uploadDate.$gte = new Date(req.query.uploadStart);
     if (req.query.uploadEnd && typeof req.query.uploadEnd === 'string' && !isNaN(new Date(req.query.uploadEnd).getTime())) filter.uploadDate.$lte = new Date(req.query.uploadEnd);
-    
+
     let uploader = req.query.uploader;
     if (uploader && typeof uploader === 'string') {
         const uploaderIds = await Uploader.find({
@@ -57,6 +57,25 @@ router.get('/search/:page', async function (req, res) {
             name: isQuoted(playlist) ? stripQuotes(playlist) : { $regex: escapeRegex(playlist), $options: 'i' }
         }, '_id');
         filter.playlistDocument = { $in: playlistIds.map(doc => doc._id) }
+    }
+
+    let type = 'all';
+    switch (req.query.type) {
+        case 'live':
+            type = 'live';
+            break;
+        case 'short':
+            type = 'short';
+            break;
+        case 'video':
+            type = 'video';
+            break;
+    }
+    if (type === 'live') filter.isLive = true;
+    if (type === 'short') filter.isShort = true; // Overrides the user hide shorts preference since they were explicitly searched for
+    if (type === 'video') {
+        filter.isLive = false;
+        filter.isShort = false;
     }
 
     // Process search
@@ -90,6 +109,7 @@ router.get('/search/:page', async function (req, res) {
         videos,
         totals,
         randomVideo,
+        type,
     });
 });
 
@@ -116,7 +136,7 @@ router.get('/:extractor/:id', async (req, res) => {
         + ' likeCount dislikeCount subtitleFiles jobDocument mediumResizedThumbnailFile'
         + ' license ageLimit seasonNumber episodeNumber trackNumber discNumber'
         + ' releaseYear format tbr asr vbr vcodec acodec ext playlistId'
-        + ' playlistDocument commentCount downloadedCommentCount ' + fields
+        + ' playlistDocument commentCount downloadedCommentCount isShort isLive ' + fields
         )
             .populate('uploaderDocument playlistDocument jobDocument')
             .exec()
@@ -125,7 +145,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         if (video.uploaderDocument) uploaderVideos = await Video.find(
             Object.assign({ uploaderDocument: video.uploaderDocument }, filter),
-            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument isShort isLive')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ uploadDate: -1 })
             .lean()
@@ -133,7 +153,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         if (video.playlistDocument) playlistVideos = await Video.find(
             Object.assign({ playlistDocument: video.playlistDocument }, filter),
-            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument isShort isLive')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ playlistIndex: 1 })
             .lean()
@@ -141,7 +161,7 @@ router.get('/:extractor/:id', async (req, res) => {
 
         jobVideos = await Video.find(
             Object.assign({ jobDocument: video.jobDocument }, filter),
-            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument')
+            'extractor id title uploader duration directory smallResizedThumbnailFile viewCount width height uploaderDocument isShort isLive')
             .populate('uploaderDocument', 'extractor id name')
             .sort({ dateDownloaded: -1 })
             .lean()

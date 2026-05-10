@@ -116,7 +116,7 @@ const VideoPreview = props => {
                         to={videoLink}
                         title={video.title}
                     >
-                        {video.title}
+                        <VideoTypeBadge video={video} /><span className="video-title-link-text">{video.title}</span>
                     </Link>
                     {video.uploaderDocument && !props.hideUploader &&
                         <Link
@@ -321,6 +321,27 @@ const VideoStatBadge = props => {
         } catch { };
     }
     return <></>;
+}
+
+export const VideoTypeBadge = props => {
+    const video = props.video;
+
+    if (!video.isLive && !video.isShort) return <></>;
+
+    const icon = video.isLive ? 'tower-broadcast' : 'bolt';
+    const label = video.isLive ? 'LIVE' : 'SHORT';
+    const color = video.isLive ? 'danger' : 'light';
+
+    return (
+        <>
+            <Badge
+                bg={color}
+            >
+                <FontAwesomeIcon icon={icon} /><> {label}</>
+            </Badge>
+            {' '}
+        </>
+    );
 }
 
 export default VideoPreview;

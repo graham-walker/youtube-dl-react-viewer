@@ -21,10 +21,10 @@
     overflow: hidden;
     line-height: 1.15em;
     padding-bottom: 0.1em;
-    text-decoration: none;
+    text-decoration: none !important;
 
-    &:hover {
-        text-decoration: underline;
+    &:hover .video-title-link-text {
+        text-decoration: underline !important;
     }
 }
 

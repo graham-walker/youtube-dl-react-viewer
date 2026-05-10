@@ -629,7 +629,7 @@ let debug;
         webpageUrl: infojsonData.webpage_url,
         categories: infojsonData.categories || [],
         tags: infojsonData.tags || [],
-        isLive: infojsonData.is_live,
+        isLive: infojsonData.is_live || infojsonData.was_live || false,
         startTime: infojsonData.start_time,
         endTime: infojsonData.end_time,
         chapters: chapters,

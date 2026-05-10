@@ -17,6 +17,7 @@ export default class VideoList extends Component {
     static contextType = UserContext;
 
     constructor(props) {
+        const parsed = queryString.parse(props.location.search);
         super(props)
         this.state = {
             page: 0,
@@ -27,6 +28,7 @@ export default class VideoList extends Component {
             totals: undefined,
             randomVideo: undefined,
             sort: 'relevance',
+            type: ['all', 'video', 'live', 'short'].includes(parsed.type) ? parsed.type : 'all',
         };
     }
 
@@ -90,7 +92,8 @@ export default class VideoList extends Component {
                         videos: this.state.videos.concat(res.data.videos),
                         totals: res.data.totals ? res.data.totals : this.state.totals,
                         randomVideo: res.data?.randomVideo ?? undefined,
-                        hasMore: (this.state.videos.length + res.data.videos.length) < (res.data.totals?.count ?? this.state.totals.count)
+                        hasMore: (this.state.videos.length + res.data.videos.length) < (res.data.totals?.count ?? this.state.totals.count),
+                        type: res.data.type,
                     });
                 }
             }).catch(err => {
@@ -104,6 +107,15 @@ export default class VideoList extends Component {
     }
 
     render() {
+        let label = 'Video';
+        switch (this.state.type) {
+            case 'short':
+                label = 'Short';
+                break;
+            case 'live':
+                label = 'Live stream';
+                break;
+        }
         const videos = this.state.videos.map(video =>
             <Col
                 style={this.props?.layout === 'playlist' ? { flex: '0 0 100%', maxWidth: '100%' } : {}}
@@ -133,9 +145,9 @@ export default class VideoList extends Component {
                     {!!this.props.stats &&
                         <>
                             <h1>
-                                {this.state.totals.count.toLocaleString()} Video
+                                {this.state.totals.count.toLocaleString()} {label}
                                 {this.state.totals.count !== 1 && 's'}
-                                {this.context.getSetting('hideShorts') && this.state.totals.shorts > 0 && ` (${this.state.totals.shorts.toLocaleString()} short${this.state.totals.shorts === 1 ? '' : 's'} hidden)`}
+                                {this.context.getSetting('hideShorts') && this.state.type !== 'short' && this.state.totals.shorts > 0 && ` (${this.state.totals.shorts.toLocaleString()} short${this.state.totals.shorts === 1 ? '' : 's'} hidden)`}
                             </h1>
                             <h5 className="mb-4">
                                 {bytesToSizeString(this.state.totals.filesize,
