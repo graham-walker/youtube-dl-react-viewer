@@ -293,10 +293,10 @@ export const detectShort = (video) => {
         video.width <= video.height &&
         (
             (
-                video.duration <= 60 &&
+                Math.floor(video.duration) <= 60 &&
                 video.uploadDate.getTime() >= new Date('2021-07-13').getTime() // Shorts were introduced July 13, 2021
             ) || (
-                video.duration <= 180 &&
+                Math.floor(video.duration) <= 180 &&
                 video.uploadDate.getTime() >= new Date('2024-10-15').getTime() // Three minute shorts were introduced October 15, 2024
             )
         )
