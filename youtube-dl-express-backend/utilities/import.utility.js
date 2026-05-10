@@ -67,12 +67,19 @@ export default class Importer {
                             const basename = files[i].name.slice(0, -'.info.json'.length);
                             const videoFileName = basename + '.' + (overrideExt ? overrideExt : infojsonData.ext);
 
+                            const videoPath = path.join(files[i].path, videoFileName);
+                            if (!fs.existsSync(videoPath)) {
+                                logError('File does not exist: ' + videoFileName);
+                                throw new Error('File does not exist: ' + videoFileName);
+                            }
+
                             // Get the downloaded date
                             let downloaded;
                             try {
-                                downloaded = (await fs.stat(path.join(files[i].path, videoFileName))).birthtime.getTime(); // Should default to ctime on OSs that do not support birthtime
+                                const stats = await fs.stat(videoPath);
+                                downloaded = stats?.birthtime?.getTime() || stats.ctime.getTime();
                             } catch (err) {
-                                logError('Unable to get downloaded date from file');
+                                logError('Unable to get downloaded date from file: ' + videoFileName);
                                 throw err;
                             }
 
