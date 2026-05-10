@@ -62,10 +62,14 @@ const updateIds = {
 
 const applyUpdates = async () => {
     let version = await Version.findOne({ accessKey: 'version' });
-    if (!version) version = await new Version().save();
+    if (!version) {
+        version = await new Version();
+        version.lastUpdateCompleted = Math.max(...Object.values(updateIds));
+        version.save();
+    }
 
     let hasUpdates = false;
-    if (Math.max(...Object.keys(updateIds).map(x => updateIds[x]), 0) > version.lastUpdateCompleted) {
+    if (Math.max(...Object.values(updateIds)) > version.lastUpdateCompleted) {
         logLine('Upgrading database. This may take a while...');
         console.time('Took');
         hasUpdates = true;
