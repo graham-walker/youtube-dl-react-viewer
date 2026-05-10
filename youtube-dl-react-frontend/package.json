@@ -32,7 +32,7 @@
     "build": "npm run copy-env && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "copy-env": "copyfiles -f ../.env ./"
+    "copy-env": "node copy-env.js"
   },
   "proxy": "http://localhost:5000/",
   "eslintConfig": {

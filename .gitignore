@@ -20,7 +20,6 @@
 .env.test.local
 .env.production.local
 .env.manual
-.env.docker
 .env
 
 npm-debug.log*

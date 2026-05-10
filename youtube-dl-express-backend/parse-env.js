@@ -2,7 +2,8 @@ import path from 'path';
 import fs from 'fs-extra';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env' });
+const envFile = ['.env.manual', '.env'].find(name => fs.existsSync(path.resolve(import.meta.dirname, '..', name)));
+if (envFile) dotenv.config({ path: path.resolve(import.meta.dirname, '..', envFile) });
 
 const expected = {
     'MONGOOSE_URL': {

@@ -26,8 +26,6 @@ services:
             - "${OUTPUT_DIRECTORY:?Error: OUTPUT_DIRECTORY is not set or is empty}:/youtube-dl"
         depends_on:
             - db
-        env_file:
-            - .env
 volumes:
     ytrv_db:
 networks:

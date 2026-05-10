@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "pm2 start pm2.config.json",
-    "dev": "nodemon --require dotenv/config index.js",
-    "exec": "node --require dotenv/config exec.js",
-    "import": "node --require dotenv/config import.js",
+    "dev": "nodemon index.js",
+    "exec": "node exec.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Graham Walker",

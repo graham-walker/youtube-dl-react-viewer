@@ -19,6 +19,9 @@ RUN if [ -n "$YOUTUBE_DL_UPDATE_COMMAND" ]; then eval "$YOUTUBE_DL_UPDATE_COMMAN
 WORKDIR /opt/youtube-dl-react-viewer
 COPY . .
 
+# Delete .env.manual
+RUN rm -f .env.manual
+
 # Throw an error if the .env file does not exist since it contains required values
 RUN if [ ! -f .env ]; then \
         echo "Error: .env file not found!" >&2; \
@@ -48,7 +51,7 @@ WORKDIR /opt/youtube-dl-react-viewer/youtube-dl-express-backend
 
 # Create the entrypoint shell script
 RUN echo '#!/bin/sh' >> docker-entrypoint.sh && \
-    echo 'node --require dotenv/config index.js' >> docker-entrypoint.sh && \
+    echo 'node index.js' >> docker-entrypoint.sh && \
     chmod 755 docker-entrypoint.sh && \
     mv docker-entrypoint.sh /usr/local/bin/
 
