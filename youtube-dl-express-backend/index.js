@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import http from 'http';
 
 import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
@@ -36,9 +37,26 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
         useUnifiedTopology: true,
     });
 
-    // Apply updates when the version number changes
+    const backendPort = parsedEnv.BACKEND_PORT;
+
+    // Start a temporary server that displays the migration status
+    let migrationStatus = 'Doing database migrations, this may take a while...';
+    const tempServer = http.createServer((req, res) => {
+        res.writeHead(503, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store',
+        });
+        res.end(`<!DOCTYPE html><html><head><title>${migrationStatus}</title><meta http-equiv="refresh" content="10"></head><body><p>${migrationStatus}</p></body></html>`);
+    });
+    await new Promise((resolve) => tempServer.listen(backendPort, resolve));
+
+    // Apply updates and recalculate statistics
     await applyUpdates();
+    migrationStatus = 'Recalculating statistics, this may take a while...';
     await recalculateStatistics();
+
+    // Close the temporary server
+    await new Promise((resolve, reject) => tempServer.close((err) => err ? reject(err) : resolve()));
 
     // Create the express server
     const app = express();
@@ -110,7 +128,6 @@ import { applyUpdates, recalculateStatistics } from './utilities/update.utility.
     }
 
     // Start the server
-    const backendPort = parsedEnv.BACKEND_PORT;
     app.listen(backendPort, () => {
         logLine('Server started on port: ' + backendPort);
     });
